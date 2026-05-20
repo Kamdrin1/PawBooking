@@ -42,11 +42,12 @@ export default function SignupPage() {
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) { setError(error.message); setLoading(false); return }
     if (data.user) {
-      await supabase.from('profiles').insert({
+      const { error: profileError } = await supabase.from('profiles').upsert({
         id: data.user.id,
         email,
         business_name: businessName,
-      })
+      }, { onConflict: 'id' })
+      if (profileError) { setError(profileError.message); setLoading(false); return }
     }
     router.push('/onboarding')
   }
