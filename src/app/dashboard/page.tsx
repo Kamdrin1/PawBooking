@@ -7,11 +7,13 @@ interface Appointment {
   id: string
   client_name: string
   client_phone: string
+  client_email: string
   dog_name: string
   dog_breed: string
   appointment_date: string
   appointment_time: string
   status: string
+  notes: string
   services: { name: string; price: number } | null
 }
 
@@ -25,6 +27,7 @@ export default function DashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming'>('today')
+  const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -54,6 +57,12 @@ export default function DashboardPage() {
   async function handleSignOut() {
     await supabase.auth.signOut()
     router.push('/login')
+  }
+
+  async function handleDelete(id: string) {
+    await supabase.from('appointments').delete().eq('id', id)
+    setAppointments(prev => prev.filter(a => a.id !== id))
+    setSelectedAppt(null)
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -172,7 +181,9 @@ export default function DashboardPage() {
               </div>
             ) : (
               (activeTab === 'today' ? todayAppts : upcomingAppts).map(appt => (
-                <div key={appt.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div key={appt.id}
+                  onClick={() => setSelectedAppt(appt)}
+                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-[#D8F3DC] rounded-full flex items-center justify-center text-[#2D6A4F] font-bold text-sm">
                       {appt.client_name.charAt(0)}
@@ -193,6 +204,95 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Appointment Detail Modal */}
+      {selectedAppt && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedAppt(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl"
+            onClick={e => e.stopPropagation()}>
+
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#D8F3DC] rounded-full flex items-center justify-center text-[#2D6A4F] font-bold">
+                  {selectedAppt.client_name.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-bold text-[#1A3329]">{selectedAppt.client_name}</div>
+                  <div className="text-xs text-gray-400">{formatDate(selectedAppt.appointment_date)} at {formatTime(selectedAppt.appointment_time)}</div>
+                </div>
+              </div>
+              <button onClick={() => setSelectedAppt(null)}
+                className="text-gray-400 hover:text-gray-600 transition text-xl font-light">✕</button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+
+              {/* Service */}
+              <div className="bg-[#F4F1EA] rounded-xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-gray-400 mb-1">Service</div>
+                  <div className="font-semibold text-[#1A3329]">{selectedAppt.services?.name || 'Appointment'}</div>
+                </div>
+                <div className="text-xl font-bold text-[#2D6A4F]">${selectedAppt.services?.price || 0}</div>
+              </div>
+
+              {/* Dog Info */}
+              <div>
+                <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Dog</div>
+                <div className="flex gap-2">
+                  <span className="bg-[#D8F3DC] text-[#2D6A4F] text-sm font-semibold px-3 py-1 rounded-full">{selectedAppt.dog_name}</span>
+                  {selectedAppt.dog_breed && <span className="bg-gray-100 text-gray-500 text-sm px-3 py-1 rounded-full">{selectedAppt.dog_breed}</span>}
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              <div>
+                <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Contact</div>
+                <div className="space-y-2">
+                  <a href={`tel:${selectedAppt.client_phone}`}
+                    className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 hover:bg-gray-100 transition">
+                    <span className="text-lg">📞</span>
+                    <span className="text-sm font-medium text-[#1A3329]">{selectedAppt.client_phone}</span>
+                  </a>
+                  {selectedAppt.client_email && (
+                    <a href={`mailto:${selectedAppt.client_email}`}
+                      className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 hover:bg-gray-100 transition">
+                      <span className="text-lg">✉️</span>
+                      <span className="text-sm font-medium text-[#1A3329]">{selectedAppt.client_email}</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Notes */}
+              {selectedAppt.notes && (
+                <div>
+                  <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Notes</div>
+                  <div className="bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-600">{selectedAppt.notes}</div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 pt-0 flex gap-3">
+              <button
+                onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
+                className="flex-1 border border-[#2D6A4F] text-[#2D6A4F] font-semibold py-3 rounded-xl hover:bg-[#D8F3DC] transition text-sm">
+                Edit
+              </button>
+              <button
+                onClick={() => { if (confirm('Delete this appointment?')) handleDelete(selectedAppt.id) }}
+                className="flex-1 border border-red-200 text-red-400 font-semibold py-3 rounded-xl hover:bg-red-50 transition text-sm">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
