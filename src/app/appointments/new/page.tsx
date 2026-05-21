@@ -17,7 +17,9 @@ export default function NewAppointmentPage() {
   const [clientEmail, setClientEmail] = useState('')
   const [dogName, setDogName] = useState('')
   const [dogBreed, setDogBreed] = useState('')
-  const [serviceId, setServiceId] = useState('')
+  const [serviceId, setServiceId] = useState('custom')
+  const [customServiceName, setCustomServiceName] = useState('')
+  const [customServicePrice, setCustomServicePrice] = useState('')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('09:00')
   const [notes, setNotes] = useState('')
@@ -37,6 +39,9 @@ export default function NewAppointmentPage() {
     loadServices()
   }, [])
 
+  const isCustom = serviceId === 'custom'
+  const selectedService = services.find(s => s.id === serviceId)
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -45,6 +50,19 @@ export default function NewAppointmentPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    let finalServiceId = serviceId === 'custom' ? null : serviceId
+
+    // If custom, create a service entry on the fly
+    if (isCustom && customServiceName) {
+      const { data: newService } = await supabase.from('services').insert({
+        profile_id: user.id,
+        name: customServiceName,
+        price: parseFloat(customServicePrice) || 0,
+        duration_minutes: 60,
+      }).select().single()
+      if (newService) finalServiceId = newService.id
+    }
+
     const { error } = await supabase.from('appointments').insert({
       profile_id: user.id,
       client_name: clientName,
@@ -52,7 +70,7 @@ export default function NewAppointmentPage() {
       client_email: clientEmail,
       dog_name: dogName,
       dog_breed: dogBreed,
-      service_id: serviceId || null,
+      service_id: finalServiceId,
       appointment_date: date,
       appointment_time: time,
       notes,
@@ -63,11 +81,8 @@ export default function NewAppointmentPage() {
     router.push('/dashboard')
   }
 
-  const selectedService = services.find(s => s.id === serviceId)
-
   return (
     <div className="min-h-screen bg-[#F4F1EA]">
-      {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4 sticky top-0 z-10">
         <button onClick={() => router.push('/dashboard')}
           className="text-gray-400 hover:text-gray-600 transition text-sm">
@@ -88,7 +103,7 @@ export default function NewAppointmentPage() {
       <div className="max-w-2xl mx-auto p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Client info */}
+          {/* Client Info */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-[#1A3329] mb-4 flex items-center gap-2">
               <span className="w-6 h-6 bg-[#D8F3DC] text-[#2D6A4F] rounded-full text-xs flex items-center justify-center font-bold">1</span>
@@ -108,7 +123,7 @@ export default function NewAppointmentPage() {
                   placeholder="(208) 555-0000" required />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-gray-400 font-normal">(optional — for confirmations)</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-gray-400 font-normal">(optional)</span></label>
                 <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
                   placeholder="jane@email.com" />
@@ -116,7 +131,7 @@ export default function NewAppointmentPage() {
             </div>
           </div>
 
-          {/* Dog info */}
+          {/* Dog Info */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-[#1A3329] mb-4 flex items-center gap-2">
               <span className="w-6 h-6 bg-[#D8F3DC] text-[#2D6A4F] rounded-full text-xs flex items-center justify-center font-bold">2</span>
@@ -138,7 +153,7 @@ export default function NewAppointmentPage() {
             </div>
           </div>
 
-          {/* Service + time */}
+          {/* Service & Time */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-[#1A3329] mb-4 flex items-center gap-2">
               <span className="w-6 h-6 bg-[#D8F3DC] text-[#2D6A4F] rounded-full text-xs flex items-center justify-center font-bold">3</span>
@@ -147,25 +162,41 @@ export default function NewAppointmentPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
-                {services.length === 0 ? (
-                  <div className="text-sm text-gray-400 bg-gray-50 rounded-xl px-4 py-3">
-                    No services set up yet — <button type="button" onClick={() => router.push('/onboarding')} className="text-[#2D6A4F] font-semibold">add services in onboarding</button>
+                <select value={serviceId} onChange={e => setServiceId(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900">
+                  {services.map(s => (
+                    <option key={s.id} value={s.id}>{s.name} — ${s.price} ({s.duration_minutes} min)</option>
+                  ))}
+                  <option value="custom">✏️ Custom / One-off service</option>
+                </select>
+
+                {/* Custom service fields */}
+                {isCustom && (
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Service Name *</label>
+                      <input type="text" value={customServiceName} onChange={e => setCustomServiceName(e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
+                        placeholder="Full Groom" required={isCustom} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                      <input type="number" value={customServicePrice} onChange={e => setCustomServicePrice(e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
+                        placeholder="65" min="0" />
+                    </div>
                   </div>
-                ) : (
-                  <select value={serviceId} onChange={e => setServiceId(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900">
-                    {services.map(s => (
-                      <option key={s.id} value={s.id}>{s.name} — ${s.price} ({s.duration_minutes} min)</option>
-                    ))}
-                  </select>
                 )}
-                {selectedService && (
+
+                {/* Selected service badge */}
+                {!isCustom && selectedService && (
                   <div className="mt-2 flex gap-3">
                     <span className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-semibold px-3 py-1 rounded-full">${selectedService.price}</span>
                     <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-3 py-1 rounded-full">{selectedService.duration_minutes} min</span>
                   </div>
                 )}
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
