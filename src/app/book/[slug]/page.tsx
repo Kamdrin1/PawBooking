@@ -114,40 +114,78 @@ export default function BookingPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
         * { font-family: 'DM Sans', sans-serif; }
+        .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F5F2EB' }}>
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-6" style={{ background: '#D8F3DC' }}>✓</div>
-          <h1 className="text-3xl font-bold mb-3" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>You're booked!</h1>
+      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
+        
+        {/* Background paw prints */}
+        <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+          {[
+            { top: '3%',  left: '2%',  rotate: '-25deg', size: 100, opacity: 0.06 },
+            { top: '8%',  left: '78%', rotate: '40deg',  size: 70,  opacity: 0.05 },
+            { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 0.04 },
+            { top: '20%', left: '88%', rotate: '20deg',  size: 120, opacity: 0.06 },
+            { top: '25%', left: '4%',  rotate: '35deg',  size: 85,  opacity: 0.05 },
+            { top: '35%', left: '58%', rotate: '-40deg', size: 60,  opacity: 0.04 },
+            { top: '42%', left: '18%', rotate: '15deg',  size: 40,  opacity: 0.05 },
+            { top: '48%', left: '85%', rotate: '-20deg', size: 95,  opacity: 0.06 },
+            { top: '55%', left: '2%',  rotate: '50deg',  size: 75,  opacity: 0.05 },
+            { top: '62%', left: '68%', rotate: '-35deg', size: 50,  opacity: 0.04 },
+            { top: '68%', left: '32%', rotate: '25deg',  size: 110, opacity: 0.06 },
+            { top: '75%', left: '92%', rotate: '-15deg', size: 65,  opacity: 0.05 },
+            { top: '78%', left: '10%', rotate: '45deg',  size: 45,  opacity: 0.04 },
+            { top: '85%', left: '52%', rotate: '-30deg', size: 90,  opacity: 0.05 },
+            { top: '90%', left: '75%', rotate: '10deg',  size: 55,  opacity: 0.04 },
+            { top: '93%', left: '22%', rotate: '-45deg', size: 80,  opacity: 0.06 },
+          ].map((paw, i) => (
+            <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
+              style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
+              fill="#1A3329">
+              <ellipse cx="50" cy="70" rx="26" ry="20"/>
+              <ellipse cx="20" cy="44" rx="12" ry="15"/>
+              <ellipse cx="38" cy="33" rx="12" ry="15"/>
+              <ellipse cx="62" cy="33" rx="12" ry="15"/>
+              <ellipse cx="80" cy="44" rx="12" ry="15"/>
+            </svg>
+          ))}
+        </div>
+
+        <div className="text-center max-w-md relative z-10">
+          {/* Circle with paw icon */}
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#D8F3DC' }}>
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
+              <ellipse cx="50" cy="70" rx="26" ry="20"/>
+              <ellipse cx="20" cy="44" rx="12" ry="15"/>
+              <ellipse cx="38" cy="33" rx="12" ry="15"/>
+              <ellipse cx="62" cy="33" rx="12" ry="15"/>
+              <ellipse cx="80" cy="44" rx="12" ry="15"/>
+            </svg>
+          </div>
+
+          <h1 className="playfair text-3xl font-bold mb-3" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>You're booked!</h1>
           <p className="text-base mb-6" style={{ color: '#6B7280' }}>
             Your appointment request has been sent to <strong style={{ color: '#1A3329' }}>{profile.business_name}</strong>. They'll confirm shortly and you'll receive a reminder before your appointment.
           </p>
+
           <div className="rounded-2xl p-5 text-left space-y-3" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Client</span>
-              <span className="font-semibold" style={{ color: '#1A3329' }}>{clientName}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Dog</span>
-              <span className="font-semibold" style={{ color: '#1A3329' }}>{dogName}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Service</span>
-              <span className="font-semibold" style={{ color: '#1A3329' }}>{selectedService?.name}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Date</span>
-              <span className="font-semibold" style={{ color: '#1A3329' }}>{new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Time</span>
-              <span className="font-semibold" style={{ color: '#1A3329' }}>{(() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()}</span>
-            </div>
-            <div style={{ borderTop: '1px solid #EDE9DF', paddingTop: '12px' }} className="flex justify-between text-sm">
-              <span style={{ color: '#9CA3AF' }}>Price</span>
-              <span className="font-bold text-base" style={{ color: '#2D6A4F' }}>${selectedService?.price}</span>
+            {[
+              { label: 'Client', value: clientName },
+              { label: 'Dog', value: dogName },
+              { label: 'Service', value: selectedService?.name },
+              { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) },
+              { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
+            ].map((row, i) => (
+              <div key={i} className="flex justify-between text-sm" style={{ borderBottom: '1px solid #EDE9DF', paddingBottom: '10px' }}>
+                <span style={{ color: '#9CA3AF' }}>{row.label}</span>
+                <span className="font-semibold" style={{ color: '#1A3329' }}>{row.value}</span>
+              </div>
+            ))}
+            <div className="flex justify-between text-sm pt-1">
+              <span className="font-semibold" style={{ color: '#9CA3AF' }}>Price</span>
+              <span className="font-bold text-lg" style={{ color: '#2D6A4F' }}>${selectedService?.price}</span>
             </div>
           </div>
+
           <p className="text-xs mt-4" style={{ color: '#9CA3AF' }}>You'll receive an SMS reminder 24 hours before your appointment.</p>
         </div>
       </div>
