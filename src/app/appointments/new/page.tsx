@@ -92,21 +92,34 @@ function AppointmentForm() {
     if (!user) return
 
     let serviceId = null
-    const existing = services.find(s => s.name.toLowerCase() === serviceName.toLowerCase())
-    if (existing) {
-      if (parseFloat(servicePrice) !== existing.price) {
-        await supabase.from('services').update({ price: parseFloat(servicePrice) || 0 }).eq('id', existing.id)
-      }
-      serviceId = existing.id
-    } else if (serviceName) {
-      const { data: newService } = await supabase.from('services').insert({
-        profile_id: user.id,
-        name: serviceName,
-        price: parseFloat(servicePrice) || 0,
-        duration_minutes: 60,
-      }).select().single()
-      if (newService) serviceId = newService.id
-    }
+const existing = services.find(s => s.name.toLowerCase().trim() === serviceName.toLowerCase().trim())
+if (existing) {
+  // Use existing service, update price if changed
+  if (parseFloat(servicePrice) !== existing.price) {
+    await supabase.from('services').update({ price: parseFloat(servicePrice) || 0 }).eq('id', existing.id)
+  }
+  serviceId = existing.id
+} else if (serviceName.trim()) {
+  // Only create new service if it genuinely doesn't exist
+  const { data: doubleCheck } = await supabase
+    .from('services')
+    .select('id')
+    .eq('profile_id', user.id)
+    .ilike('name', serviceName.trim())
+    .single()
+  
+  if (doubleCheck) {
+    serviceId = doubleCheck.id
+  } else {
+    const { data: newService } = await supabase.from('services').insert({
+      profile_id: user.id,
+      name: serviceName.trim(),
+      price: parseFloat(servicePrice) || 0,
+      duration_minutes: 60,
+    }).select().single()
+    if (newService) serviceId = newService.id
+  }
+}
 
     const apptData = {
       client_name: clientName,
