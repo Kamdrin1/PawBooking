@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Service {
   id: string
@@ -25,19 +25,47 @@ export default function NewAppointmentPage() {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
   const serviceInputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
-    async function loadServices() {
+    async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
-      const { data } = await supabase.from('services').select('*').eq('profile_id', user.id)
-      setServices(data || [])
+
+      // Load saved services
+      const { data: servicesData } = await supabase
+        .from('services').select('*').eq('profile_id', user.id)
+      setServices(servicesData || [])
+
+      // Check if editing
+      const id = searchParams.get('edit')
+      if (id) {
+        setEditId(id)
+        const { data: appt } = await supabase
+          .from('appointments')
+          .select('*, services(name, price)')
+          .eq('id', id)
+          .single()
+        if (appt) {
+          setClientName(appt.client_name || '')
+          setClientPhone(appt.client_phone || '')
+          setClientEmail(appt.client_email || '')
+          setDogName(appt.dog_name || '')
+          setDogBreed(appt.dog_breed || '')
+          setServiceName(appt.services?.name || '')
+          setServicePrice(appt.services?.price?.toString() || '')
+          setDate(appt.appointment_date || '')
+          setTime(appt.appointment_time || '')
+          setNotes(appt.notes || '')
+        }
+      }
     }
-    loadServices()
+    load()
   }, [])
 
   // Close dropdown when clicking outside
@@ -62,7 +90,7 @@ export default function NewAppointmentPage() {
     setShowDropdown(false)
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -70,7 +98,7 @@ export default function NewAppointmentPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // Check if service already exists, otherwise create it
+    // Find or create service
     let serviceId = null
     const existing = services.find(s => s.name.toLowerCase() === serviceName.toLowerCase())
     if (existing) {
@@ -85,8 +113,7 @@ export default function NewAppointmentPage() {
       if (newService) serviceId = newService.id
     }
 
-    const { error } = await supabase.from('appointments').insert({
-      profile_id: user.id,
+    const apptData = {
       client_name: clientName,
       client_phone: clientPhone,
       client_email: clientEmail,
@@ -97,9 +124,23 @@ export default function NewAppointmentPage() {
       appointment_time: time,
       notes,
       status: 'confirmed',
-    })
+    }
 
-    if (error) { setError(error.message); setLoading(false); return }
+    if (editId) {
+      // UPDATE existing appointment
+      const { error } = await supabase
+        .from('appointments')
+        .update(apptData)
+        .eq('id', editId)
+      if (error) { setError(error.message); setLoading(false); return }
+    } else {
+      // INSERT new appointment
+      const { error } = await supabase
+        .from('appointments')
+        .insert({ ...apptData, profile_id: user.id })
+      if (error) { setError(error.message); setLoading(false); return }
+    }
+
     router.push('/dashboard')
   }
 
@@ -118,7 +159,7 @@ export default function NewAppointmentPage() {
             <ellipse cx="62" cy="33" rx="12" ry="15"/>
             <ellipse cx="80" cy="44" rx="12" ry="15"/>
           </svg>
-          <span className="font-bold text-[#1A3329]">New Appointment</span>
+          <span className="font-bold text-[#1A3329]">{editId ? 'Edit Appointment' : 'New Appointment'}</span>
         </div>
       </nav>
 
@@ -252,7 +293,7 @@ export default function NewAppointmentPage() {
 
           <button type="submit" disabled={loading}
             className="w-full bg-[#2D6A4F] text-white rounded-xl py-4 font-semibold text-base hover:bg-[#1A3329] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 shadow-md hover:shadow-lg">
-            {loading ? 'Saving...' : 'Save Appointment 🐾'}
+            {loading ? 'Saving...' : editId ? 'Update Appointment 🐾' : 'Save Appointment 🐾'}
           </button>
         </form>
       </div>
