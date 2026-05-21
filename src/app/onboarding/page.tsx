@@ -63,24 +63,25 @@ export default function OnboardingPage() {
       availability: JSON.stringify({ days: availability, startTime, endTime }),
     }).eq('id', user.id)
 
-    const validServices = services.filter(s => s.name && s.price)
-    
-    for (const s of validServices) {
-      const { data: existing } = await supabase
-        .from('services')
-        .select('id')
-        .eq('profile_id', user.id)
-        .ilike('name', s.name.trim())
-        .single()
+    const validServices = services.filter(s => s.name.trim() && s.price)
 
-      if (existing) {
-        // Update price if service already exists
+    // Get all existing services for this user first
+    const { data: existingServices } = await supabase
+      .from('services')
+      .select('id, name')
+      .eq('profile_id', user.id)
+
+    for (const s of validServices) {
+      const match = (existingServices || []).find(
+        e => e.name.toLowerCase().trim() === s.name.toLowerCase().trim()
+      )
+
+      if (match) {
         await supabase.from('services').update({
           price: parseFloat(s.price),
           duration_minutes: parseInt(s.duration),
-        }).eq('id', existing.id)
+        }).eq('id', match.id)
       } else {
-        // Only insert if it doesn't exist
         await supabase.from('services').insert({
           profile_id: user.id,
           name: s.name.trim(),
