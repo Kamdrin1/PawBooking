@@ -38,29 +38,31 @@ export default function Home() {
       <div style={{ background: '#F5F2EB' }}>
 
         {/* NAVBAR */}
-        <nav className="sticky-nav px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#1A3329' }}>
-              <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
-                <ellipse cx="50" cy="70" rx="26" ry="20"/>
-                <ellipse cx="20" cy="44" rx="12" ry="15"/>
-                <ellipse cx="38" cy="33" rx="12" ry="15"/>
-                <ellipse cx="62" cy="33" rx="12" ry="15"/>
-                <ellipse cx="80" cy="44" rx="12" ry="15"/>
-              </svg>
-            </div>
-            <span className="playfair font-semibold text-base" style={{ color: '#1A3329' }}>PawBooking</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="nav-link">Features</a>
-            <a href="#how" className="nav-link">How It Works</a>
-            <a href="#pricing" className="nav-link">Pricing</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="nav-link">Log in</Link>
-            <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
-          </div>
-        </nav>
+<nav className="sticky-nav">
+  <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
+          <ellipse cx="50" cy="70" rx="26" ry="20"/>
+          <ellipse cx="20" cy="44" rx="12" ry="15"/>
+          <ellipse cx="38" cy="33" rx="12" ry="15"/>
+          <ellipse cx="62" cy="33" rx="12" ry="15"/>
+          <ellipse cx="80" cy="44" rx="12" ry="15"/>
+        </svg>
+      </div>
+      <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+      <a href="#features" className="nav-link">Features</a>
+      <a href="#how" className="nav-link">How It Works</a>
+      <a href="#pricing" className="nav-link">Pricing</a>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <Link href="/login" className="nav-link">Log in</Link>
+      <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
+    </div>
+  </div>
+</nav>
 
         {/* HERO */}
         <section style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
