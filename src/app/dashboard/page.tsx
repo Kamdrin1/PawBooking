@@ -22,12 +22,25 @@ interface Profile {
   plan: string
 }
 
+interface Service {
+  id: string
+  name: string
+  price: number
+  duration_minutes: number
+}
+
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming'>('today')
+  const [activePage, setActivePage] = useState<'dashboard' | 'services'>('dashboard')
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
+  const [newServiceName, setNewServiceName] = useState('')
+  const [newServicePrice, setNewServicePrice] = useState('')
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [serviceError, setServiceError] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
@@ -45,6 +58,12 @@ export default function DashboardPage() {
         .order('appointment_date', { ascending: true })
         .order('appointment_time', { ascending: true })
       setAppointments(apptData || [])
+      const { data: serviceData } = await supabase
+        .from('services')
+        .select('*')
+        .eq('profile_id', user.id)
+        .order('name', { ascending: true })
+      setServices(serviceData || [])
       setLoading(false)
     }
     load()
@@ -59,6 +78,45 @@ export default function DashboardPage() {
     await supabase.from('appointments').delete().eq('id', id)
     setAppointments(prev => prev.filter(a => a.id !== id))
     setSelectedAppt(null)
+  }
+
+  async function handleAddService() {
+    setServiceError('')
+    if (!newServiceName.trim()) { setServiceError('Service name is required'); return }
+    const duplicate = services.find(s => s.name.toLowerCase() === newServiceName.toLowerCase().trim())
+    if (duplicate) { setServiceError(`"${newServiceName}" already exists`); return }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data, error } = await supabase.from('services').insert({
+      profile_id: user.id,
+      name: newServiceName.trim(),
+      price: parseFloat(newServicePrice) || 0,
+      duration_minutes: 60,
+    }).select().single()
+    if (error) { setServiceError(error.message); return }
+    setServices(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+    setNewServiceName('')
+    setNewServicePrice('')
+  }
+
+  async function handleUpdateService() {
+    if (!editingService) return
+    setServiceError('')
+    const duplicate = services.find(s => s.name.toLowerCase() === editingService.name.toLowerCase().trim() && s.id !== editingService.id)
+    if (duplicate) { setServiceError(`"${editingService.name}" already exists`); return }
+    const { error } = await supabase.from('services').update({
+      name: editingService.name.trim(),
+      price: editingService.price,
+    }).eq('id', editingService.id)
+    if (error) { setServiceError(error.message); return }
+    setServices(prev => prev.map(s => s.id === editingService.id ? editingService : s).sort((a, b) => a.name.localeCompare(b.name)))
+    setEditingService(null)
+  }
+
+  async function handleDeleteService(id: string) {
+    if (!confirm('Delete this service?')) return
+    await supabase.from('services').delete().eq('id', id)
+    setServices(prev => prev.filter(s => s.id !== id))
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -110,7 +168,6 @@ export default function DashboardPage() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
         body { background: #F5F2EB; }
         .playfair { font-family: 'Playfair Display', serif; }
-        .dm-sans { font-family: 'DM Sans', sans-serif; }
         * { font-family: 'DM Sans', sans-serif; }
         .nav-item { transition: all 0.15s ease; }
         .nav-item:hover { background: rgba(45,106,79,0.08); color: #1A3329; }
@@ -131,14 +188,16 @@ export default function DashboardPage() {
         .action-btn { transition: all 0.15s ease; }
         .action-btn:hover { background: #EDE9DF; }
         .scrollbar-none::-webkit-scrollbar { display: none; }
+        .service-row { border-bottom: 1px solid #EDE9DF; transition: background 0.15s; }
+        .service-row:hover { background: #F5F2EB; }
+        .service-row:last-child { border-bottom: none; }
+        input:focus, textarea:focus { outline: none; border-color: #2D6A4F !important; box-shadow: 0 0 0 3px rgba(45,106,79,0.08); }
       `}</style>
 
-      <div className="min-h-screen flex dm-sans" style={{ background: '#F5F2EB' }}>
+      <div className="min-h-screen flex" style={{ background: '#F5F2EB' }}>
 
         {/* SIDEBAR */}
         <aside className="w-60 flex-shrink-0 flex flex-col sticky top-0 h-screen" style={{ background: '#FDFBF7', borderRight: '1px solid #EDE9DF' }}>
-          
-          {/* Logo area */}
           <div className="px-6 pt-8 pb-6" style={{ borderBottom: '1px solid #EDE9DF' }}>
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#1A3329' }}>
@@ -159,24 +218,28 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Nav links */}
           <nav className="flex-1 px-4 py-5 space-y-1">
             {[
-              { label: 'Dashboard', emoji: '▤', active: true },
-              { label: 'Appointments', emoji: '📅', active: false },
-              { label: 'Clients', emoji: '👥', active: false },
-              { label: 'Settings', emoji: '⚙', active: false },
+              { label: 'Dashboard', emoji: '▤', page: 'dashboard' },
+              { label: 'Appointments', emoji: '📅', page: 'appointments' },
+              { label: 'Clients', emoji: '👥', page: 'clients' },
+              { label: 'Edit Services', emoji: '✂️', page: 'services' },
+              { label: 'Settings', emoji: '⚙', page: 'settings' },
             ].map((item, i) => (
               <button key={i}
-                className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left ${item.active ? 'nav-active' : ''}`}
-                style={{ color: item.active ? 'white' : '#6B7280' }}>
+                onClick={() => {
+                  if (item.page === 'dashboard' || item.page === 'services') {
+                    setActivePage(item.page as 'dashboard' | 'services')
+                  }
+                }}
+                className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left ${activePage === item.page ? 'nav-active' : ''}`}
+                style={{ color: activePage === item.page ? 'white' : '#6B7280' }}>
                 <span className="text-base">{item.emoji}</span>
                 {item.label}
               </button>
             ))}
           </nav>
 
-          {/* Sign out */}
           <div className="px-4 pb-6" style={{ borderTop: '1px solid #EDE9DF', paddingTop: '16px' }}>
             <button onClick={handleSignOut}
               className="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-left"
@@ -189,132 +252,236 @@ export default function DashboardPage() {
         {/* MAIN */}
         <main className="flex-1 overflow-auto scrollbar-none">
 
-          {/* Header */}
-          <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
-            <div>
-              <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>
-                {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}
-              </h1>
-              <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-              </p>
-            </div>
-            <button onClick={() => router.push('/appointments/new')}
-              className="btn-new flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
-              + New Appointment
-            </button>
-          </header>
-
-          <div className="px-8 py-7 space-y-6 max-w-5xl">
-
-            {/* STAT CARDS */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="stat-card rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>Today</div>
-                <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>{todayAppts.length}</div>
-                <div className="text-sm" style={{ color: '#6B7280' }}>Appointments</div>
-              </div>
-
-              <div className="stat-card rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>This Month</div>
-                <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>{thisMonthAppts.length}</div>
-                <div className="text-sm" style={{ color: '#6B7280' }}>Total bookings</div>
-              </div>
-
-              <div className="stat-card rounded-2xl p-6" style={{ background: '#1A3329', border: '1px solid #1A3329' }}>
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(216,243,220,0.6)' }}>Revenue</div>
-                <div className="playfair text-5xl font-semibold mb-1 text-white" style={{ fontFamily: 'Playfair Display, serif' }}>${monthRevenue}</div>
-                <div className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Est. this month</div>
-              </div>
-            </div>
-
-            {/* QUICK ACTIONS */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+          {/* DASHBOARD PAGE */}
+          {activePage === 'dashboard' && (
+            <>
+              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
                 <div>
-                  <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329' }}>Your Booking Link</div>
-                  <div className="text-xs" style={{ color: '#9CA3AF' }}>Share this with clients</div>
+                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>
+                    {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}
+                  </h1>
+                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
                 </div>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`); alert('Copied!') }}
-                  className="action-btn px-4 py-2 rounded-xl text-sm font-semibold"
-                  style={{ background: '#F5F2EB', color: '#2D6A4F', border: '1px solid #D8F3DC' }}>
-                  Copy Link
+                <button onClick={() => router.push('/appointments/new')}
+                  className="btn-new flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+                  + New Appointment
                 </button>
-              </div>
+              </header>
 
-              <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-                <div>
-                  <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329' }}>SMS Reminders</div>
-                  <div className="text-xs" style={{ color: '#9CA3AF' }}>Auto-sending 24hr before</div>
+              <div className="px-8 py-7 space-y-6 max-w-5xl">
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="stat-card rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>Today</div>
+                    <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>{todayAppts.length}</div>
+                    <div className="text-sm" style={{ color: '#6B7280' }}>Appointments</div>
+                  </div>
+                  <div className="stat-card rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>This Month</div>
+                    <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>{thisMonthAppts.length}</div>
+                    <div className="text-sm" style={{ color: '#6B7280' }}>Total bookings</div>
+                  </div>
+                  <div className="stat-card rounded-2xl p-6" style={{ background: '#1A3329', border: '1px solid #1A3329' }}>
+                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(216,243,220,0.6)' }}>Revenue</div>
+                    <div className="playfair text-5xl font-semibold mb-1 text-white" style={{ fontFamily: 'Playfair Display, serif' }}>${monthRevenue}</div>
+                    <div className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Est. this month</div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: '#D8F3DC', color: '#1A5C36' }}>
-                  <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#2D6A4F' }} />
-                  Active
-                </div>
-              </div>
-            </div>
 
-            {/* APPOINTMENTS TABLE */}
-            <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-              
-              {/* Tabs */}
-              <div className="flex" style={{ borderBottom: '1px solid #EDE9DF' }}>
-                {(['today', 'upcoming'] as const).map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)}
-                    className={`tab-btn flex-1 py-4 text-sm px-6 text-left ${activeTab === tab ? 'tab-active-style' : ''}`}
-                    style={{ color: activeTab === tab ? '#1A3329' : '#9CA3AF' }}>
-                    {tab === 'today' ? `Today  ·  ${todayAppts.length}` : `Upcoming  ·  ${upcomingAppts.length}`}
-                  </button>
-                ))}
-              </div>
-
-              {/* Rows */}
-              {displayAppts.length === 0 ? (
-                <div className="py-20 text-center">
-                  <div className="text-4xl mb-4">🐾</div>
-                  <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No appointments {activeTab === 'today' ? 'today' : 'coming up'}</div>
-                  <div className="text-sm mb-6" style={{ color: '#9CA3AF' }}>Add one to fill your schedule</div>
-                  <button onClick={() => router.push('/appointments/new')}
-                    className="btn-new px-6 py-2.5 rounded-xl text-white text-sm font-semibold">
-                    Add Appointment
-                  </button>
+                {/* Quick actions */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                    <div>
+                      <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329' }}>Your Booking Link</div>
+                      <div className="text-xs" style={{ color: '#9CA3AF' }}>Share this with clients</div>
+                    </div>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`); alert('Copied!') }}
+                      className="action-btn px-4 py-2 rounded-xl text-sm font-semibold"
+                      style={{ background: '#F5F2EB', color: '#2D6A4F', border: '1px solid #D8F3DC' }}>
+                      Copy Link
+                    </button>
+                  </div>
+                  <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                    <div>
+                      <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329' }}>SMS Reminders</div>
+                      <div className="text-xs" style={{ color: '#9CA3AF' }}>Auto-sending 24hr before</div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: '#D8F3DC', color: '#1A5C36' }}>
+                      <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#2D6A4F' }} />
+                      Active
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                displayAppts.map(appt => {
-                  const color = getAvatarColor(appt.client_name)
-                  return (
-                    <div key={appt.id} onClick={() => setSelectedAppt(appt)}
-                      className="appt-row flex items-center justify-between px-6 py-4 cursor-pointer">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                          style={{ background: color.bg, color: color.text }}>
-                          {getInitials(appt.client_name)}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{appt.client_name}</div>
-                          <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
-                            <span>{appt.dog_name}</span>
-                            {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
+
+                {/* Appointments */}
+                <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  <div className="flex" style={{ borderBottom: '1px solid #EDE9DF' }}>
+                    {(['today', 'upcoming'] as const).map(tab => (
+                      <button key={tab} onClick={() => setActiveTab(tab)}
+                        className={`tab-btn flex-1 py-4 text-sm px-6 text-left ${activeTab === tab ? 'tab-active-style' : ''}`}
+                        style={{ color: activeTab === tab ? '#1A3329' : '#9CA3AF' }}>
+                        {tab === 'today' ? `Today  ·  ${todayAppts.length}` : `Upcoming  ·  ${upcomingAppts.length}`}
+                      </button>
+                    ))}
+                  </div>
+
+                  {displayAppts.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <div className="text-4xl mb-4">🐾</div>
+                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No appointments {activeTab === 'today' ? 'today' : 'coming up'}</div>
+                      <div className="text-sm mb-6" style={{ color: '#9CA3AF' }}>Add one to fill your schedule</div>
+                      <button onClick={() => router.push('/appointments/new')}
+                        className="btn-new px-6 py-2.5 rounded-xl text-white text-sm font-semibold">
+                        Add Appointment
+                      </button>
+                    </div>
+                  ) : (
+                    displayAppts.map(appt => {
+                      const color = getAvatarColor(appt.client_name)
+                      return (
+                        <div key={appt.id} onClick={() => setSelectedAppt(appt)}
+                          className="appt-row flex items-center justify-between px-6 py-4 cursor-pointer">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                              style={{ background: color.bg, color: color.text }}>
+                              {getInitials(appt.client_name)}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{appt.client_name}</div>
+                              <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
+                                <span>{appt.dog_name}</span>
+                                {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            {activeTab === 'upcoming' && (
+                              <div className="text-sm" style={{ color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>
+                            )}
+                            <div className="text-right">
+                              <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
+                              {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
+                            </div>
+                            <div style={{ color: '#D1D5DB' }}>›</div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        {activeTab === 'upcoming' && (
-                          <div className="text-sm" style={{ color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>
-                        )}
-                        <div className="text-right">
-                          <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
-                          {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
-                        </div>
-                        <div style={{ color: '#D1D5DB' }}>›</div>
-                      </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* SERVICES PAGE */}
+          {activePage === 'services' && (
+            <>
+              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
+                <div>
+                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Edit Services</h1>
+                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage the services you offer and their prices</p>
+                </div>
+              </header>
+
+              <div className="px-8 py-7 max-w-2xl space-y-6">
+
+                {/* Add new service */}
+                <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Add a Service</h2>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
+                      <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)}
+                        placeholder="Full Groom"
+                        className="w-full px-4 py-3 rounded-xl text-sm"
+                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
                     </div>
-                  )
-                })
-              )}
-            </div>
-          </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
+                      <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)}
+                        placeholder="65"
+                        className="w-full px-4 py-3 rounded-xl text-sm"
+                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
+                    </div>
+                  </div>
+                  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
+                  <button onClick={handleAddService}
+                    className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+                    + Add Service
+                  </button>
+                </div>
+
+                {/* Services list */}
+                <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  <div className="px-6 py-4" style={{ borderBottom: '1px solid #EDE9DF' }}>
+                    <h2 className="font-semibold text-sm" style={{ color: '#1A3329' }}>Your Services ({services.length})</h2>
+                  </div>
+
+                  {services.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <div className="text-3xl mb-3">✂️</div>
+                      <div className="text-sm" style={{ color: '#9CA3AF' }}>No services added yet</div>
+                    </div>
+                  ) : (
+                    services.map(service => (
+                      <div key={service.id} className="service-row px-6 py-4">
+                        {editingService?.id === service.id ? (
+                          <div className="flex items-center gap-3">
+                            <input type="text" value={editingService.name}
+                              onChange={e => setEditingService({ ...editingService, name: e.target.value })}
+                              className="flex-1 px-3 py-2 rounded-lg text-sm"
+                              style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+                            <input type="number" value={editingService.price}
+                              onChange={e => setEditingService({ ...editingService, price: parseFloat(e.target.value) || 0 })}
+                              className="w-24 px-3 py-2 rounded-lg text-sm"
+                              style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+                            <button onClick={handleUpdateService}
+                              className="px-4 py-2 rounded-lg text-xs font-semibold text-white"
+                              style={{ background: '#1A3329' }}>Save</button>
+                            <button onClick={() => setEditingService(null)}
+                              className="px-4 py-2 rounded-lg text-xs font-semibold"
+                              style={{ background: '#F5F2EB', color: '#6B7280' }}>Cancel</button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: '#D8F3DC' }}>✂️</div>
+                              <div>
+                                <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{service.name}</div>
+                                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Fixed price</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <span className="font-bold text-sm" style={{ color: '#2D6A4F' }}>${service.price}</span>
+                              <button onClick={() => setEditingService(service)}
+                                className="text-xs px-3 py-1.5 rounded-lg transition-all"
+                                style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
+                                Edit
+                              </button>
+                              <button onClick={() => handleDeleteService(service.id)}
+                                className="text-xs px-3 py-1.5 rounded-lg transition-all"
+                                style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  💡 These services appear as options when adding appointments and on your public booking page. Prices are locked for clients.
+                </p>
+              </div>
+            </>
+          )}
         </main>
       </div>
 
@@ -327,7 +494,6 @@ export default function DashboardPage() {
             style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}
             onClick={e => e.stopPropagation()}>
 
-            {/* Modal header */}
             <div className="flex items-center justify-between p-6" style={{ borderBottom: '1px solid #EDE9DF' }}>
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold"
@@ -340,12 +506,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <button onClick={() => setSelectedAppt(null)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
                 style={{ background: '#F5F2EB', color: '#6B7280' }}>✕</button>
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Service */}
               <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: '#F5F2EB' }}>
                 <div>
                   <div className="text-xs uppercase tracking-widest font-medium mb-1" style={{ color: '#9CA3AF' }}>Service</div>
@@ -354,7 +519,6 @@ export default function DashboardPage() {
                 <div className="playfair text-2xl font-semibold" style={{ color: '#2D6A4F', fontFamily: 'Playfair Display, serif' }}>${selectedAppt.services?.price || 0}</div>
               </div>
 
-              {/* Dog */}
               <div>
                 <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Dog</div>
                 <div className="flex gap-2 flex-wrap">
@@ -363,7 +527,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Contact */}
               <div>
                 <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Contact</div>
                 <div className="space-y-2">
@@ -384,7 +547,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Notes */}
               {selectedAppt.notes && (
                 <div>
                   <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Notes</div>
@@ -395,7 +557,6 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Modal footer */}
             <div className="flex gap-3 px-6 pb-6">
               <button onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
                 className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
@@ -405,10 +566,8 @@ export default function DashboardPage() {
                 Edit Appointment
               </button>
               <button onClick={() => { if (confirm('Delete this appointment?')) handleDelete(selectedAppt.id) }}
-                className="px-5 py-3 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#FECACA')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#FEE2E2')}>
+                className="px-5 py-3 rounded-xl text-sm font-semibold"
+                style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
                 Delete
               </button>
             </div>

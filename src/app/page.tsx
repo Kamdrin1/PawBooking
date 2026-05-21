@@ -3,292 +3,370 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F5F2EB] font-sans">
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+        * { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        .playfair { font-family: 'Playfair Display', serif; }
+        body { background: #F5F2EB; }
+        .nav-link { color: #4B5563; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.15s; }
+        .nav-link:hover { color: #1A3329; }
+        .btn-primary { background: #1A3329; color: white; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-primary:hover { background: #2D6A4F; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(26,51,41,0.25); }
+        .btn-outline { background: transparent; color: #1A3329; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: 1.5px solid #D1C9B8; }
+        .btn-outline:hover { border-color: #1A3329; background: rgba(26,51,41,0.04); }
+        .btn-cta { background: #E8704A; color: white; font-weight: 600; font-size: 15px; padding: 16px 36px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-cta:hover { background: #d4603a; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(232,112,74,0.35); }
+        .card { background: #FDFBF7; border: 1px solid #EDE9DF; border-radius: 20px; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(26,51,41,0.08); }
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #2D6A4F; }
+        .divider { height: 1px; background: #EDE9DF; }
+        .price-large { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; color: #1A3329; line-height: 1; }
+        .testimonial-quote { font-style: italic; color: #4B5563; font-size: 14px; line-height: 1.7; }
+        .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(245,242,235,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid #EDE9DF; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: #FDFBF7; border: 1px solid #EDE9DF; border-radius: 50px; padding: 8px 16px; font-size: 13px; color: #4B5563; font-weight: 500; }
+        .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #2D6A4F; display: inline-block; }
+        .step-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(45,106,79,0.15); color: #2D6A4F; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pro-card { background: #1A3329; border-radius: 20px; }
+        .check { color: #2D6A4F; font-weight: 600; margin-right: 8px; }
+        .check-white { color: #D8F3DC; font-weight: 600; margin-right: 8px; }
+        .cross { color: #D1C9B8; margin-right: 8px; }
+        .star { color: #F59E0B; }
+      `}</style>
 
-      {/* NAVBAR */}
-      <nav className="flex items-center justify-between px-8 py-5 bg-[#F5F2EB] sticky top-0 z-50 border-b border-black/5">
-        <div className="flex items-center gap-2">
-          <span className="text-[#2D6A4F] text-xl">🐾</span>
-          <span className="font-bold text-[#1A3329] text-lg">PawBooking</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#1A3329]">
-          <a href="#features" className="hover:text-[#2D6A4F] transition">Features</a>
-          <a href="#how" className="hover:text-[#2D6A4F] transition">How It Works</a>
-          <a href="#pricing" className="hover:text-[#2D6A4F] transition">Pricing</a>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium text-[#1A3329] hover:text-[#2D6A4F] transition">Log in</Link>
-          <Link href="/signup" className="bg-[#2D6A4F] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#1A3329] transition">Start Free Trial</Link>
-        </div>
-      </nav>
+      <div style={{ background: '#F5F2EB' }}>
 
-      {/* HERO */}
-      <section className="flex flex-col items-center text-center px-6 pt-20 pb-16">
-        <div className="bg-[#2D6A4F]/10 text-[#2D6A4F] text-sm font-medium px-4 py-1.5 rounded-full mb-8">
-          🐾 Now live — start your free 30-day trial today
-        </div>
-        <h1 className="text-5xl md:text-7xl font-black text-[#1A3329] leading-tight max-w-4xl mb-6">
-          Stop losing <span className="text-[#2D6A4F]">$85</span> every time<br />
-          a client <span className="text-[#E8704A] italic">forgets.</span>
-        </h1>
-        <p className="text-lg text-[#4A5568] max-w-xl mb-10">
-          PawBooking handles your bookings, sends automatic SMS reminders before every appointment, and requests Google reviews after every job — completely on autopilot.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/signup" className="bg-[#2D6A4F] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#1A3329] transition text-sm">
-            Start Free Trial — No Card Required
-          </Link>
-          <Link href="/login" className="border border-[#1A3329]/20 text-[#1A3329] font-semibold px-8 py-4 rounded-full hover:bg-[#1A3329]/5 transition text-sm">
-            Log In →
-          </Link>
-        </div>
-        <p className="text-xs text-[#4A5568] mt-4">30 days free. No credit card needed. Cancel anytime.</p>
-      </section>
-
-      {/* STATS BAR */}
-      <section className="bg-[#1A3329] py-8 px-6">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { stat: '−34%', label: 'Fewer no-shows' },
-            { stat: '$85+', label: 'Saved per no-show' },
-            { stat: '4.9★', label: 'Avg Google rating' },
-            { stat: '10min', label: 'To get set up' },
-          ].map((s, i) => (
-            <div key={i}>
-              <div className="text-2xl font-black text-white">{s.stat}</div>
-              <div className="text-white/50 text-xs mt-1">{s.label}</div>
+        {/* NAVBAR */}
+        <nav className="sticky-nav px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#1A3329' }}>
+              <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
+                <ellipse cx="50" cy="70" rx="26" ry="20"/>
+                <ellipse cx="20" cy="44" rx="12" ry="15"/>
+                <ellipse cx="38" cy="33" rx="12" ry="15"/>
+                <ellipse cx="62" cy="33" rx="12" ry="15"/>
+                <ellipse cx="80" cy="44" rx="12" ry="15"/>
+              </svg>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* PROBLEM SECTION */}
-      <section className="px-6 py-20 max-w-5xl mx-auto">
-        <p className="text-center text-sm font-semibold text-[#2D6A4F] uppercase tracking-widest mb-4">The Real Cost</p>
-        <h2 className="text-3xl md:text-4xl font-black text-[#1A3329] text-center mb-4">
-          You're running a grooming business solo.<br />Admin shouldn't eat your day.
-        </h2>
-        <p className="text-center text-[#4A5568] max-w-xl mx-auto mb-12">
-          Every no-show, every forgotten review request, every booking taken over text — it adds up to real money and real hours out of your week.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { icon: '📵', title: 'No-shows kill your day', desc: 'You drove there. You set up. They forgot. That\'s 2 hours and a full appointment slot gone.', cost: '↑ $85–$150 lost per no-show' },
-            { icon: '⭐', title: 'Reviews don\'t ask themselves', desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews' },
-            { icon: '📱', title: 'Booking over text is chaos', desc: 'Back-and-forth messages, double bookings, missed requests. There\'s a better way.', cost: '↑ Hours of admin every single week' },
-          ].map((p, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 border border-black/5 shadow-sm">
-              <div className="text-3xl mb-4">{p.icon}</div>
-              <h3 className="font-bold text-[#1A3329] text-lg mb-2">{p.title}</h3>
-              <p className="text-[#4A5568] text-sm mb-4">{p.desc}</p>
-              <span className="text-xs font-semibold text-[#E8704A]">{p.cost}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" className="bg-white px-6 py-20">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-center text-sm font-semibold text-[#2D6A4F] uppercase tracking-widest mb-4">What You Get</p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#1A3329] text-center mb-4">Everything you need. Nothing you don't.</h2>
-          <p className="text-center text-[#4A5568] max-w-xl mx-auto mb-12">Three tools that work together to save you time, cut no-shows, and grow your reputation — automatically.</p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: '📅',
-                tag: 'Basic + Pro',
-                title: 'Smart Online Booking',
-                desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.',
-                bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'],
-              },
-              {
-                icon: '💬',
-                tag: 'Basic + Pro',
-                title: 'Automatic SMS Reminders',
-                desc: 'PawBooking texts your clients automatically — 24 hours before and 2 hours before their appointment.',
-                bullets: ['24hr + 2hr reminders by default', 'You choose the timing', 'Clients can confirm or cancel by reply', 'Proven to cut no-shows by 34%'],
-              },
-              {
-                icon: '⭐',
-                tag: 'Pro Only',
-                title: 'Auto Review Requests',
-                desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Smart and completely automatic.',
-                bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'],
-              },
-            ].map((f, i) => (
-              <div key={i} className="bg-[#F5F2EB] rounded-2xl p-6 border border-black/5">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl">{f.icon}</span>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${f.tag === 'Pro Only' ? 'bg-[#E8704A]/10 text-[#E8704A]' : 'bg-[#2D6A4F]/10 text-[#2D6A4F]'}`}>{f.tag}</span>
-                </div>
-                <h3 className="font-bold text-[#1A3329] text-lg mb-2">{f.title}</h3>
-                <p className="text-[#4A5568] text-sm mb-4">{f.desc}</p>
-                <ul className="space-y-1">
-                  {f.bullets.map((b, j) => (
-                    <li key={j} className="text-xs text-[#4A5568] flex items-start gap-2">
-                      <span className="text-[#2D6A4F] mt-0.5">✓</span> {b}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <span className="playfair font-semibold text-base" style={{ color: '#1A3329' }}>PawBooking</span>
           </div>
-        </div>
-      </section>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="nav-link">Features</a>
+            <a href="#how" className="nav-link">How It Works</a>
+            <a href="#pricing" className="nav-link">Pricing</a>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="nav-link">Log in</Link>
+            <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
+          </div>
+        </nav>
 
-      {/* HOW IT WORKS */}
-      <section id="how" className="bg-[#1A3329] px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#2D6A4F] text-sm font-semibold uppercase tracking-widest mb-4">Simple Setup</p>
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-12">Up and running in 10 minutes.</h2>
-          <div className="grid md:grid-cols-3 gap-8 text-left">
+        {/* HERO */}
+        <section style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
+          <div className="hero-badge" style={{ marginBottom: '32px', display: 'inline-flex' }}>
+            <span className="hero-badge-dot" />
+            Now live — start your free 30-day trial today
+          </div>
+          <h1 className="playfair" style={{ fontSize: 'clamp(48px, 8vw, 80px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.1, marginBottom: '24px' }}>
+            Stop losing <span style={{ color: '#2D6A4F' }}>$85</span> every<br />
+            time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
+          </h1>
+          <p style={{ fontSize: '18px', color: '#6B7280', maxWidth: '520px', margin: '0 auto 40px', lineHeight: 1.7 }}>
+            PawBooking handles your bookings, sends automatic SMS reminders before every appointment, and requests Google reviews after every job — completely on autopilot.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
+            <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 32px' }}>
+              Start Free Trial — No Card Required
+            </Link>
+            <Link href="/login" className="btn-outline" style={{ fontSize: '15px', padding: '16px 32px' }}>
+              Log In →
+            </Link>
+          </div>
+          <p style={{ fontSize: '13px', color: '#9CA3AF' }}>30 days free. No credit card needed. Cancel anytime.</p>
+        </section>
+
+        {/* STATS BAR */}
+        <div style={{ background: '#1A3329', padding: '32px 24px' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', textAlign: 'center' }}>
             {[
-              { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 10 minutes.' },
-              { step: '2', title: 'Share your booking link', desc: 'Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That\'s your whole marketing setup.' },
-              { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
+              { stat: '−34%', label: 'Fewer no-shows' },
+              { stat: '$85+', label: 'Saved per no-show' },
+              { stat: '4.9★', label: 'Avg Google rating' },
+              { stat: '10min', label: 'To get set up' },
             ].map((s, i) => (
               <div key={i}>
-                <div className="w-10 h-10 rounded-full bg-[#2D6A4F] text-white font-bold flex items-center justify-center mb-4">{s.step}</div>
-                <h3 className="font-bold text-white text-lg mb-2">{s.title}</h3>
-                <p className="text-white/60 text-sm">{s.desc}</p>
+                <div className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: 'white', marginBottom: '4px' }}>{s.stat}</div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* TESTIMONIALS */}
-      <section className="px-6 py-20 max-w-5xl mx-auto">
-        <p className="text-center text-sm font-semibold text-[#2D6A4F] uppercase tracking-widest mb-4">Early Feedback</p>
-        <h2 className="text-3xl md:text-4xl font-black text-[#1A3329] text-center mb-12">Groomers love it.</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: 'I was losing two or three appointments a week to no-shows. Since using PawBooking I\'ve had maybe two in two months. The math is insane.' },
-            { name: 'Jamie R.', role: 'Solo Groomer · Austin, TX', quote: 'The review thing is genius. I gained 26 Google reviews in my first month. My phone is ringing from people who found me because of my rating.' },
-            { name: 'Maria T.', role: 'Mobile Groomer · Denver, CO', quote: 'I used to take bookings over text like an animal. Now clients book themselves and I wake up to a full schedule. Worth every penny.' },
-          ].map((t, i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 border border-black/5 shadow-sm">
-              <div className="text-yellow-400 mb-3 text-sm">⭐⭐⭐⭐⭐</div>
-              <p className="text-[#4A5568] text-sm mb-4 italic">"{t.quote}"</p>
-              <div>
-                <div className="font-bold text-[#1A3329] text-sm">{t.name}</div>
-                <div className="text-xs text-[#4A5568]">{t.role}</div>
-              </div>
+        {/* PROBLEM SECTION */}
+        <section style={{ background: '#F5F2EB', padding: '80px 24px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div className="section-label" style={{ marginBottom: '12px' }}>The Real Cost</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '16px', lineHeight: 1.2 }}>
+                You're running a grooming business solo.<br />Admin shouldn't eat your day.
+              </h2>
+              <p style={{ color: '#6B7280', maxWidth: '500px', margin: '0 auto', fontSize: '15px', lineHeight: 1.7 }}>
+                Every no-show, every forgotten review request, every booking taken over text — it adds up to real money and real hours out of your week.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+              {[
+                { icon: '📵', title: 'No-shows kill your day', desc: 'You drove there. You set up. They forgot. That\'s 2 hours and a full appointment slot gone.', cost: '↑ $85–$150 lost per no-show', costColor: '#E8704A' },
+                { icon: '⭐', title: 'Reviews don\'t ask themselves', desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews', costColor: '#E8704A' },
+                { icon: '📱', title: 'Booking over text is chaos', desc: 'Back-and-forth messages, double bookings, missed requests. There\'s a better way.', cost: '↑ Hours of admin every single week', costColor: '#E8704A' },
+              ].map((p, i) => (
+                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
+                  <div style={{ fontSize: '28px', marginBottom: '16px' }}>{p.icon}</div>
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '10px', fontSize: '16px' }}>{p.title}</h3>
+                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.7, marginBottom: '16px' }}>{p.desc}</p>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: p.costColor }}>{p.cost}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="bg-white px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-center text-sm font-semibold text-[#2D6A4F] uppercase tracking-widest mb-4">Simple Pricing</p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#1A3329] text-center mb-4">One app. Two plans. No surprises.</h2>
-          <p className="text-center text-[#4A5568] mb-12">Cancel anytime. No contracts. Starts at less than $1 a day.</p>
-          <div className="grid md:grid-cols-2 gap-6">
+        <div className="divider" />
 
-            {/* Basic */}
-            <div className="bg-[#F5F2EB] rounded-2xl p-8 border border-black/5">
-              <h3 className="font-bold text-[#1A3329] text-xl mb-1">Basic</h3>
-              <p className="text-[#4A5568] text-sm mb-4">Perfect for getting started</p>
-              <div className="text-5xl font-black text-[#1A3329] mb-6">$29<span className="text-base font-normal text-[#4A5568]">/mo</span></div>
-              <div className="space-y-2 mb-6">
-                {[
-                  { text: 'Online booking page', included: true },
-                  { text: 'SMS appointment reminders', included: true },
-                  { text: 'Up to 30 appointments/mo', included: true },
-                  { text: 'Instant booking notifications', included: true },
-                  { text: 'Auto review requests', included: false },
-                  { text: 'Client history & dog notes', included: false },
-                  { text: 'Smart personalized messages', included: false },
-                  { text: 'Unlimited appointments', included: false },
-                ].map((f, i) => (
-                  <div key={i} className={`flex items-center gap-2 text-sm ${f.included ? 'text-[#1A3329]' : 'text-[#4A5568]/40 line-through'}`}>
-                    <span className={f.included ? 'text-[#2D6A4F]' : 'text-[#4A5568]/40'}>
-                      {f.included ? '✓' : '✗'}
-                    </span>
-                    {f.text}
+        {/* FEATURES */}
+        <section id="features" style={{ background: '#FDFBF7', padding: '80px 24px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div className="section-label" style={{ marginBottom: '12px' }}>What You Get</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '16px' }}>
+                Everything you need. Nothing you don't.
+              </h2>
+              <p style={{ color: '#6B7280', maxWidth: '480px', margin: '0 auto', fontSize: '15px', lineHeight: 1.7 }}>
+                Three tools that work together to save you time, cut no-shows, and grow your reputation — automatically.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+              {[
+                {
+                  icon: '📅', tag: 'Basic + Pro', tagColor: '#2D6A4F', tagBg: '#D8F3DC',
+                  title: 'Smart Online Booking',
+                  desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.',
+                  bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'],
+                },
+                {
+                  icon: '💬', tag: 'Basic + Pro', tagColor: '#2D6A4F', tagBg: '#D8F3DC',
+                  title: 'Automatic SMS Reminders',
+                  desc: 'PawBooking texts your clients automatically — 24 hours before and 2 hours before their appointment.',
+                  bullets: ['24hr + 2hr reminders by default', 'You choose the timing', 'Clients can confirm or cancel by reply', 'Proven to cut no-shows by 34%'],
+                },
+                {
+                  icon: '⭐', tag: 'Pro Only', tagColor: '#E8704A', tagBg: '#FDE8D8',
+                  title: 'Auto Review Requests',
+                  desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Completely automatic.',
+                  bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'],
+                },
+              ].map((f, i) => (
+                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <span style={{ fontSize: '28px' }}>{f.icon}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px', background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
                   </div>
-                ))}
-              </div>
-              <Link href="/signup" className="block text-center border-2 border-[#2D6A4F] text-[#2D6A4F] font-semibold py-3 rounded-xl hover:bg-[#2D6A4F] hover:text-white transition">
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* Pro */}
-            <div className="bg-[#2D6A4F] rounded-2xl p-8 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#E8704A] text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
-                ⭐ Most Popular
-              </div>
-              <h3 className="font-bold text-white text-xl mb-1">Pro</h3>
-              <p className="text-white/60 text-sm mb-4">For groomers serious about growth</p>
-              <div className="text-5xl font-black text-white mb-6">$49<span className="text-base font-normal text-white/60">/mo</span></div>
-              <div className="space-y-2 mb-6">
-                {[
-                  'Everything in Basic',
-                  'Unlimited appointments',
-                  'Auto review requests after every job',
-                  'Client history & dog notes',
-                  'Smart personalized reminder messages',
-                  'Priority support',
-                  'Early access to new features',
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-white/80">
-                    <span className="text-white">✓</span> {f}
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '10px', fontSize: '16px' }}>{f.title}</h3>
+                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.7, marginBottom: '16px' }}>{f.desc}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {f.bullets.map((b, j) => (
+                      <div key={j} style={{ fontSize: '13px', color: '#6B7280', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                        <span style={{ color: '#2D6A4F', fontWeight: 700, flexShrink: 0 }}>✓</span> {b}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Link href="/signup" className="block text-center bg-white text-[#2D6A4F] font-semibold py-3 rounded-xl hover:bg-[#F5F2EB] transition">
-                Start Free Trial
-              </Link>
+                </div>
+              ))}
             </div>
-
           </div>
-          <p className="text-center text-sm text-[#4A5568] mt-6">
-            🐾 Both plans include a <strong>30-day free trial</strong>. No credit card required to start.
-          </p>
-        </div>
-      </section>
+        </section>
 
-      {/* FINAL CTA */}
-      <section className="bg-[#1A3329] px-6 py-20">
-        <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-            Ready to stop losing money to no-shows?
-          </h2>
-          <p className="text-white/60 mb-8">
-            Join PawBooking today. 30 days free, no credit card needed, cancel anytime.
-          </p>
-          <Link href="/signup" className="inline-block bg-[#E8704A] text-white font-semibold px-10 py-4 rounded-full hover:bg-[#d4603a] transition text-sm">
-            Start Your Free Trial →
-          </Link>
-          <div className="flex flex-wrap justify-center gap-6 mt-6 text-white/40 text-xs">
-            <span>✓ 30 days free</span>
-            <span>✓ No credit card needed</span>
-            <span>✓ Cancel anytime</span>
-            <span>✓ Setup in 10 minutes</span>
-          </div>
-        </div>
-      </section>
+        <div className="divider" />
 
-      {/* FOOTER */}
-      <footer className="bg-[#1A3329] border-t border-white/10 px-6 py-8">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[#2D6A4F]">🐾</span>
-            <span className="font-bold text-white">PawBooking</span>
+        {/* HOW IT WORKS */}
+        <section id="how" style={{ background: '#1A3329', padding: '80px 24px' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+            <div className="section-label" style={{ marginBottom: '12px', color: '#D8F3DC' }}>Simple Setup</div>
+            <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: 'white', marginBottom: '48px' }}>
+              Up and running in 10 minutes.
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '32px', textAlign: 'left' }}>
+              {[
+                { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 10 minutes.' },
+                { step: '2', title: 'Share your booking link', desc: 'Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That\'s your whole marketing setup.' },
+                { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
+              ].map((s, i) => (
+                <div key={i}>
+                  <div className="step-circle" style={{ marginBottom: '16px', background: 'rgba(216,243,220,0.15)', color: '#D8F3DC' }}>{s.step}</div>
+                  <h3 style={{ fontWeight: 700, color: 'white', marginBottom: '8px', fontSize: '15px' }}>{s.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', lineHeight: 1.7 }}>{s.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="text-white/40 text-xs">© 2026 PawBooking. Built for dog groomers everywhere.</p>
-          <div className="flex gap-6 text-white/40 text-xs">
-            <a href="#" className="hover:text-white transition">Privacy</a>
-            <a href="#" className="hover:text-white transition">Terms</a>
-            <a href="mailto:hello@pawbooking.com" className="hover:text-white transition">Contact</a>
-          </div>
-        </div>
-      </footer>
+        </section>
 
-    </div>
+        {/* TESTIMONIALS */}
+        <section style={{ background: '#F5F2EB', padding: '80px 24px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div className="section-label" style={{ marginBottom: '12px' }}>Early Feedback</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329' }}>
+                Groomers love it.
+              </h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+              {[
+                { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: 'I was losing two or three appointments a week to no-shows. Since using PawBooking I\'ve had maybe two in two months. The math is insane.' },
+                { name: 'Jamie R.', role: 'Solo Groomer · Austin, TX', quote: 'The review thing is genius. I gained 26 Google reviews in my first month. My phone is ringing from people who found me because of my rating.' },
+                { name: 'Maria T.', role: 'Mobile Groomer · Denver, CO', quote: 'I used to take bookings over text like an animal. Now clients book themselves and I wake up to a full schedule. Worth every penny.' },
+              ].map((t, i) => (
+                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
+                  <div className="star" style={{ fontSize: '13px', marginBottom: '14px' }}>★★★★★</div>
+                  <p className="testimonial-quote" style={{ marginBottom: '20px' }}>"{t.quote}"</p>
+                  <div style={{ borderTop: '1px solid #EDE9DF', paddingTop: '16px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#1A3329' }}>{t.name}</div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{t.role}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <div className="divider" />
+
+        {/* PRICING */}
+        <section id="pricing" style={{ background: '#FDFBF7', padding: '80px 24px' }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div className="section-label" style={{ marginBottom: '12px' }}>Simple Pricing</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
+                One app. Two plans. No surprises.
+              </h2>
+              <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. Starts at less than $1 a day.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+              {/* Basic */}
+              <div className="card" style={{ padding: '32px' }}>
+                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '20px', marginBottom: '4px' }}>Basic</h3>
+                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>Perfect for getting started</p>
+                <div style={{ marginBottom: '24px' }}>
+                  <span className="playfair price-large">$29</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+                  {[
+                    { text: 'Online booking page', included: true },
+                    { text: 'SMS appointment reminders', included: true },
+                    { text: 'Up to 30 appointments/mo', included: true },
+                    { text: 'Instant booking notifications', included: true },
+                    { text: 'Auto review requests', included: false },
+                    { text: 'Client history & dog notes', included: false },
+                    { text: 'Unlimited appointments', included: false },
+                  ].map((f, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: f.included ? '#1A3329' : '#D1C9B8', textDecoration: f.included ? 'none' : 'line-through' }}>
+                      <span style={{ marginRight: '8px', color: f.included ? '#2D6A4F' : '#D1C9B8', fontWeight: 700 }}>{f.included ? '✓' : '✗'}</span>
+                      {f.text}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/signup" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
+                  Start Free Trial
+                </Link>
+              </div>
+
+              {/* Pro */}
+              <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)', background: '#E8704A', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 14px', borderRadius: '0 0 10px 10px', whiteSpace: 'nowrap' }}>
+                  ⭐ Most Popular
+                </div>
+                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px', marginTop: '16px' }}>Pro</h3>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
+                <div style={{ marginBottom: '24px' }}>
+                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$49</span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>/mo</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+                  {[
+                    'Everything in Basic',
+                    'Unlimited appointments',
+                    'Auto review requests after every job',
+                    'Client history & dog notes',
+                    'Smart personalized messages',
+                    'Priority support',
+                    'Early access to new features',
+                  ].map((f, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
+                      <span style={{ marginRight: '8px', color: '#D8F3DC', fontWeight: 700 }}>✓</span>
+                      {f}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/signup" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', background: 'white', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
+                  Start Free Trial
+                </Link>
+              </div>
+
+            </div>
+            <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
+              🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No credit card required to start.
+            </p>
+          </div>
+        </section>
+
+        {/* FINAL CTA */}
+        <section style={{ background: '#1A3329', padding: '80px 24px', textAlign: 'center' }}>
+          <div style={{ maxWidth: '520px', margin: '0 auto' }}>
+            <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 700, color: 'white', marginBottom: '16px', lineHeight: 1.2 }}>
+              Ready to stop losing money to no-shows?
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '32px', fontSize: '15px', lineHeight: 1.7 }}>
+              Join PawBooking today. 30 days free, no credit card needed, cancel anytime.
+            </p>
+            <Link href="/signup" className="btn-cta">
+              Start Your Free Trial →
+            </Link>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '24px', flexWrap: 'wrap' }}>
+              {['✓ 30 days free', '✓ No credit card needed', '✓ Cancel anytime', '✓ Setup in 10 minutes'].map((t, i) => (
+                <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>{t}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FOOTER */}
+        <footer style={{ background: '#1A3329', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '24px 32px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'rgba(216,243,220,0.15)', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="12" height="12" viewBox="0 0 100 100" fill="#D8F3DC">
+                  <ellipse cx="50" cy="70" rx="26" ry="20"/>
+                  <ellipse cx="20" cy="44" rx="12" ry="15"/>
+                  <ellipse cx="38" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="62" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="80" cy="44" rx="12" ry="15"/>
+                </svg>
+              </div>
+              <span className="playfair" style={{ color: 'white', fontWeight: 600, fontSize: '14px' }}>PawBooking</span>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>© 2026 PawBooking. Built for dog groomers everywhere.</p>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              {['Privacy', 'Terms', 'Contact'].map((l, i) => (
+                <a key={i} href="#" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}>{l}</a>
+              ))}
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </>
   )
 }
