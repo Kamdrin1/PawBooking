@@ -96,18 +96,24 @@ function NewAppointmentForm() {
     if (!user) return
 
     let serviceId = null
-    const existing = services.find(s => s.name.toLowerCase() === serviceName.toLowerCase())
-    if (existing) {
-      serviceId = existing.id
-    } else if (serviceName) {
-      const { data: newService } = await supabase.from('services').insert({
-        profile_id: user.id,
-        name: serviceName,
-        price: parseFloat(servicePrice) || 0,
-        duration_minutes: 60,
-      }).select().single()
-      if (newService) serviceId = newService.id
-    }
+const existing = services.find(s => s.name.toLowerCase() === serviceName.toLowerCase())
+if (existing) {
+  // If price changed, update the service price
+  if (parseFloat(servicePrice) !== existing.price) {
+    await supabase.from('services').update({
+      price: parseFloat(servicePrice) || 0
+    }).eq('id', existing.id)
+  }
+  serviceId = existing.id
+} else if (serviceName) {
+  const { data: newService } = await supabase.from('services').insert({
+    profile_id: user.id,
+    name: serviceName,
+    price: parseFloat(servicePrice) || 0,
+    duration_minutes: 60,
+  }).select().single()
+  if (newService) serviceId = newService.id
+}
 
     const apptData = {
       client_name: clientName,
