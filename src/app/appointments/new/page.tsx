@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -10,7 +10,7 @@ interface Service {
   duration_minutes: number
 }
 
-export default function NewAppointmentPage() {
+function NewAppointmentForm() {
   const [services, setServices] = useState<Service[]>([])
   const [clientName, setClientName] = useState('')
   const [clientPhone, setClientPhone] = useState('')
@@ -37,12 +37,10 @@ export default function NewAppointmentPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      // Load saved services
       const { data: servicesData } = await supabase
         .from('services').select('*').eq('profile_id', user.id)
       setServices(servicesData || [])
 
-      // Check if editing
       const id = searchParams.get('edit')
       if (id) {
         setEditId(id)
@@ -68,7 +66,6 @@ export default function NewAppointmentPage() {
     load()
   }, [])
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
@@ -90,7 +87,7 @@ export default function NewAppointmentPage() {
     setShowDropdown(false)
   }
 
-async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -98,7 +95,6 @@ async function handleSubmit(e: React.FormEvent) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // Find or create service
     let serviceId = null
     const existing = services.find(s => s.name.toLowerCase() === serviceName.toLowerCase())
     if (existing) {
@@ -127,14 +123,12 @@ async function handleSubmit(e: React.FormEvent) {
     }
 
     if (editId) {
-      // UPDATE existing appointment
       const { error } = await supabase
         .from('appointments')
         .update(apptData)
         .eq('id', editId)
       if (error) { setError(error.message); setLoading(false); return }
     } else {
-      // INSERT new appointment
       const { error } = await supabase
         .from('appointments')
         .insert({ ...apptData, profile_id: user.id })
@@ -224,7 +218,6 @@ async function handleSubmit(e: React.FormEvent) {
             </h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                {/* Service combobox */}
                 <div className="relative">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
                   <input
@@ -236,7 +229,6 @@ async function handleSubmit(e: React.FormEvent) {
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
                     placeholder="Full Groom, Bath..."
                   />
-                  {/* Dropdown */}
                   {showDropdown && filteredServices.length > 0 && (
                     <div ref={dropdownRef}
                       className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
@@ -251,8 +243,6 @@ async function handleSubmit(e: React.FormEvent) {
                     </div>
                   )}
                 </div>
-
-                {/* Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
                   <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)}
@@ -298,5 +288,13 @@ async function handleSubmit(e: React.FormEvent) {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function NewAppointmentPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F4F1EA] flex items-center justify-center"><div className="text-[#2D6A4F] font-semibold">Loading...</div></div>}>
+      <NewAppointmentForm />
+    </Suspense>
   )
 }
