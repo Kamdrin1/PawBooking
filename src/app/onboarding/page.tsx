@@ -64,15 +64,30 @@ export default function OnboardingPage() {
     }).eq('id', user.id)
 
     const validServices = services.filter(s => s.name && s.price)
-    if (validServices.length > 0) {
-      await supabase.from('services').insert(
-        validServices.map(s => ({
-          profile_id: user.id,
-          name: s.name,
+    
+    for (const s of validServices) {
+      const { data: existing } = await supabase
+        .from('services')
+        .select('id')
+        .eq('profile_id', user.id)
+        .ilike('name', s.name.trim())
+        .single()
+
+      if (existing) {
+        // Update price if service already exists
+        await supabase.from('services').update({
           price: parseFloat(s.price),
           duration_minutes: parseInt(s.duration),
-        }))
-      )
+        }).eq('id', existing.id)
+      } else {
+        // Only insert if it doesn't exist
+        await supabase.from('services').insert({
+          profile_id: user.id,
+          name: s.name.trim(),
+          price: parseFloat(s.price),
+          duration_minutes: parseInt(s.duration),
+        })
+      }
     }
 
     router.push('/dashboard')
