@@ -8,12 +8,15 @@ interface Service {
   name: string
   price: number
   duration_minutes: number
+  payment_type: 'none' | 'deposit' | 'full'
+  deposit_amount: number
 }
 
 interface Profile {
   id: string
   business_name: string
   service_area: string
+  stripe_account_id?: string
 }
 
 export default function BookingPage() {
@@ -68,6 +71,42 @@ export default function BookingPage() {
     setLoading(true)
     setError('')
 
+    const selectedSvc = services.find(s => s.id === serviceId)
+
+    // If payment required, go to Stripe checkout
+    if (selectedSvc && (selectedSvc.payment_type === 'full' || selectedSvc.payment_type === 'deposit')) {
+      const amount = selectedSvc.payment_type === 'full' 
+        ? selectedSvc.price 
+        : selectedSvc.deposit_amount
+
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId,
+          serviceName: selectedSvc.name,
+          amount,
+          groomerStripeId: profile?.stripe_account_id || null,
+          bookingData: {
+            clientName, clientPhone, clientEmail,
+            dogName, dogBreed, date, time, notes,
+            profileId: profile!.id,
+            slug,
+          }
+        })
+      })
+
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setError('Failed to start checkout. Please try again.')
+      setLoading(false)
+      return
+    }
+
+    // No payment required — create appointment directly
     const { error } = await supabase.from('appointments').insert({
       profile_id: profile!.id,
       client_name: clientName,
