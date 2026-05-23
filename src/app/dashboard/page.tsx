@@ -397,32 +397,67 @@ useEffect(() => {
               <div className="px-8 py-7 max-w-2xl space-y-6">
 
                 {/* Add new service */}
-                <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-                  <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Add a Service</h2>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
-                      <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)}
-                        placeholder="Full Groom"
-                        className="w-full px-4 py-3 rounded-xl text-sm"
-                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
-                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
-                      <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)}
-                        placeholder="65"
-                        className="w-full px-4 py-3 rounded-xl text-sm"
-                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
-                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
-                    </div>
-                  </div>
-                  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
-                  <button onClick={handleAddService}
-                    className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
-                    + Add Service
-                  </button>
-                </div>
+<div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+  <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Add a Service</h2>
+  <div className="grid grid-cols-2 gap-3 mb-3">
+    <div>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
+      <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)}
+        placeholder="Full Groom"
+        className="w-full px-4 py-3 rounded-xl text-sm"
+        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
+    </div>
+    <div>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
+      <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)}
+        placeholder="65"
+        className="w-full px-4 py-3 rounded-xl text-sm"
+        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
+    </div>
+  </div>
+
+  {/* Payment type selector */}
+  <div className="mb-3">
+    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
+    <div className="grid grid-cols-3 gap-2">
+      {[
+        { value: 'none', label: '💵 Pay in person', desc: 'No upfront payment' },
+        { value: 'deposit', label: '💳 Deposit', desc: 'Partial payment upfront' },
+        { value: 'full', label: '✅ Full payment', desc: 'Pay full amount upfront' },
+      ].map(opt => (
+        <button key={opt.value} type="button"
+          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
+          className="p-3 rounded-xl text-left transition-all"
+          style={{
+            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
+            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
+          }}>
+          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* Deposit amount field */}
+  {newPaymentType === 'deposit' && (
+    <div className="mb-3">
+      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Deposit Amount ($)</label>
+      <input type="number" value={newDepositAmount} onChange={e => setNewDepositAmount(e.target.value)}
+        placeholder="25"
+        className="w-full px-4 py-3 rounded-xl text-sm"
+        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+    </div>
+  )}
+
+  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
+  <button onClick={handleAddService}
+    className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+    + Add Service
+  </button>
+</div>
 
                 {/* Services list */}
                 <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
