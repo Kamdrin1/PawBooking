@@ -64,36 +64,39 @@ function SuccessContent() {
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {[
-          { top: '5%', left: '3%', rotate: '-25deg', size: 90, opacity: 0.06 },
-          { top: '10%', left: '80%', rotate: '40deg', size: 65, opacity: 0.05 },
-          { top: '25%', left: '90%', rotate: '20deg', size: 110, opacity: 0.06 },
-          { top: '70%', left: '5%', rotate: '50deg', size: 75, opacity: 0.05 },
-          { top: '85%', left: '60%', rotate: '-30deg', size: 85, opacity: 0.05 },
-        ].map((paw, i) => (
-          <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
-            style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
-            fill="#1A3329">
-            <ellipse cx="50" cy="70" rx="26" ry="20"/>
-            <ellipse cx="20" cy="44" rx="12" ry="15"/>
-            <ellipse cx="38" cy="33" rx="12" ry="15"/>
-            <ellipse cx="62" cy="33" rx="12" ry="15"/>
-            <ellipse cx="80" cy="44" rx="12" ry="15"/>
-          </svg>
-        ))}
-      </div>
-      <div className="text-center max-w-md relative z-10">
-        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#D8F3DC' }}>
-          <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
-            <ellipse cx="50" cy="70" rx="26" ry="20"/>
-            <ellipse cx="20" cy="44" rx="12" ry="15"/>
-            <ellipse cx="38" cy="33" rx="12" ry="15"/>
-            <ellipse cx="62" cy="33" rx="12" ry="15"/>
-            <ellipse cx="80" cy="44" rx="12" ry="15"/>
-          </svg>
+  { top: '3%',  left: '2%',  rotate: '-25deg', size: 90,  opacity: 0.06 },
+  { top: '8%',  left: '78%', rotate: '40deg',  size: 65,  opacity: 0.05 },
+  { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 0.04 },
+  { top: '15%', left: '88%', rotate: '20deg',  size: 110, opacity: 0.06 },
+  { top: '20%', left: '4%',  rotate: '35deg',  size: 80,  opacity: 0.05 },
+  { top: '28%', left: '58%', rotate: '-40deg', size: 55,  opacity: 0.04 },
+  { top: '35%', left: '18%', rotate: '15deg',  size: 40,  opacity: 0.05 },
+  { top: '42%', left: '85%', rotate: '-20deg', size: 95,  opacity: 0.06 },
+  { top: '50%', left: '2%',  rotate: '50deg',  size: 70,  opacity: 0.05 },
+  { top: '55%', left: '65%', rotate: '-35deg', size: 50,  opacity: 0.04 },
+  { top: '62%', left: '32%', rotate: '25deg',  size: 110, opacity: 0.06 },
+  { top: '68%', left: '90%', rotate: '-15deg', size: 60,  opacity: 0.05 },
+  { top: '72%', left: '10%', rotate: '45deg',  size: 45,  opacity: 0.04 },
+  { top: '78%', left: '52%', rotate: '-30deg', size: 85,  opacity: 0.05 },
+  { top: '83%', left: '75%', rotate: '10deg',  size: 55,  opacity: 0.04 },
+  { top: '88%', left: '22%', rotate: '-45deg', size: 80,  opacity: 0.06 },
+  { top: '93%', left: '60%', rotate: '30deg',  size: 45,  opacity: 0.05 },
+  { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 0.06 },
+].map((paw, i) => (
+  <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
+    style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
+    fill="#1A3329">
+    <ellipse cx="50" cy="70" rx="26" ry="20"/>
+    <ellipse cx="20" cy="44" rx="12" ry="15"/>
+    <ellipse cx="38" cy="33" rx="12" ry="15"/>
+    <ellipse cx="62" cy="33" rx="12" ry="15"/>
+    <ellipse cx="80" cy="44" rx="12" ry="15"/>
+  </svg>
+))}
         </div>
         <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
-          You're booked & paid!
-        </h1>
+  You're booked!
+</h1>
         <p style={{ color: '#6B7280', marginBottom: '24px', lineHeight: 1.7 }}>
           Your payment was successful and your appointment is confirmed. You'll receive an SMS reminder before your appointment.
         </p>
