@@ -27,6 +27,8 @@ interface Service {
   name: string
   price: number
   duration_minutes: number
+  payment_type: 'none' | 'deposit' | 'full'
+  deposit_amount: number
 }
 
 export default function DashboardPage() {
@@ -43,8 +45,10 @@ export default function DashboardPage() {
   const [serviceError, setServiceError] = useState('')
   const router = useRouter()
   const supabase = createClient()
-
-  useEffect(() => {
+const [newPaymentType, setNewPaymentType] = useState<'none' | 'deposit' | 'full'>('none')
+const [newDepositAmount, setNewDepositAmount] = useState('')
+  
+useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -92,11 +96,15 @@ export default function DashboardPage() {
       name: newServiceName.trim(),
       price: parseFloat(newServicePrice) || 0,
       duration_minutes: 60,
+      payment_type: newPaymentType,
+      deposit_amount: newPaymentType === 'deposit' ? parseFloat(newDepositAmount) || 0 : 0,
     }).select().single()
     if (error) { setServiceError(error.message); return }
     setServices(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewServiceName('')
     setNewServicePrice('')
+    setNewPaymentType('none')
+    setNewDepositAmount('')
   }
 
   async function handleUpdateService() {
