@@ -474,8 +474,10 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center gap-6">
                             <div className="text-sm" style={{ color: '#6B7280' }}>{clientAppts.length} appointment{clientAppts.length !== 1 ? 's' : ''}</div>
-                            <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
-                          </div>
+<div className="flex flex-col items-end gap-1">
+  <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
+  {appt.client_email && <a href={`mailto:${appt.client_email}`} className="text-xs" style={{ color: '#9CA3AF' }}>{appt.client_email}</a>}
+</div>                          </div>
                         </div>
                       )
                     })
