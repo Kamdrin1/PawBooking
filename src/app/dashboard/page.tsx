@@ -20,6 +20,7 @@ interface Appointment {
 interface Profile {
   business_name: string
   plan: string
+  payment_methods: string[]
 }
 
 interface Service {
@@ -538,26 +539,25 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mb-3">
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: 'none', label: '💵 Pay in person', desc: 'No upfront payment' },
-                        { value: 'deposit', label: '💳 Deposit', desc: 'Partial payment upfront' },
-                        { value: 'full', label: '✅ Full payment', desc: 'Pay full amount upfront' },
-                      ].map(opt => (
-                        <button key={opt.value} type="button"
-                          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
-                          className="p-3 rounded-xl text-left transition-all"
-                          style={{
-                            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
-                            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
-                          }}>
-                          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
-                          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
+  <div className="grid grid-cols-2 gap-2">
+    {[
+      ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'none', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
+      ...(profile?.payment_methods?.includes('online') ? [{ value: 'full', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
+    ].map(opt => (
+      <button key={opt.value} type="button"
+        onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
+        className="p-3 rounded-xl text-left transition-all"
+        style={{
+          border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
+          background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
+        }}>
+        <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+        <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
+      </button>
+    ))}
+  </div>
+</div>
 
                   {newPaymentType === 'deposit' && (
                     <div className="mb-3">
@@ -612,7 +612,9 @@ export default function DashboardPage() {
                               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: '#D8F3DC' }}>✂️</div>
                               <div>
                                 <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{service.name}</div>
-                                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Fixed price</div>
+                                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
+  {service.payment_type === 'full' ? '💳 Pay Online' : '💵 Pay in Person'}
+</div>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
