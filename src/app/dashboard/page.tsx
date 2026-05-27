@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming'>('today')
-  const [activePage, setActivePage] = useState<'dashboard' | 'services'>('dashboard')
+  const [activePage, setActivePage] = useState<'dashboard' | 'appointments' | 'clients' | 'services' | 'settings'>('dashboard')
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
   const [newServiceName, setNewServiceName] = useState('')
   const [newServicePrice, setNewServicePrice] = useState('')
@@ -45,10 +45,10 @@ export default function DashboardPage() {
   const [serviceError, setServiceError] = useState('')
   const router = useRouter()
   const supabase = createClient()
-const [newPaymentType, setNewPaymentType] = useState<'none' | 'deposit' | 'full'>('none')
-const [newDepositAmount, setNewDepositAmount] = useState('')
-  
-useEffect(() => {
+  const [newPaymentType, setNewPaymentType] = useState<'none' | 'deposit' | 'full'>('none')
+  const [newDepositAmount, setNewDepositAmount] = useState('')
+
+  useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -235,11 +235,7 @@ useEffect(() => {
               { label: 'Settings', emoji: '⚙', page: 'settings' },
             ].map((item, i) => (
               <button key={i}
-                onClick={() => {
-                  if (item.page === 'dashboard' || item.page === 'services') {
-                    setActivePage(item.page as 'dashboard' | 'services')
-                  }
-                }}
+                onClick={() => setActivePage(item.page as 'dashboard' | 'appointments' | 'clients' | 'services' | 'settings')}
                 className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-left ${activePage === item.page ? 'nav-active' : ''}`}
                 style={{ color: activePage === item.page ? 'white' : '#6B7280' }}>
                 <span className="text-base">{item.emoji}</span>
@@ -279,7 +275,6 @@ useEffect(() => {
               </header>
 
               <div className="px-8 py-7 space-y-6 max-w-5xl">
-                {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="stat-card rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                     <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>Today</div>
@@ -298,7 +293,6 @@ useEffect(() => {
                   </div>
                 </div>
 
-                {/* Quick actions */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                     <div>
@@ -324,7 +318,6 @@ useEffect(() => {
                   </div>
                 </div>
 
-                {/* Appointments */}
                 <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                   <div className="flex" style={{ borderBottom: '1px solid #EDE9DF' }}>
                     {(['today', 'upcoming'] as const).map(tab => (
@@ -384,6 +377,132 @@ useEffect(() => {
             </>
           )}
 
+          {/* APPOINTMENTS PAGE */}
+          {activePage === 'appointments' && (
+            <>
+              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
+                <div>
+                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Appointments</h1>
+                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>All your upcoming appointments</p>
+                </div>
+                <button onClick={() => router.push('/appointments/new')}
+                  className="btn-new flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+                  + New Appointment
+                </button>
+              </header>
+              <div className="px-8 py-7 max-w-5xl">
+                <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  {appointments.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <div className="text-4xl mb-4">📅</div>
+                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No appointments yet</div>
+                      <div className="text-sm mb-6" style={{ color: '#9CA3AF' }}>Add one to get started</div>
+                      <button onClick={() => router.push('/appointments/new')}
+                        className="btn-new px-6 py-2.5 rounded-xl text-white text-sm font-semibold">
+                        Add Appointment
+                      </button>
+                    </div>
+                  ) : (
+                    appointments.map(appt => {
+                      const color = getAvatarColor(appt.client_name)
+                      return (
+                        <div key={appt.id} onClick={() => setSelectedAppt(appt)}
+                          className="appt-row flex items-center justify-between px-6 py-4 cursor-pointer">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                              style={{ background: color.bg, color: color.text }}>
+                              {getInitials(appt.client_name)}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{appt.client_name}</div>
+                              <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
+                                <span>{appt.dog_name}</span>
+                                {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-sm" style={{ color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>
+                            <div className="text-right">
+                              <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
+                              {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
+                            </div>
+                            <div style={{ color: '#D1D5DB' }}>›</div>
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* CLIENTS PAGE */}
+          {activePage === 'clients' && (
+            <>
+              <header className="px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
+                <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Clients</h1>
+                <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Your client list and their dogs</p>
+              </header>
+              <div className="px-8 py-7 max-w-5xl">
+                <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  {appointments.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <div className="text-4xl mb-4">👥</div>
+                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No clients yet</div>
+                      <div className="text-sm" style={{ color: '#9CA3AF' }}>Clients appear here once they book an appointment</div>
+                    </div>
+                  ) : (
+                    [...new Map(appointments.map(a => [a.client_name, a])).values()].map(appt => {
+                      const color = getAvatarColor(appt.client_name)
+                      const clientAppts = appointments.filter(a => a.client_name === appt.client_name)
+                      return (
+                        <div key={appt.client_name} className="appt-row flex items-center justify-between px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                              style={{ background: color.bg, color: color.text }}>
+                              {getInitials(appt.client_name)}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{appt.client_name}</div>
+                              <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
+                                <span>🐾 {appt.dog_name}</span>
+                                {appt.dog_breed && <><span>·</span><span>{appt.dog_breed}</span></>}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-sm" style={{ color: '#6B7280' }}>{clientAppts.length} appointment{clientAppts.length !== 1 ? 's' : ''}</div>
+                            <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* SETTINGS PAGE */}
+          {activePage === 'settings' && (
+            <>
+              <header className="px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
+                <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Settings</h1>
+                <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
+              </header>
+              <div className="px-8 py-7 max-w-2xl">
+                <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>Business Name</div>
+                  <div className="text-sm mb-4" style={{ color: '#6B7280' }}>{profile?.business_name}</div>
+                  <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>Current Plan</div>
+                  <div className="text-sm capitalize" style={{ color: '#2D6A4F' }}>{profile?.plan} Plan</div>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* SERVICES PAGE */}
           {activePage === 'services' && (
             <>
@@ -395,71 +514,66 @@ useEffect(() => {
               </header>
 
               <div className="px-8 py-7 max-w-2xl space-y-6">
+                <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                  <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Add a Service</h2>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
+                      <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)}
+                        placeholder="Full Groom"
+                        className="w-full px-4 py-3 rounded-xl text-sm"
+                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
+                      <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)}
+                        placeholder="65"
+                        className="w-full px-4 py-3 rounded-xl text-sm"
+                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
+                    </div>
+                  </div>
 
-                {/* Add new service */}
-<div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-  <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Add a Service</h2>
-  <div className="grid grid-cols-2 gap-3 mb-3">
-    <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
-      <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)}
-        placeholder="Full Groom"
-        className="w-full px-4 py-3 rounded-xl text-sm"
-        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
-        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
-    </div>
-    <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
-      <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)}
-        placeholder="65"
-        className="w-full px-4 py-3 rounded-xl text-sm"
-        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
-        onKeyDown={e => e.key === 'Enter' && handleAddService()} />
-    </div>
-  </div>
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 'none', label: '💵 Pay in person', desc: 'No upfront payment' },
+                        { value: 'deposit', label: '💳 Deposit', desc: 'Partial payment upfront' },
+                        { value: 'full', label: '✅ Full payment', desc: 'Pay full amount upfront' },
+                      ].map(opt => (
+                        <button key={opt.value} type="button"
+                          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
+                          className="p-3 rounded-xl text-left transition-all"
+                          style={{
+                            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
+                            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
+                          }}>
+                          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+                          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-  {/* Payment type selector */}
-  <div className="mb-3">
-    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
-    <div className="grid grid-cols-3 gap-2">
-      {[
-        { value: 'none', label: '💵 Pay in person', desc: 'No upfront payment' },
-        { value: 'deposit', label: '💳 Deposit', desc: 'Partial payment upfront' },
-        { value: 'full', label: '✅ Full payment', desc: 'Pay full amount upfront' },
-      ].map(opt => (
-        <button key={opt.value} type="button"
-          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
-          className="p-3 rounded-xl text-left transition-all"
-          style={{
-            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
-            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
-          }}>
-          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
-          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
-        </button>
-      ))}
-    </div>
-  </div>
+                  {newPaymentType === 'deposit' && (
+                    <div className="mb-3">
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Deposit Amount ($)</label>
+                      <input type="number" value={newDepositAmount} onChange={e => setNewDepositAmount(e.target.value)}
+                        placeholder="25"
+                        className="w-full px-4 py-3 rounded-xl text-sm"
+                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+                    </div>
+                  )}
 
-  {/* Deposit amount field */}
-  {newPaymentType === 'deposit' && (
-    <div className="mb-3">
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Deposit Amount ($)</label>
-      <input type="number" value={newDepositAmount} onChange={e => setNewDepositAmount(e.target.value)}
-        placeholder="25"
-        className="w-full px-4 py-3 rounded-xl text-sm"
-        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
-    </div>
-  )}
+                  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
+                  <button onClick={handleAddService}
+                    className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+                    + Add Service
+                  </button>
+                </div>
 
-  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
-  <button onClick={handleAddService}
-    className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
-    + Add Service
-  </button>
-</div>
-
-                {/* Services list */}
                 <div className="rounded-2xl overflow-hidden" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                   <div className="px-6 py-4" style={{ borderBottom: '1px solid #EDE9DF' }}>
                     <h2 className="font-semibold text-sm" style={{ color: '#1A3329' }}>Your Services ({services.length})</h2>
@@ -525,6 +639,7 @@ useEffect(() => {
               </div>
             </>
           )}
+
         </main>
       </div>
 
