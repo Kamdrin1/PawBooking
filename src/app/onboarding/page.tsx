@@ -34,6 +34,7 @@ export default function OnboardingPage() {
   const [availability, setAvailability] = useState({ Monday: true, Tuesday: true, Wednesday: true, Thursday: true, Friday: true, Saturday: false, Sunday: false })
   const [startTime, setStartTime] = useState('09:00')
   const [endTime, setEndTime] = useState('17:00')
+  const [paymentMethods, setPaymentMethods] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -52,6 +53,12 @@ export default function OnboardingPage() {
     setServices(services.filter((_, i) => i !== index))
   }
 
+  function togglePayment(method: string) {
+    setPaymentMethods(prev =>
+      prev.includes(method) ? prev.filter(m => m !== method) : [...prev, method]
+    )
+  }
+
   async function handleFinish() {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
@@ -61,11 +68,10 @@ export default function OnboardingPage() {
       phone,
       service_area: serviceArea,
       availability: JSON.stringify({ days: availability, startTime, endTime }),
+      payment_methods: paymentMethods,
     }).eq('id', user.id)
 
     const validServices = services.filter(s => s.name.trim() && s.price)
-
-    // Get all existing services for this user first
     const { data: existingServices } = await supabase
       .from('services')
       .select('id, name')
@@ -75,7 +81,6 @@ export default function OnboardingPage() {
       const match = (existingServices || []).find(
         e => e.name.toLowerCase().trim() === s.name.toLowerCase().trim()
       )
-
       if (match) {
         await supabase.from('services').update({
           price: parseFloat(s.price),
@@ -114,17 +119,17 @@ export default function OnboardingPage() {
 
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 relative z-10">
 
-        {/* Progress */}
+        {/* Progress — now 4 steps */}
         <div className="flex items-center gap-2 mb-8">
-          {[1,2,3].map(n => (
+          {[1,2,3,4].map(n => (
             <div key={n} className="flex items-center gap-2 flex-1">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step >= n ? 'bg-[#2D6A4F] text-white' : 'bg-gray-100 text-gray-400'}`}>{n}</div>
-              {n < 3 && <div className={`flex-1 h-1 rounded transition-all ${step > n ? 'bg-[#2D6A4F]' : 'bg-gray-100'}`}/>}
+              {n < 4 && <div className={`flex-1 h-1 rounded transition-all ${step > n ? 'bg-[#2D6A4F]' : 'bg-gray-100'}`}/>}
             </div>
           ))}
         </div>
 
-        {/* Step 1 */}
+        {/* Step 1 - Business Info */}
         {step === 1 && (
           <div>
             <h2 className="text-2xl font-bold text-[#1A3329] mb-1">Your business info</h2>
@@ -150,7 +155,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2 */}
+        {/* Step 2 - Services */}
         {step === 2 && (
           <div>
             <h2 className="text-2xl font-bold text-[#1A3329] mb-1">Your services</h2>
@@ -199,7 +204,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3 */}
+        {/* Step 3 - Availability */}
         {step === 3 && (
           <div>
             <h2 className="text-2xl font-bold text-[#1A3329] mb-1">Your availability</h2>
@@ -229,7 +234,64 @@ export default function OnboardingPage() {
                 className="flex-1 border border-gray-200 text-gray-500 rounded-xl py-3 font-semibold hover:bg-gray-50 transition">
                 ← Back
               </button>
-              <button onClick={handleFinish} disabled={loading}
+              <button onClick={() => setStep(4)}
+                className="flex-1 bg-[#2D6A4F] text-white rounded-xl py-3 font-semibold hover:bg-[#1A3329] transition">
+                Continue →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4 - Payment Methods */}
+        {step === 4 && (
+          <div>
+            <h2 className="text-2xl font-bold text-[#1A3329] mb-1">How do you accept payment?</h2>
+            <p className="text-gray-500 text-sm mb-6">Select all that apply — you can change this anytime.</p>
+
+            <div className="space-y-3 mb-6">
+              {[
+                {
+                  id: 'in_person',
+                  label: 'Pay in Person',
+                  desc: 'Cash or Card — client pays at the appointment',
+                  icon: '💵',
+                },
+                {
+                  id: 'online',
+                  label: 'Pay Online',
+                  desc: 'Client pays before the appointment online',
+                  icon: '💳',
+                },
+              ].map(method => (
+                <button key={method.id}
+                  onClick={() => togglePayment(method.id)}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all"
+                  style={{
+                    border: paymentMethods.includes(method.id) ? '2px solid #2D6A4F' : '2px solid #E5E7EB',
+                    background: paymentMethods.includes(method.id) ? '#D8F3DC' : '#F9FAFB',
+                  }}>
+                  <div className="text-3xl">{method.icon}</div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-[#1A3329]">{method.label}</div>
+                    <div className="text-sm text-gray-500 mt-0.5">{method.desc}</div>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${paymentMethods.includes(method.id) ? 'border-[#2D6A4F] bg-[#2D6A4F]' : 'border-gray-300'}`}>
+                    {paymentMethods.includes(method.id) && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {paymentMethods.length === 0 && (
+              <p className="text-xs text-red-400 mb-4">Please select at least one payment method.</p>
+            )}
+
+            <div className="flex gap-3">
+              <button onClick={() => setStep(3)}
+                className="flex-1 border border-gray-200 text-gray-500 rounded-xl py-3 font-semibold hover:bg-gray-50 transition">
+                ← Back
+              </button>
+              <button onClick={handleFinish} disabled={loading || paymentMethods.length === 0}
                 className="flex-1 bg-[#2D6A4F] text-white rounded-xl py-3 font-semibold hover:bg-[#1A3329] transition disabled:opacity-50">
                 {loading ? 'Setting up...' : 'Finish Setup 🐾'}
               </button>
