@@ -149,6 +149,10 @@ export default function DashboardPage() {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
+  function getPaymentLabel(method: string) {
+    return method === 'online' ? '💳 Pay Online' : '💵 Pay in Person'
+  }
+
   const avatarColors = [
     { bg: '#D8F3DC', text: '#1A3329' },
     { bg: '#FDE8D8', text: '#7C2D12' },
@@ -357,6 +361,8 @@ export default function DashboardPage() {
                               <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
                                 <span>{appt.dog_name}</span>
                                 {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
+                                <span>·</span>
+                                <span>{getPaymentLabel(appt.payment_method)}</span>
                               </div>
                             </div>
                           </div>
@@ -420,6 +426,8 @@ export default function DashboardPage() {
                               <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
                                 <span>{appt.dog_name}</span>
                                 {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
+                                <span>·</span>
+                                <span>{getPaymentLabel(appt.payment_method)}</span>
                               </div>
                             </div>
                           </div>
@@ -476,10 +484,11 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center gap-6">
                             <div className="text-sm" style={{ color: '#6B7280' }}>{clientAppts.length} appointment{clientAppts.length !== 1 ? 's' : ''}</div>
-<div className="flex flex-col items-end gap-1">
-  <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
-  {appt.client_email && <a href={`mailto:${appt.client_email}`} className="text-xs" style={{ color: '#9CA3AF' }}>{appt.client_email}</a>}
-</div>                          </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
+                              {appt.client_email && <a href={`mailto:${appt.client_email}`} className="text-xs" style={{ color: '#9CA3AF' }}>{appt.client_email}</a>}
+                            </div>
+                          </div>
                         </div>
                       )
                     })
@@ -540,25 +549,25 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mb-3">
-  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
-  <div className="grid grid-cols-2 gap-2">
-    {[
-      ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'none', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
-      ...(profile?.payment_methods?.includes('online') ? [{ value: 'full', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
-    ].map(opt => (
-      <button key={opt.value} type="button"
-        onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
-        className="p-3 rounded-xl text-left transition-all"
-        style={{
-          border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
-          background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
-        }}>
-        <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
-        <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
-      </button>
-    ))}
-  </div>
-</div>
+                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'none', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
+                        ...(profile?.payment_methods?.includes('online') ? [{ value: 'full', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
+                      ].map(opt => (
+                        <button key={opt.value} type="button"
+                          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
+                          className="p-3 rounded-xl text-left transition-all"
+                          style={{
+                            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
+                            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
+                          }}>
+                          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+                          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
                   {newPaymentType === 'deposit' && (
                     <div className="mb-3">
@@ -614,12 +623,12 @@ export default function DashboardPage() {
                               <div>
                                 <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{service.name}</div>
                                 <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-  {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online')
-    ? '💵 Pay in Person · 💳 Pay Online'
-    : profile?.payment_methods?.includes('online')
-    ? '💳 Pay Online'
-    : '💵 Pay in Person'}
-</div>
+                                  {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online')
+                                    ? '💵 Pay in Person · 💳 Pay Online'
+                                    : profile?.payment_methods?.includes('online')
+                                    ? '💳 Pay Online'
+                                    : '💵 Pay in Person'}
+                                </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -653,7 +662,7 @@ export default function DashboardPage() {
       </div>
 
       {/* MODAL */}
-       {selectedAppt && (
+      {selectedAppt && (
         <div className="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(26,51,41,0.4)', backdropFilter: 'blur(4px)' }}
           onClick={() => setSelectedAppt(null)}>
@@ -713,12 +722,7 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-<div>
-  <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Payment</div>
-  <div className="px-3 py-2 rounded-xl text-sm font-medium" style={{ background: '#F5F2EB', color: '#1A3329', border: '1px solid #EDE9DF' }}>
-    {selectedAppt.payment_method === 'online' ? '💳 Pay Online' : '💵 Pay in Person'}
-  </div>
-</div>
+
               {selectedAppt.notes && (
                 <div>
                   <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Notes</div>
