@@ -125,11 +125,11 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
             <div className="rounded-xl p-4 mb-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
               <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>⭐ Upgrade to Pro — $49/mo</div>
               <div className="text-xs mb-3" style={{ color: '#6B7280' }}>Unlimited appointments, auto review requests, client history, smart messages & priority support.</div>
-              <button onClick={() => router.push('/pricing')}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white"
-                style={{ background: '#1A3329' }}>
-                View Pro Plan →
-              </button>
+              <button disabled
+  className="w-full py-2.5 rounded-xl text-sm font-semibold"
+  style={{ background: '#E5E7EB', color: '#9CA3AF', cursor: 'not-allowed' }}>
+  Coming Soon
+</button>
             </div>
           )}
 
