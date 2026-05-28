@@ -14,6 +14,7 @@ interface Appointment {
   appointment_time: string
   status: string
   notes: string
+  payment_method: string
   services: { name: string; price: number } | null
 }
 
@@ -652,7 +653,7 @@ export default function DashboardPage() {
       </div>
 
       {/* MODAL */}
-      {selectedAppt && (
+       {selectedAppt && (
         <div className="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(26,51,41,0.4)', backdropFilter: 'blur(4px)' }}
           onClick={() => setSelectedAppt(null)}>
@@ -712,7 +713,12 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-
+<div>
+  <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Payment</div>
+  <div className="px-3 py-2 rounded-xl text-sm font-medium" style={{ background: '#F5F2EB', color: '#1A3329', border: '1px solid #EDE9DF' }}>
+    {selectedAppt.payment_method === 'online' ? '💳 Pay Online' : '💵 Pay in Person'}
+  </div>
+</div>
               {selectedAppt.notes && (
                 <div>
                   <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF' }}>Notes</div>
