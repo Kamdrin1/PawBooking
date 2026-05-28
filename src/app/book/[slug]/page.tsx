@@ -17,6 +17,7 @@ interface Profile {
   business_name: string
   service_area: string
   stripe_account_id?: string
+  payment_methods: string[]
 }
 
 export default function BookingPage() {
@@ -40,17 +41,22 @@ export default function BookingPage() {
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
   const [notes, setNotes] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('in_person')
 
   useEffect(() => {
     async function load() {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, business_name, service_area')
+        .select('id, business_name, service_area, payment_methods')
         .ilike('business_name', slug.replace(/-/g, ' '))
         .single()
 
       if (!profiles) { setNotFound(true); return }
       setProfile(profiles)
+
+      if (profiles.payment_methods?.length === 1) {
+        setPaymentMethod(profiles.payment_methods[0])
+      }
 
       const { data: serviceData } = await supabase
         .from('services')
@@ -73,10 +79,9 @@ export default function BookingPage() {
 
     const selectedSvc = services.find(s => s.id === serviceId)
 
-    // If payment required, go to Stripe checkout
     if (selectedSvc && (selectedSvc.payment_type === 'full' || selectedSvc.payment_type === 'deposit')) {
-      const amount = selectedSvc.payment_type === 'full' 
-        ? selectedSvc.price 
+      const amount = selectedSvc.payment_type === 'full'
+        ? selectedSvc.price
         : selectedSvc.deposit_amount
 
       const res = await fetch('/api/create-checkout', {
@@ -106,7 +111,6 @@ export default function BookingPage() {
       return
     }
 
-    // No payment required — create appointment directly
     const { error } = await supabase.from('appointments').insert({
       profile_id: profile!.id,
       client_name: clientName,
@@ -119,6 +123,7 @@ export default function BookingPage() {
       appointment_time: time,
       notes,
       status: 'pending',
+      payment_method: paymentMethod,
     })
 
     if (error) { setError(error.message); setLoading(false); return }
@@ -156,8 +161,7 @@ export default function BookingPage() {
         .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
       <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
-        
-        {/* Background paw prints */}
+
         <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
           {[
             { top: '3%',  left: '2%',  rotate: '-25deg', size: 100, opacity: 0.06 },
@@ -190,7 +194,6 @@ export default function BookingPage() {
         </div>
 
         <div className="text-center max-w-md relative z-10">
-          {/* Circle with paw icon */}
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#D8F3DC' }}>
             <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
@@ -213,6 +216,7 @@ export default function BookingPage() {
               { label: 'Service', value: selectedService?.name },
               { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) },
               { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
+              { label: 'Payment', value: paymentMethod === 'online' ? '💳 Pay Online' : '💵 Pay in Person' },
             ].map((row, i) => (
               <div key={i} className="flex justify-between text-sm" style={{ borderBottom: '1px solid #EDE9DF', paddingBottom: '10px' }}>
                 <span style={{ color: '#9CA3AF' }}>{row.label}</span>
@@ -251,7 +255,6 @@ export default function BookingPage() {
 
       <div className="min-h-screen" style={{ background: '#F5F2EB' }}>
 
-        {/* Header */}
         <div style={{ background: '#1A3329', padding: '32px 24px', textAlign: 'center' }}>
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(216,243,220,0.15)' }}>
             <svg width="24" height="24" viewBox="0 0 100 100" fill="#D8F3DC">
@@ -377,6 +380,30 @@ export default function BookingPage() {
               </div>
             </div>
 
+            {/* Payment Method — only shows if groomer accepts both */}
+            {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online') && (
+              <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+                <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>How would you like to pay?</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'in_person', label: '💵 Pay in Person', desc: 'Cash or Card at appointment' },
+                    { id: 'online', label: '💳 Pay Online', desc: 'Pay securely before appointment' },
+                  ].map(opt => (
+                    <button key={opt.id} type="button"
+                      onClick={() => setPaymentMethod(opt.id)}
+                      className="p-4 rounded-xl text-left transition-all"
+                      style={{
+                        border: paymentMethod === opt.id ? '2px solid #1A3329' : '2px solid #EDE9DF',
+                        background: paymentMethod === opt.id ? '#D8F3DC' : '#F5F2EB',
+                      }}>
+                      <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329' }}>{opt.label}</div>
+                      <div className="text-xs" style={{ color: '#6B7280' }}>{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Notes */}
             <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Additional Notes <span className="font-normal text-sm" style={{ color: '#9CA3AF' }}>(optional)</span></h2>
@@ -402,6 +429,10 @@ export default function BookingPage() {
                   <div className="flex justify-between text-sm">
                     <span style={{ color: '#2D6A4F' }}>Time</span>
                     <span className="font-semibold" style={{ color: '#1A3329' }}>{(() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: '#2D6A4F' }}>Payment</span>
+                    <span className="font-semibold" style={{ color: '#1A3329' }}>{paymentMethod === 'online' ? '💳 Pay Online' : '💵 Pay in Person'}</span>
                   </div>
                   <div className="flex justify-between text-sm pt-2" style={{ borderTop: '1px solid #B7E4C7' }}>
                     <span className="font-semibold" style={{ color: '#2D6A4F' }}>Total</span>
