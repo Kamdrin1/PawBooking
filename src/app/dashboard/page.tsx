@@ -613,7 +613,11 @@ export default function DashboardPage() {
                               <div>
                                 <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{service.name}</div>
                                 <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-  {service.payment_type === 'full' ? '💳 Pay Online' : '💵 Pay in Person'}
+  {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online')
+    ? '💵 Pay in Person · 💳 Pay Online'
+    : profile?.payment_methods?.includes('online')
+    ? '💳 Pay Online'
+    : '💵 Pay in Person'}
 </div>
                               </div>
                             </div>
