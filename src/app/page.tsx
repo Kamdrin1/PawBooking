@@ -38,31 +38,31 @@ export default function Home() {
       <div style={{ background: '#F5F2EB' }}>
 
         {/* NAVBAR */}
-<nav className="sticky-nav">
-  <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-      <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
-          <ellipse cx="50" cy="70" rx="26" ry="20"/>
-          <ellipse cx="20" cy="44" rx="12" ry="15"/>
-          <ellipse cx="38" cy="33" rx="12" ry="15"/>
-          <ellipse cx="62" cy="33" rx="12" ry="15"/>
-          <ellipse cx="80" cy="44" rx="12" ry="15"/>
-        </svg>
-      </div>
-      <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
-    </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-      <a href="#features" className="nav-link">Features</a>
-      <a href="#how" className="nav-link">How It Works</a>
-      <a href="#pricing" className="nav-link">Pricing</a>
-    </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-      <Link href="/login" className="nav-link">Log in</Link>
-      <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
-    </div>
-  </div>
-</nav>
+        <nav className="sticky-nav">
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
+                  <ellipse cx="50" cy="70" rx="26" ry="20"/>
+                  <ellipse cx="20" cy="44" rx="12" ry="15"/>
+                  <ellipse cx="38" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="62" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="80" cy="44" rx="12" ry="15"/>
+                </svg>
+              </div>
+              <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+              <a href="#features" className="nav-link">Features</a>
+              <a href="#how" className="nav-link">How It Works</a>
+              <a href="#pricing" className="nav-link">Pricing</a>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Link href="/login" className="nav-link">Log in</Link>
+              <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
+            </div>
+          </div>
+        </nav>
 
         {/* HERO */}
         <section style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
@@ -287,10 +287,7 @@ export default function Home() {
 
               {/* Pro */}
               <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '-1px', left: '50%', transform: 'translateX(-50%)', background: '#E8704A', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 14px', borderRadius: '0 0 10px 10px', whiteSpace: 'nowrap' }}>
-                  ⭐ Most Popular
-                </div>
-                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px', marginTop: '16px' }}>Pro</h3>
+                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px' }}>Pro</h3>
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
                 <div style={{ marginBottom: '24px' }}>
                   <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$49</span>
@@ -312,9 +309,9 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/signup" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', background: 'white', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
-                  Start Free Trial
-                </Link>
+                <button disabled style={{ display: 'block', width: '100%', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.4)', border: 'none', cursor: 'not-allowed' }}>
+                  Coming Soon
+                </button>
               </div>
 
             </div>
@@ -348,7 +345,7 @@ export default function Home() {
         <footer style={{ background: '#1A3329', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '24px 32px' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'rgba(216,243,220,0.15)', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ background: 'rgba(216,243,220,0.15)', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="12" height="12" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
                   <ellipse cx="20" cy="44" rx="12" ry="15"/>
