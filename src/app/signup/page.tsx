@@ -49,7 +49,18 @@ export default function SignupPage() {
       }, { onConflict: 'id' })
       if (profileError) { setError(profileError.message); setLoading(false); return }
     }
-    router.push('/onboarding')
+    // Create Stripe checkout session
+const res = await fetch('/api/create-subscription-checkout', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    userId: data.user.id,
+    email,
+    businessName,
+  }),
+})
+const { url } = await res.json()
+if (url) window.location.href = url
   }
 
   return (
