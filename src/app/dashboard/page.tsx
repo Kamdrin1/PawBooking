@@ -33,6 +33,120 @@ interface Service {
   deposit_amount: number
 }
 
+function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
+  profile: Profile | null
+  onBusinessNameUpdate: (name: string) => void
+  supabase: ReturnType<typeof createClient>
+  router: ReturnType<typeof useRouter>
+}) {
+  const [editingName, setEditingName] = useState(false)
+  const [newName, setNewName] = useState(profile?.business_name || '')
+  const [savingName, setSavingName] = useState(false)
+  const [nameError, setNameError] = useState('')
+
+  async function handleSaveName() {
+    if (!newName.trim()) { setNameError('Business name is required'); return }
+    setSavingName(true)
+    setNameError('')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({ business_name: newName.trim() }).eq('id', user.id)
+    if (error) { setNameError(error.message); setSavingName(false); return }
+    onBusinessNameUpdate(newName.trim())
+    setEditingName(false)
+    setSavingName(false)
+  }
+
+  return (
+    <>
+      <header className="px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
+        <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Settings</h1>
+        <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
+      </header>
+      <div className="px-8 py-7 max-w-2xl space-y-4">
+
+        {/* Business Name */}
+        <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm font-semibold" style={{ color: '#1A3329' }}>Business Name</div>
+            {!editingName && (
+              <button onClick={() => { setEditingName(true); setNewName(profile?.business_name || '') }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
+                ✏️
+              </button>
+            )}
+          </div>
+          {editingName ? (
+            <div className="space-y-3">
+              <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl text-sm"
+                style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                onKeyDown={e => e.key === 'Enter' && handleSaveName()} />
+              {nameError && <p className="text-xs" style={{ color: '#DC2626' }}>{nameError}</p>}
+              <div className="flex gap-2">
+                <button onClick={handleSaveName} disabled={savingName}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+                  style={{ background: '#1A3329' }}>
+                  {savingName ? 'Saving...' : 'Save'}
+                </button>
+                <button onClick={() => { setEditingName(false); setNameError('') }}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold"
+                  style={{ background: '#F5F2EB', color: '#6B7280' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm" style={{ color: '#6B7280' }}>{profile?.business_name}</div>
+          )}
+        </div>
+
+        {/* Plan */}
+        <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+          <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Your Plan</div>
+          <div className="rounded-xl p-4 mb-4" style={{ background: profile?.plan === 'pro' ? '#1A3329' : '#F5F2EB', border: '1px solid #EDE9DF' }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-semibold capitalize" style={{ color: profile?.plan === 'pro' ? 'white' : '#1A3329' }}>
+                  {profile?.plan === 'pro' ? '⭐ Pro Plan' : '📋 Basic Plan'}
+                </div>
+                <div className="text-xs mt-1" style={{ color: profile?.plan === 'pro' ? 'rgba(255,255,255,0.6)' : '#9CA3AF' }}>
+                  {profile?.plan === 'pro' ? '$49/month · All features included' : '$29/month · Core features'}
+                </div>
+              </div>
+              <div className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: profile?.plan === 'pro' ? 'rgba(216,243,220,0.2)' : '#D8F3DC', color: profile?.plan === 'pro' ? '#D8F3DC' : '#1A5C36' }}>
+                Active
+              </div>
+            </div>
+          </div>
+
+          {profile?.plan !== 'pro' && (
+            <div className="rounded-xl p-4 mb-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+              <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>⭐ Upgrade to Pro — $49/mo</div>
+              <div className="text-xs mb-3" style={{ color: '#6B7280' }}>Unlimited appointments, auto review requests, client history, smart messages & priority support.</div>
+              <button onClick={() => router.push('/pricing')}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white"
+                style={{ background: '#1A3329' }}>
+                View Pro Plan →
+              </button>
+            </div>
+          )}
+
+          {profile?.plan === 'pro' && (
+            <button onClick={() => router.push('/pricing')}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold"
+              style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
+              Manage Plan
+            </button>
+          )}
+        </div>
+
+      </div>
+    </>
+  )
+}
+
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -500,20 +614,12 @@ export default function DashboardPage() {
 
           {/* SETTINGS PAGE */}
           {activePage === 'settings' && (
-            <>
-              <header className="px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
-                <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Settings</h1>
-                <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
-              </header>
-              <div className="px-8 py-7 max-w-2xl">
-                <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
-                  <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>Business Name</div>
-                  <div className="text-sm mb-4" style={{ color: '#6B7280' }}>{profile?.business_name}</div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>Current Plan</div>
-                  <div className="text-sm capitalize" style={{ color: '#2D6A4F' }}>{profile?.plan} Plan</div>
-                </div>
-              </div>
-            </>
+            <SettingsPage
+              profile={profile}
+              onBusinessNameUpdate={(name) => setProfile(prev => prev ? { ...prev, business_name: name } : prev)}
+              supabase={supabase}
+              router={router}
+            />
           )}
 
           {/* SERVICES PAGE */}
