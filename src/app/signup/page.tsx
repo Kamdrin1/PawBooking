@@ -39,28 +39,51 @@ export default function SignupPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) { setError(error.message); setLoading(false); return }
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: data.user.id,
-        email,
-        business_name: businessName,
-      }, { onConflict: 'id' })
-      if (profileError) { setError(profileError.message); setLoading(false); return }
+
+    // Step 1 — Create Supabase auth account
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    if (signUpError) { setError(signUpError.message); setLoading(false); return }
+    if (!data.user) { setError('Something went wrong. Please try again.'); setLoading(false); return }
+
+    // Step 2 — Create profile
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: data.user.id,
+      email,
+      business_name: businessName,
+    }, { onConflict: 'id' })
+    if (profileError) { setError(profileError.message); setLoading(false); return }
+
+    // Step 3 — Create Stripe checkout session with 30-day trial
+    try {
+      const res = await fetch('/api/create-subscription-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: data.user.id,
+          email,
+          businessName,
+        }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json()
+        console.error('Stripe checkout error:', errData)
+        router.push('/onboarding')
+        return
+      }
+
+      const result = await res.json()
+
+      if (result.url) {
+        window.location.href = result.url
+      } else {
+        console.error('No Stripe URL returned:', result)
+        router.push('/onboarding')
+      }
+    } catch (err) {
+      console.error('Stripe checkout failed:', err)
+      router.push('/onboarding')
     }
-    // Create Stripe checkout session
-const res = await fetch('/api/create-subscription-checkout', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    userId: data.user?.id,
-    email,
-    businessName,
-  }),
-})
-const { url } = await res.json()
-if (url) window.location.href = url
   }
 
   return (
@@ -93,7 +116,7 @@ if (url) window.location.href = url
           </div>
           <p className="text-gray-500 mt-1">Create your free account</p>
           <span className="inline-flex items-center gap-1 bg-[#D8F3DC] text-[#2D6A4F] text-xs font-semibold px-3 py-1 rounded-full mt-2">
-            ✓ 30 days free on Pro
+            ✓ 30 days free · No credit card required
           </span>
         </div>
 
