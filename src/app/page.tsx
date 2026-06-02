@@ -9,8 +9,8 @@ export default function Home() {
         * { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
         .playfair { font-family: 'Playfair Display', serif; }
         body { background: #F5F2EB; }
-        .nav-link { color: #4B5563; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.15s; }
-        .nav-link:hover { color: #1A3329; }
+        .nav-link { color: #1A3329; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.15s; }
+        .nav-link:hover { color: #2D6A4F; }
         .btn-primary { background: #1A3329; color: white; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #2D6A4F; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(26,51,41,0.25); }
         .btn-outline { background: transparent; color: #1A3329; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: 1.5px solid #D1C9B8; }
@@ -34,8 +34,8 @@ export default function Home() {
 
         {/* NAVBAR */}
         <nav className="sticky-nav">
-          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '160px' }}>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
@@ -47,15 +47,15 @@ export default function Home() {
               </div>
               <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
               <a href="#pricing" className="nav-link">Pricing</a>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '28px', minWidth: '280px', justifyContent: 'flex-end' }}>
               <Link href="/login" className="nav-link">Log in</Link>
               <Link href="/signup" className="nav-link">Sign up</Link>
-              <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
+              <Link href="/signup" className="btn-primary" style={{ padding: '10px 22px' }}>Start Free Trial</Link>
             </div>
           </div>
         </nav>
@@ -77,7 +77,7 @@ export default function Home() {
               Log In →
             </Link>
           </div>
-          <p style={{ fontSize: '13px', color: '#9CA3AF' }}>30 days free. Cancel anytime.</p>
+          <p style={{ fontSize: '13px', color: '#1A3329', fontWeight: 500 }}>30 days free. Cancel anytime.</p>
         </section>
 
         {/* STATS BAR */}
