@@ -39,6 +39,18 @@ export default function OnboardingPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  function formatPhone(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 10)
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `(${digits.slice(0,3)}) ${digits.slice(3)}`
+    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`
+  }
+
+  function toE164(value: string) {
+    const digits = value.replace(/\D/g, '')
+    return digits.length === 10 ? `+1${digits}` : digits.length === 11 ? `+${digits}` : value
+  }
+
   function addService() {
     setServices([...services, { name: '', price: '', duration: '60' }])
   }
@@ -65,7 +77,7 @@ export default function OnboardingPage() {
     if (!user) return
 
     await supabase.from('profiles').update({
-      phone,
+      phone: toE164(phone),
       service_area: serviceArea,
       availability: JSON.stringify({ days: availability, startTime, endTime }),
       payment_methods: paymentMethods,
@@ -119,7 +131,7 @@ export default function OnboardingPage() {
 
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 relative z-10">
 
-        {/* Progress — now 4 steps */}
+        {/* Progress */}
         <div className="flex items-center gap-2 mb-8">
           {[1,2,3,4].map(n => (
             <div key={n} className="flex items-center gap-2 flex-1">
@@ -137,9 +149,10 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                <input type="tel" value={phone} onChange={e => setPhone(formatPhone(e.target.value))}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F]"
                   placeholder="(208) 555-0000" />
+                <p className="text-xs text-gray-400 mt-1">Enter your 10-digit US number — we'll format it automatically.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Service Area</label>
@@ -250,18 +263,8 @@ export default function OnboardingPage() {
 
             <div className="space-y-3 mb-6">
               {[
-                {
-                  id: 'in_person',
-                  label: 'Pay in Person',
-                  desc: 'Cash or Card — client pays at the appointment',
-                  icon: '💵',
-                },
-                {
-                  id: 'online',
-                  label: 'Pay Online',
-                  desc: 'Client pays before the appointment online',
-                  icon: '💳',
-                },
+                { id: 'in_person', label: 'Pay in Person', desc: 'Cash or Card — client pays at the appointment', icon: '💵' },
+                { id: 'online', label: 'Pay Online', desc: 'Client pays before the appointment online', icon: '💳' },
               ].map(method => (
                 <button key={method.id}
                   onClick={() => togglePayment(method.id)}
