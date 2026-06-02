@@ -35,7 +35,6 @@ export default function Home() {
         {/* NAVBAR */}
         <nav className="sticky-nav">
           <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-            {/* LEFT — Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
@@ -48,13 +47,11 @@ export default function Home() {
               </div>
               <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
             </div>
-            {/* CENTER — absolutely centered */}
             <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '56px' }}>
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
               <a href="#pricing" className="nav-link">Pricing</a>
             </div>
-            {/* RIGHT — Log in, Sign up, CTA */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
               <Link href="/login" className="nav-link">Log in</Link>
               <Link href="/signup" className="nav-link">Sign up</Link>
@@ -75,9 +72,6 @@ export default function Home() {
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
             <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 32px' }}>
               Start Free Trial
-            </Link>
-            <Link href="/login" className="btn-outline" style={{ fontSize: '15px', padding: '16px 32px' }}>
-              Log In →
             </Link>
           </div>
           <p style={{ fontSize: '13px', color: '#1A3329', fontWeight: 500 }}>30 days free. Cancel anytime.</p>
