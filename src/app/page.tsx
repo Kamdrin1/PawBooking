@@ -25,13 +25,8 @@ export default function Home() {
         .price-large { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; color: #1A3329; line-height: 1; }
         .testimonial-quote { font-style: italic; color: #4B5563; font-size: 14px; line-height: 1.7; }
         .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(245,242,235,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid #EDE9DF; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: #FDFBF7; border: 1px solid #EDE9DF; border-radius: 50px; padding: 8px 16px; font-size: 13px; color: #4B5563; font-weight: 500; }
-        .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #2D6A4F; display: inline-block; }
         .step-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(45,106,79,0.15); color: #2D6A4F; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .pro-card { background: #1A3329; border-radius: 20px; }
-        .check { color: #2D6A4F; font-weight: 600; margin-right: 8px; }
-        .check-white { color: #D8F3DC; font-weight: 600; margin-right: 8px; }
-        .cross { color: #D1C9B8; margin-right: 8px; }
         .star { color: #F59E0B; }
       `}</style>
 
@@ -59,17 +54,14 @@ export default function Home() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Link href="/login" className="nav-link">Log in</Link>
+              <Link href="/signup" className="nav-link">Sign up</Link>
               <Link href="/signup" className="btn-primary" style={{ padding: '10px 20px' }}>Start Free Trial</Link>
             </div>
           </div>
         </nav>
 
         {/* HERO */}
-        <section style={{ paddingTop: '80px', paddingBottom: '80px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
-          <div className="hero-badge" style={{ marginBottom: '32px', display: 'inline-flex' }}>
-            <span className="hero-badge-dot" />
-            Now live — start your free 30-day trial today
-          </div>
+        <section style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
           <h1 className="playfair" style={{ fontSize: 'clamp(48px, 8vw, 80px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.1, marginBottom: '24px' }}>
             Stop losing <span style={{ color: '#2D6A4F' }}>$85</span> every<br />
             time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
@@ -79,13 +71,13 @@ export default function Home() {
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
             <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 32px' }}>
-              Start Free Trial — No Card Required
+              Start Free Trial
             </Link>
             <Link href="/login" className="btn-outline" style={{ fontSize: '15px', padding: '16px 32px' }}>
               Log In →
             </Link>
           </div>
-          <p style={{ fontSize: '13px', color: '#9CA3AF' }}>30 days free. No credit card needed. Cancel anytime.</p>
+          <p style={{ fontSize: '13px', color: '#9CA3AF' }}>30 days free. Cancel anytime.</p>
         </section>
 
         {/* STATS BAR */}
@@ -328,13 +320,13 @@ export default function Home() {
               Ready to stop losing money to no-shows?
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '32px', fontSize: '15px', lineHeight: 1.7 }}>
-              Join PawBooking today. 30 days free, no credit card needed, cancel anytime.
+              Join PawBooking today. 30 days free, cancel anytime.
             </p>
             <Link href="/signup" className="btn-cta">
               Start Your Free Trial →
             </Link>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '24px', flexWrap: 'wrap' }}>
-              {['✓ 30 days free', '✓ No credit card needed', '✓ Cancel anytime', '✓ Setup in 10 minutes'].map((t, i) => (
+              {['✓ 30 days free', '✓ Cancel anytime', '✓ Setup in 10 minutes'].map((t, i) => (
                 <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>{t}</span>
               ))}
             </div>
