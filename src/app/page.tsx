@@ -34,7 +34,8 @@ export default function Home() {
 
         {/* NAVBAR */}
         <nav className="sticky-nav">
-          <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+            {/* LEFT — Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
@@ -47,11 +48,13 @@ export default function Home() {
               </div>
               <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '56px' }}>
+            {/* CENTER — absolutely centered */}
+            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '56px' }}>
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
               <a href="#pricing" className="nav-link">Pricing</a>
             </div>
+            {/* RIGHT — Log in, Sign up, CTA */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
               <Link href="/login" className="nav-link">Log in</Link>
               <Link href="/signup" className="nav-link">Sign up</Link>
@@ -247,7 +250,6 @@ export default function Home() {
               <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. Starts at less than $1 a day.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-
               {/* Basic */}
               <div className="card" style={{ padding: '32px' }}>
                 <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '20px', marginBottom: '4px' }}>Basic</h3>
@@ -276,7 +278,6 @@ export default function Home() {
                   Start Free Trial
                 </Link>
               </div>
-
               {/* Pro */}
               <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
                 <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px' }}>Pro</h3>
@@ -305,7 +306,6 @@ export default function Home() {
                   Coming Soon
                 </button>
               </div>
-
             </div>
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
               🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No credit card required to start.
