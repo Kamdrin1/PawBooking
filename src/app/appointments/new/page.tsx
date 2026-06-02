@@ -26,6 +26,7 @@ function AppointmentForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
+  const [limitReached, setLimitReached] = useState(false)
   const serviceInputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -36,8 +37,12 @@ function AppointmentForm() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+
       const { data: servicesData } = await supabase.from('services').select('*').eq('profile_id', user.id)
       setServices(servicesData || [])
+
+      const { data: profile } = await supabase.from('profiles').select('plan').eq('id', user.id).single()
+
       const id = searchParams.get('edit')
       if (id) {
         setEditId(id)
@@ -57,6 +62,19 @@ function AppointmentForm() {
           setDate(appt.appointment_date || '')
           setTime(appt.appointment_time || '')
           setNotes(appt.notes || '')
+        }
+      } else {
+        // Only check limit for new appointments on Basic plan
+        if (profile?.plan === 'basic') {
+          const monthStart = new Date()
+          monthStart.setDate(1)
+          const monthStartStr = monthStart.toISOString().split('T')[0]
+          const { count } = await supabase
+            .from('appointments')
+            .select('id', { count: 'exact', head: true })
+            .eq('profile_id', user.id)
+            .gte('appointment_date', monthStartStr)
+          if ((count || 0) >= 30) setLimitReached(true)
         }
       }
     }
@@ -92,34 +110,31 @@ function AppointmentForm() {
     if (!user) return
 
     let serviceId = null
-const existing = services.find(s => s.name.toLowerCase().trim() === serviceName.toLowerCase().trim())
-if (existing) {
-  // Use existing service, update price if changed
-  if (parseFloat(servicePrice) !== existing.price) {
-    await supabase.from('services').update({ price: parseFloat(servicePrice) || 0 }).eq('id', existing.id)
-  }
-  serviceId = existing.id
-} else if (serviceName.trim()) {
-  // Only create new service if it genuinely doesn't exist
-  const { data: doubleCheck } = await supabase
-    .from('services')
-    .select('id')
-    .eq('profile_id', user.id)
-    .ilike('name', serviceName.trim())
-    .single()
-  
-  if (doubleCheck) {
-    serviceId = doubleCheck.id
-  } else {
-    const { data: newService } = await supabase.from('services').insert({
-      profile_id: user.id,
-      name: serviceName.trim(),
-      price: parseFloat(servicePrice) || 0,
-      duration_minutes: 60,
-    }).select().single()
-    if (newService) serviceId = newService.id
-  }
-}
+    const existing = services.find(s => s.name.toLowerCase().trim() === serviceName.toLowerCase().trim())
+    if (existing) {
+      if (parseFloat(servicePrice) !== existing.price) {
+        await supabase.from('services').update({ price: parseFloat(servicePrice) || 0 }).eq('id', existing.id)
+      }
+      serviceId = existing.id
+    } else if (serviceName.trim()) {
+      const { data: doubleCheck } = await supabase
+        .from('services')
+        .select('id')
+        .eq('profile_id', user.id)
+        .ilike('name', serviceName.trim())
+        .single()
+      if (doubleCheck) {
+        serviceId = doubleCheck.id
+      } else {
+        const { data: newService } = await supabase.from('services').insert({
+          profile_id: user.id,
+          name: serviceName.trim(),
+          price: parseFloat(servicePrice) || 0,
+          duration_minutes: 60,
+        }).select().single()
+        if (newService) serviceId = newService.id
+      }
+    }
 
     const apptData = {
       client_name: clientName,
@@ -146,7 +161,6 @@ if (existing) {
 
   const inputClass = "w-full px-4 py-3 rounded-xl text-sm font-medium transition-all outline-none"
   const inputStyle = { background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }
-  const inputFocusStyle = { border: '1px solid #2D6A4F' }
 
   return (
     <>
@@ -171,7 +185,6 @@ if (existing) {
 
       <div className="min-h-screen" style={{ background: '#F5F2EB' }}>
 
-        {/* Nav */}
         <nav style={{ background: '#FDFBF7', borderBottom: '1px solid #EDE9DF' }}
           className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4">
           <button onClick={() => router.push('/dashboard')} className="back-btn flex items-center gap-1.5 text-sm font-medium">
@@ -196,148 +209,161 @@ if (existing) {
 
         <div className="max-w-2xl mx-auto px-6 py-8">
 
-          {/* Page title */}
-          <div className="mb-8">
-            <h1 className="playfair text-3xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>
-              {editId ? 'Edit Appointment' : 'New Appointment'}
-            </h1>
-            <p className="text-sm" style={{ color: '#9CA3AF' }}>
-              {editId ? 'Update the details below' : 'Fill in the details to book an appointment'}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* CLIENT INFO */}
-            <div className="form-card p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="step-num">1</div>
-                <h2 className="font-semibold" style={{ color: '#1A3329' }}>Client Info</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 sm:col-span-1">
-                  <label>Client Name *</label>
-                  <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
-                    className={inputClass} style={inputStyle} placeholder="Jane Smith" required />
-                </div>
-                <div className="col-span-2 sm:col-span-1">
-                  <label>Phone Number *</label>
-                  <input type="tel" value={clientPhone} onChange={e => setClientPhone(e.target.value)}
-                    className={inputClass} style={inputStyle} placeholder="(208) 555-0000" required />
-                </div>
-                <div className="col-span-2">
-                  <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional)</span></label>
-                  <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
-                    className={inputClass} style={inputStyle} placeholder="jane@email.com" />
-                </div>
-              </div>
+          {limitReached ? (
+            <div className="text-center py-20">
+              <div className="text-5xl mb-4">🐾</div>
+              <h2 className="playfair text-2xl font-semibold mb-2" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>
+                Monthly limit reached
+              </h2>
+              <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: '#6B7280' }}>
+                You've used all 30 appointments included in your Basic plan this month. Upgrade to Pro for unlimited appointments.
+              </p>
+              <button onClick={() => router.push('/dashboard')}
+                className="submit-btn px-8 py-3 rounded-xl font-semibold text-sm mr-3">
+                Back to Dashboard
+              </button>
+              <button onClick={() => router.push('/pricing')}
+                className="px-8 py-3 rounded-xl font-semibold text-sm"
+                style={{ background: '#D8F3DC', color: '#1A3329' }}>
+                Upgrade to Pro ⭐
+              </button>
             </div>
+          ) : (
+            <>
+              <div className="mb-8">
+                <h1 className="playfair text-3xl font-semibold mb-1" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>
+                  {editId ? 'Edit Appointment' : 'New Appointment'}
+                </h1>
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>
+                  {editId ? 'Update the details below' : 'Fill in the details to book an appointment'}
+                </p>
+              </div>
 
-            {/* DOG INFO */}
-            <div className="form-card p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="step-num">2</div>
-                <h2 className="font-semibold" style={{ color: '#1A3329' }}>Dog Info</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label>Dog&apos;s Name *</label>
-                  <input type="text" value={dogName} onChange={e => setDogName(e.target.value)}
-                    className={inputClass} style={inputStyle} placeholder="Buddy" required />
-                </div>
-                <div>
-                  <label>Breed</label>
-                  <input type="text" value={dogBreed} onChange={e => setDogBreed(e.target.value)}
-                    className={inputClass} style={inputStyle} placeholder="Golden Retriever" />
-                </div>
-              </div>
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* SERVICE & TIME */}
-            <div className="form-card p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="step-num">3</div>
-                <h2 className="font-semibold" style={{ color: '#1A3329' }}>Service & Time</h2>
-              </div>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Service combobox */}
-                  <div className="relative">
-                    <label>Service</label>
-                    <input
-                      ref={serviceInputRef}
-                      type="text"
-                      value={serviceName}
-                      onChange={e => { setServiceName(e.target.value); setShowDropdown(true) }}
-                      onFocus={() => setShowDropdown(true)}
-                      className={inputClass}
-                      style={inputStyle}
-                      placeholder="Full Groom, Bath..."
-                    />
-                    {showDropdown && filteredServices.length > 0 && (
-                      <div ref={dropdownRef}
-                        className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-20"
-                        style={{ background: '#FDFBF7', border: '1px solid #EDE9DF', boxShadow: '0 8px 25px rgba(26,51,41,0.1)' }}>
-                        {filteredServices.map(s => (
-                          <button key={s.id} type="button" onClick={() => selectService(s)}
-                            className="dropdown-item w-full px-4 py-3 text-left flex items-center justify-between"
-                            style={{ borderBottom: '1px solid #EDE9DF' }}>
-                            <span className="text-sm font-medium" style={{ color: '#1A3329' }}>{s.name}</span>
-                            <span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ background: '#D8F3DC', color: '#1A5C36' }}>${s.price}</span>
-                          </button>
-                        ))}
+                <div className="form-card p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="step-num">1</div>
+                    <h2 className="font-semibold" style={{ color: '#1A3329' }}>Client Info</h2>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2 sm:col-span-1">
+                      <label>Client Name *</label>
+                      <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
+                        className={inputClass} style={inputStyle} placeholder="Jane Smith" required />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <label>Phone Number *</label>
+                      <input type="tel" value={clientPhone} onChange={e => setClientPhone(e.target.value)}
+                        className={inputClass} style={inputStyle} placeholder="(208) 555-0000" required />
+                    </div>
+                    <div className="col-span-2">
+                      <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional)</span></label>
+                      <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
+                        className={inputClass} style={inputStyle} placeholder="jane@email.com" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-card p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="step-num">2</div>
+                    <h2 className="font-semibold" style={{ color: '#1A3329' }}>Dog Info</h2>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label>Dog&apos;s Name *</label>
+                      <input type="text" value={dogName} onChange={e => setDogName(e.target.value)}
+                        className={inputClass} style={inputStyle} placeholder="Buddy" required />
+                    </div>
+                    <div>
+                      <label>Breed</label>
+                      <input type="text" value={dogBreed} onChange={e => setDogBreed(e.target.value)}
+                        className={inputClass} style={inputStyle} placeholder="Golden Retriever" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-card p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="step-num">3</div>
+                    <h2 className="font-semibold" style={{ color: '#1A3329' }}>Service & Time</h2>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="relative">
+                        <label>Service</label>
+                        <input
+                          ref={serviceInputRef}
+                          type="text"
+                          value={serviceName}
+                          onChange={e => { setServiceName(e.target.value); setShowDropdown(true) }}
+                          onFocus={() => setShowDropdown(true)}
+                          className={inputClass}
+                          style={inputStyle}
+                          placeholder="Full Groom, Bath..."
+                        />
+                        {showDropdown && filteredServices.length > 0 && (
+                          <div ref={dropdownRef}
+                            className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-20"
+                            style={{ background: '#FDFBF7', border: '1px solid #EDE9DF', boxShadow: '0 8px 25px rgba(26,51,41,0.1)' }}>
+                            {filteredServices.map(s => (
+                              <button key={s.id} type="button" onClick={() => selectService(s)}
+                                className="dropdown-item w-full px-4 py-3 text-left flex items-center justify-between"
+                                style={{ borderBottom: '1px solid #EDE9DF' }}>
+                                <span className="text-sm font-medium" style={{ color: '#1A3329' }}>{s.name}</span>
+                                <span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ background: '#D8F3DC', color: '#1A5C36' }}>${s.price}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Price */}
-                  <div>
-                    <label>Price ($)</label>
-                    <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)}
-                      className={inputClass} style={inputStyle} placeholder="65" min="0" />
-                  </div>
-                </div>
-
-                {/* Date & Time */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label>Date *</label>
-                    <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                      className={inputClass} style={inputStyle}
-                      required min={new Date().toISOString().split('T')[0]} />
-                  </div>
-                  <div>
-                    <label>Time *</label>
-                    <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                      className={inputClass} style={inputStyle} required />
+                      <div>
+                        <label>Price ($)</label>
+                        <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)}
+                          className={inputClass} style={inputStyle} placeholder="65" min="0" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label>Date *</label>
+                        <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                          className={inputClass} style={inputStyle}
+                          required min={new Date().toISOString().split('T')[0]} />
+                      </div>
+                      <div>
+                        <label>Time *</label>
+                        <input type="time" value={time} onChange={e => setTime(e.target.value)}
+                          className={inputClass} style={inputStyle} required />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* NOTES */}
-            <div className="form-card p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="step-num">4</div>
-                <h2 className="font-semibold" style={{ color: '#1A3329' }}>Notes <span className="font-normal text-sm" style={{ color: '#9CA3AF' }}>(optional)</span></h2>
-              </div>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-                className={inputClass} style={{ ...inputStyle, resize: 'none' }}
-                placeholder="Allergies, special instructions, temperament notes..." />
-            </div>
+                <div className="form-card p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="step-num">4</div>
+                    <h2 className="font-semibold" style={{ color: '#1A3329' }}>Notes <span className="font-normal text-sm" style={{ color: '#9CA3AF' }}>(optional)</span></h2>
+                  </div>
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
+                    className={inputClass} style={{ ...inputStyle, resize: 'none' }}
+                    placeholder="Allergies, special instructions, temperament notes..." />
+                </div>
 
-            {error && (
-              <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
-                {error}
-              </div>
-            )}
+                {error && (
+                  <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
+                    {error}
+                  </div>
+                )}
 
-            <button type="submit" disabled={loading}
-              className="submit-btn w-full py-4 rounded-xl font-semibold text-sm">
-              {loading ? 'Saving...' : editId ? 'Update Appointment 🐾' : 'Save Appointment 🐾'}
-            </button>
+                <button type="submit" disabled={loading}
+                  className="submit-btn w-full py-4 rounded-xl font-semibold text-sm">
+                  {loading ? 'Saving...' : editId ? 'Update Appointment 🐾' : 'Save Appointment 🐾'}
+                </button>
 
-          </form>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </>
