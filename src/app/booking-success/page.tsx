@@ -24,10 +24,21 @@ const pawPositions = [
   { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 0.06 },
 ]
 
+interface BookingData {
+  clientName: string
+  dogName: string
+  serviceName: string
+  servicePrice: string
+  date: string
+  time: string
+  businessName: string
+}
+
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  const [booking, setBooking] = useState<BookingData | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -50,7 +61,26 @@ function SuccessContent() {
             notes: data.metadata.notes || null,
             status: 'confirmed',
             payment_status: 'paid',
+            payment_method: 'online',
           })
+
+          const [h, m] = (data.metadata.time || '').split(':')
+          const hour = parseInt(h)
+          const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+          const formattedDate = new Date(data.metadata.date + 'T00:00:00').toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric'
+          })
+
+          setBooking({
+            clientName: data.metadata.clientName,
+            dogName: data.metadata.dogName,
+            serviceName: data.metadata.serviceName,
+            servicePrice: data.metadata.amount,
+            date: formattedDate,
+            time: formattedTime,
+            businessName: data.metadata.businessName || 'your groomer',
+          })
+
           setStatus('success')
         } else {
           setStatus('error')
@@ -80,8 +110,7 @@ function SuccessContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
-      
-      {/* Paw prints */}
+
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {pawPositions.map((paw, i) => (
           <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
@@ -96,7 +125,6 @@ function SuccessContent() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="text-center max-w-md relative z-10">
         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#D8F3DC' }}>
           <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
@@ -107,15 +135,37 @@ function SuccessContent() {
             <ellipse cx="80" cy="44" rx="12" ry="15"/>
           </svg>
         </div>
+
         <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
           You&apos;re booked!
         </h1>
         <p style={{ color: '#6B7280', marginBottom: '24px', lineHeight: 1.7 }}>
-          Your payment was successful and your appointment is confirmed. You&apos;ll receive an SMS reminder before your appointment.
+          Your appointment request has been sent to <strong style={{ color: '#1A3329' }}>{booking?.businessName}</strong>. Your payment was successful and you&apos;ll receive an SMS reminder before your appointment.
         </p>
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold" style={{ background: '#D8F3DC', color: '#1A5C36' }}>
-          ✓ Payment confirmed
-        </div>
+
+        {booking && (
+          <div className="rounded-2xl p-5 text-left space-y-3 mb-4" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+            {[
+              { label: 'Client', value: booking.clientName },
+              { label: 'Dog', value: booking.dogName },
+              { label: 'Service', value: booking.serviceName },
+              { label: 'Date', value: booking.date },
+              { label: 'Time', value: booking.time },
+              { label: 'Payment', value: '💳 Pay Online' },
+            ].map((row, i) => (
+              <div key={i} className="flex justify-between text-sm" style={{ borderBottom: '1px solid #EDE9DF', paddingBottom: '10px' }}>
+                <span style={{ color: '#9CA3AF' }}>{row.label}</span>
+                <span className="font-semibold" style={{ color: '#1A3329' }}>{row.value}</span>
+              </div>
+            ))}
+            <div className="flex justify-between text-sm pt-1">
+              <span className="font-semibold" style={{ color: '#9CA3AF' }}>Price</span>
+              <span className="font-bold text-lg" style={{ color: '#2D6A4F' }}>${booking.servicePrice}</span>
+            </div>
+          </div>
+        )}
+
+        <p className="text-xs" style={{ color: '#9CA3AF' }}>You&apos;ll receive an SMS reminder 24 hours before your appointment.</p>
       </div>
     </div>
   )

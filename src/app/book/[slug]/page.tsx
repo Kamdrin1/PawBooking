@@ -90,11 +90,12 @@ if (paymentMethod === 'online' && selectedSvc) {
       amount: selectedSvc.price,
       groomerStripeId: profile?.stripe_account_id || null,
       bookingData: {
-        clientName, clientPhone, clientEmail,
-        dogName, dogBreed, date, time, notes,
-        profileId: profile!.id,
-        slug,
-      }
+  clientName, clientPhone, clientEmail,
+  dogName, dogBreed, date, time, notes,
+  profileId: profile!.id,
+  slug,
+  businessName: profile!.business_name,
+}
     })
   })
 

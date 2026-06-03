@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
       cancel_url: `https://www.pawbooking.net/book/${bookingData.slug}`,
       metadata: {
         serviceId,
+        serviceName,
+        amount: String(amount),
         groomerStripeId: groomerStripeId || '',
         clientName: bookingData.clientName,
         clientPhone: bookingData.clientPhone,
@@ -40,6 +42,7 @@ export async function POST(req: NextRequest) {
         notes: bookingData.notes || '',
         profileId: bookingData.profileId,
         slug: bookingData.slug,
+        businessName: bookingData.businessName || '',
       },
     })
 
