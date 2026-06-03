@@ -75,13 +75,11 @@ export default function OnboardingPage() {
   setLoading(true)
   let userId: string | null = null
 
-  // Try to get user from active session first
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
     userId = user.id
   } else {
-    // Session lost — recover userId from Stripe session_id in URL
     const params = new URLSearchParams(window.location.search)
     const sessionId = params.get('session_id')
     if (sessionId) {
@@ -100,36 +98,25 @@ export default function OnboardingPage() {
     return
   }
 
-  await supabase.from('profiles').update({
-    phone: toE164(phone),
-    service_area: serviceArea,
-    availability: JSON.stringify({ days: availability, startTime, endTime }),
-    payment_methods: paymentMethods,
-  }).eq('id', userId)
+  const validServices = services
+    .filter(s => s.name.trim() && s.price)
+    .map(s => ({ name: s.name.trim(), price: s.price, duration: s.duration }))
 
-  const validServices = services.filter(s => s.name.trim() && s.price)
-  const { data: existingServices } = await supabase
-    .from('services')
-    .select('id, name')
-    .eq('profile_id', userId)
+  const res = await fetch('/api/save-onboarding', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId,
+      phone: toE164(phone),
+      serviceArea,
+      availability: { days: availability, startTime, endTime },
+      paymentMethods,
+      services: validServices,
+    }),
+  })
 
-  for (const s of validServices) {
-    const match = (existingServices || []).find(
-      e => e.name.toLowerCase().trim() === s.name.toLowerCase().trim()
-    )
-    if (match) {
-      await supabase.from('services').update({
-        price: parseFloat(s.price),
-        duration_minutes: parseInt(s.duration),
-      }).eq('id', match.id)
-    } else {
-      await supabase.from('services').insert({
-        profile_id: userId,
-        name: s.name.trim(),
-        price: parseFloat(s.price),
-        duration_minutes: parseInt(s.duration),
-      })
-    }
+  if (!res.ok) {
+    console.error('Failed to save onboarding data')
   }
 
   router.push('/dashboard')
