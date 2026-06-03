@@ -64,8 +64,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
         <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
       </header>
       <div className="px-8 py-7 max-w-2xl space-y-4">
-
-        {/* Business Name */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm font-semibold" style={{ color: '#1A3329' }}>Business Name</div>
@@ -102,7 +100,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
           )}
         </div>
 
-        {/* Plan */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Your Plan</div>
           <div className="rounded-xl p-4 mb-4" style={{ background: profile?.plan === 'pro' ? '#1A3329' : '#F5F2EB', border: '1px solid #EDE9DF' }}>
@@ -120,19 +117,16 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
               </div>
             </div>
           </div>
-
           {profile?.plan !== 'pro' && (
             <div className="rounded-xl p-4 mb-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
               <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>⭐ Upgrade to Pro — $49/mo</div>
               <div className="text-xs mb-3" style={{ color: '#6B7280' }}>Unlimited appointments, auto review requests, client history, smart messages & priority support.</div>
-              <button disabled
-  className="w-full py-2.5 rounded-xl text-sm font-semibold"
-  style={{ background: '#E5E7EB', color: '#9CA3AF', cursor: 'not-allowed' }}>
-  Coming Soon
-</button>
+              <button disabled className="w-full py-2.5 rounded-xl text-sm font-semibold"
+                style={{ background: '#E5E7EB', color: '#9CA3AF', cursor: 'not-allowed' }}>
+                Coming Soon
+              </button>
             </div>
           )}
-
           {profile?.plan === 'pro' && (
             <button onClick={() => router.push('/pricing')}
               className="w-full py-2.5 rounded-xl text-sm font-semibold"
@@ -141,7 +135,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
             </button>
           )}
         </div>
-
       </div>
     </>
   )
@@ -159,6 +152,7 @@ export default function DashboardPage() {
   const [newServicePrice, setNewServicePrice] = useState('')
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [serviceError, setServiceError] = useState('')
+  const [monthlyApptCount, setMonthlyApptCount] = useState(0)
   const router = useRouter()
   const supabase = createClient()
   const [newPaymentType, setNewPaymentType] = useState<'none' | 'deposit' | 'full'>('none')
@@ -178,6 +172,17 @@ export default function DashboardPage() {
         .order('appointment_date', { ascending: true })
         .order('appointment_time', { ascending: true })
       setAppointments(apptData || [])
+
+      // Count this month's appointments for Basic plan limit
+      const monthStart = new Date()
+      monthStart.setDate(1)
+      const { count } = await supabase
+        .from('appointments')
+        .select('id', { count: 'exact', head: true })
+        .eq('profile_id', user.id)
+        .gte('appointment_date', monthStart.toISOString().split('T')[0])
+      setMonthlyApptCount(count || 0)
+
       const { data: serviceData } = await supabase
         .from('services')
         .select('*')
@@ -248,6 +253,8 @@ export default function DashboardPage() {
   const upcomingAppts = appointments.filter(a => a.appointment_date > today)
   const thisMonthAppts = appointments.filter(a => a.appointment_date.startsWith(new Date().toISOString().slice(0, 7)))
   const monthRevenue = thisMonthAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
+  const isBasic = profile?.plan !== 'pro'
+  const apptLimitPct = Math.min((monthlyApptCount / 30) * 100, 100)
 
   function formatTime(time: string) {
     const [h, m] = time.split(':')
@@ -364,6 +371,31 @@ export default function DashboardPage() {
             ))}
           </nav>
 
+          {/* Basic Plan Appointment Counter */}
+          {isBasic && (
+            <div className="px-4 pb-4">
+              <div className="rounded-xl p-3" style={{ background: monthlyApptCount >= 30 ? '#FEE2E2' : '#F5F2EB', border: `1px solid ${monthlyApptCount >= 30 ? '#FECACA' : '#EDE9DF'}` }}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs font-semibold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>
+                    Appointments
+                  </div>
+                  <div className="text-xs font-bold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>
+                    {monthlyApptCount}/30
+                  </div>
+                </div>
+                <div className="w-full rounded-full h-1.5" style={{ background: '#EDE9DF' }}>
+                  <div className="h-1.5 rounded-full transition-all" style={{
+                    width: `${apptLimitPct}%`,
+                    background: monthlyApptCount >= 30 ? '#DC2626' : monthlyApptCount >= 24 ? '#F59E0B' : '#2D6A4F'
+                  }} />
+                </div>
+                <div className="text-xs mt-1.5" style={{ color: '#9CA3AF' }}>
+                  {monthlyApptCount >= 30 ? 'Limit reached · Upgrade for unlimited' : `${30 - monthlyApptCount} remaining this month`}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="px-4 pb-6" style={{ borderTop: '1px solid #EDE9DF', paddingTop: '16px' }}>
             <button onClick={handleSignOut}
               className="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-left"
@@ -388,10 +420,6 @@ export default function DashboardPage() {
                     {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
-                <button onClick={() => router.push('/appointments/new')}
-                  className="btn-new flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
-                  + New Appointment
-                </button>
               </header>
 
               <div className="px-8 py-7 space-y-6 max-w-5xl">
