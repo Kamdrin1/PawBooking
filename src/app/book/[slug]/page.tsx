@@ -79,37 +79,34 @@ export default function BookingPage() {
 
     const selectedSvc = services.find(s => s.id === serviceId)
 
-    if (selectedSvc && (selectedSvc.payment_type === 'full' || selectedSvc.payment_type === 'deposit')) {
-      const amount = selectedSvc.payment_type === 'full'
-        ? selectedSvc.price
-        : selectedSvc.deposit_amount
-
-      const res = await fetch('/api/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceId,
-          serviceName: selectedSvc.name,
-          amount,
-          groomerStripeId: profile?.stripe_account_id || null,
-          bookingData: {
-            clientName, clientPhone, clientEmail,
-            dogName, dogBreed, date, time, notes,
-            profileId: profile!.id,
-            slug,
-          }
-        })
-      })
-
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-        return
+// If payment method is online, go to Stripe checkout
+if (paymentMethod === 'online' && selectedSvc) {
+  const res = await fetch('/api/create-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      serviceId,
+      serviceName: selectedSvc.name,
+      amount: selectedSvc.price,
+      groomerStripeId: profile?.stripe_account_id || null,
+      bookingData: {
+        clientName, clientPhone, clientEmail,
+        dogName, dogBreed, date, time, notes,
+        profileId: profile!.id,
+        slug,
       }
-      setError('Failed to start checkout. Please try again.')
-      setLoading(false)
-      return
-    }
+    })
+  })
+
+  const data = await res.json()
+  if (data.url) {
+    window.location.href = data.url
+    return
+  }
+  setError('Failed to start checkout. Please try again.')
+  setLoading(false)
+  return
+}
 
     const { error } = await supabase.from('appointments').insert({
       profile_id: profile!.id,
