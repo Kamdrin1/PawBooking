@@ -45,7 +45,15 @@ export default function SignupPage() {
     if (signUpError) { setError(signUpError.message); setLoading(false); return }
     if (!data.user) { setError('Something went wrong. Please try again.'); setLoading(false); return }
 
-    // Step 2 — Create profile
+    // Step 2 — Immediately sign in to establish a persistent session
+    // before Stripe redirects away from the page
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) {
+      console.error('Sign in after signup failed:', signInError.message)
+      // Non-fatal — continue anyway
+    }
+
+    // Step 3 — Create profile
     const { error: profileError } = await supabase.from('profiles').upsert({
       id: data.user.id,
       email,
@@ -53,7 +61,7 @@ export default function SignupPage() {
     }, { onConflict: 'id' })
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
-    // Step 3 — Create Stripe checkout session with 30-day trial
+    // Step 4 — Create Stripe checkout session with 30-day trial
     try {
       const res = await fetch('/api/create-subscription-checkout', {
         method: 'POST',
