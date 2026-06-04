@@ -16,8 +16,8 @@ export async function POST(req: Request) {
     const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
 
     await resend.emails.send({
-      from: 'PawBooking <onboarding@resend.dev>',
-      to: 'monchigameing@gmail.com',
+      from: 'PawBooking <notifications@pawbooking.net>',
+to: 'monchigameing@gmail.com',
       subject: `🐾 New Booking — ${clientName} & ${dogName}`,
       html: `
         <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; background: #F5F2EB; padding: 32px; border-radius: 16px;">
