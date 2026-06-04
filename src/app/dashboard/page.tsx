@@ -64,13 +64,15 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
     'Up to 30 appointments/mo',
     'SMS appointment reminders',
     'Instant booking notifications',
-    'Client history & dog notes',
+    'Client history',
   ]
 
   const basicLocked = [
     'Unlimited appointments',
-    'Auto review requests',
+    'Rebooking reminders',
+    'Auto review requests after every job',
     'Smart personalized messages',
+    'Monthly revenue & booking reports',
     'Early access to new features',
     'Priority support',
   ]
@@ -78,8 +80,9 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
   const proFeatures = [
     'Everything in Basic',
     'Unlimited appointments',
+    'Rebooking reminders',
     'Auto review requests after every job',
-    'Smart personalized messages',
+    'Monthly revenue & booking reports',
     'Early access to new features',
     'Priority support',
   ]
@@ -154,8 +157,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
                 <span className="text-3xl font-bold" style={{ color: !isPro ? 'white' : '#1A3329', fontFamily: 'Playfair Display, serif' }}>$30</span>
                 <span className="text-xs" style={{ color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF' }}>/mo</span>
               </div>
-
-              {/* Included */}
               <div className="flex flex-col gap-2 flex-1">
                 {basicIncluded.map(f => (
                   <div key={f} className="flex items-start gap-2">
@@ -166,11 +167,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
                     <span className="text-xs leading-relaxed" style={{ color: !isPro ? 'rgba(255,255,255,0.8)' : '#374151' }}>{f}</span>
                   </div>
                 ))}
-
-                {/* Divider */}
                 <div className="my-1" style={{ borderTop: !isPro ? '1px solid rgba(255,255,255,0.1)' : '1px solid #EDE9DF' }} />
-
-                {/* Locked */}
                 {basicLocked.map(f => (
                   <div key={f} className="flex items-start gap-2">
                     <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
@@ -189,10 +186,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
               border: isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF',
             }}>
               <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
-                style={{
-                  background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329',
-                  color: 'white',
-                }}>
+                style={{ background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329', color: 'white' }}>
                 {isPro ? 'Current' : '⭐ Popular'}
               </div>
               <div className="text-xs font-bold uppercase tracking-widest mb-1"
@@ -218,7 +212,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
 
           </div>
 
-          {/* CTA */}
           {!isPro ? (
             <button onClick={() => router.push('/pricing')}
               className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -253,6 +246,7 @@ export default function DashboardPage() {
   const [serviceError, setServiceError] = useState('')
   const [monthlyApptCount, setMonthlyApptCount] = useState(0)
   const [newPaymentTypes, setNewPaymentTypes] = useState<string[]>([])
+  const [completingAppt, setCompletingAppt] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -300,6 +294,22 @@ export default function DashboardPage() {
     await supabase.from('appointments').delete().eq('id', id)
     setAppointments(prev => prev.filter(a => a.id !== id))
     setSelectedAppt(null)
+  }
+
+  async function handleMarkComplete(id: string) {
+    setCompletingAppt(id)
+    const { error } = await supabase
+      .from('appointments')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+    if (!error) {
+      setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: 'completed' } : a))
+      setSelectedAppt(prev => prev?.id === id ? { ...prev, status: 'completed' } : prev)
+    }
+    setCompletingAppt(null)
   }
 
   async function handleAddService() {
@@ -683,7 +693,11 @@ export default function DashboardPage() {
                               <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
                               {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
                             </div>
-                            <div style={{ color: '#D1D5DB' }}>›</div>
+                            {appt.status === 'completed' ? (
+                              <div className="px-2 py-1 rounded-full text-xs font-semibold" style={{ background: '#D8F3DC', color: '#1A5C36' }}>✓ Done</div>
+                            ) : (
+                              <div style={{ color: '#D1D5DB' }}>›</div>
+                            )}
                           </div>
                         </div>
                       )
@@ -913,9 +927,14 @@ export default function DashboardPage() {
                   <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{formatDate(selectedAppt.appointment_date)} · {formatTime(selectedAppt.appointment_time)}</div>
                 </div>
               </div>
-              <button onClick={() => setSelectedAppt(null)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                style={{ background: '#F5F2EB', color: '#6B7280' }}>✕</button>
+              <div className="flex items-center gap-2">
+                {selectedAppt.status === 'completed' && (
+                  <div className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: '#D8F3DC', color: '#1A5C36' }}>✓ Completed</div>
+                )}
+                <button onClick={() => setSelectedAppt(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                  style={{ background: '#F5F2EB', color: '#6B7280' }}>✕</button>
+              </div>
             </div>
 
             <div className="p-6 space-y-5">
@@ -966,15 +985,26 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-3 px-6 pb-6">
-              <button onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: '#1A3329', color: 'white' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#2D6A4F')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#1A3329')}>
-                Edit Appointment
-              </button>
+              {selectedAppt.status !== 'completed' && (
+                <button
+                  onClick={() => handleMarkComplete(selectedAppt.id)}
+                  disabled={completingAppt === selectedAppt.id}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 transition-all"
+                  style={{ background: '#D8F3DC', color: '#1A5C36', border: '1px solid #B7E4C7' }}>
+                  {completingAppt === selectedAppt.id ? 'Saving...' : '✓ Mark Complete'}
+                </button>
+              )}
+              {selectedAppt.status !== 'completed' && (
+                <button onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
+                  className="py-3 px-4 rounded-xl text-sm font-semibold transition-all"
+                  style={{ background: '#1A3329', color: 'white' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#2D6A4F')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#1A3329')}>
+                  Edit
+                </button>
+              )}
               <button onClick={() => { if (confirm('Delete this appointment?')) handleDelete(selectedAppt.id) }}
-                className="px-5 py-3 rounded-xl text-sm font-semibold"
+                className="py-3 px-4 rounded-xl text-sm font-semibold"
                 style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
                 Delete
               </button>
