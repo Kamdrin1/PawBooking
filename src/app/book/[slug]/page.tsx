@@ -42,6 +42,7 @@ export default function BookingPage() {
   const [time, setTime] = useState('')
   const [notes, setNotes] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('in_person')
+  const [smsConsent, setSmsConsent] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -74,40 +75,43 @@ export default function BookingPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!smsConsent) {
+      setError('Please agree to receive SMS reminders to complete your booking.')
+      return
+    }
     setLoading(true)
     setError('')
 
     const selectedSvc = services.find(s => s.id === serviceId)
 
-// If payment method is online, go to Stripe checkout
-if (paymentMethod === 'online' && selectedSvc) {
-  const res = await fetch('/api/create-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      serviceId,
-      serviceName: selectedSvc.name,
-      amount: selectedSvc.price,
-      groomerStripeId: profile?.stripe_account_id || null,
-      bookingData: {
-  clientName, clientPhone, clientEmail,
-  dogName, dogBreed, date, time, notes,
-  profileId: profile!.id,
-  slug,
-  businessName: profile!.business_name,
-}
-    })
-  })
+    if (paymentMethod === 'online' && selectedSvc) {
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId,
+          serviceName: selectedSvc.name,
+          amount: selectedSvc.price,
+          groomerStripeId: profile?.stripe_account_id || null,
+          bookingData: {
+            clientName, clientPhone, clientEmail,
+            dogName, dogBreed, date, time, notes,
+            profileId: profile!.id,
+            slug,
+            businessName: profile!.business_name,
+          }
+        })
+      })
 
-  const data = await res.json()
-  if (data.url) {
-    window.location.href = data.url
-    return
-  }
-  setError('Failed to start checkout. Please try again.')
-  setLoading(false)
-  return
-}
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setError('Failed to start checkout. Please try again.')
+      setLoading(false)
+      return
+    }
 
     const { error } = await supabase.from('appointments').insert({
       profile_id: profile!.id,
@@ -159,7 +163,6 @@ if (paymentMethod === 'online' && selectedSvc) {
         .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
       <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
-
         <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
           {[
             { top: '3%',  left: '2%',  rotate: '-25deg', size: 100, opacity: 0.06 },
@@ -202,9 +205,9 @@ if (paymentMethod === 'online' && selectedSvc) {
             </svg>
           </div>
 
-          <h1 className="playfair text-3xl font-bold mb-3" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>You're booked!</h1>
+          <h1 className="playfair text-3xl font-bold mb-3" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>You&apos;re booked!</h1>
           <p className="text-base mb-6" style={{ color: '#6B7280' }}>
-            Your appointment request has been sent to <strong style={{ color: '#1A3329' }}>{profile.business_name}</strong>. They'll confirm shortly and you'll receive a reminder before your appointment.
+            Your appointment request has been sent to <strong style={{ color: '#1A3329' }}>{profile.business_name}</strong>. They&apos;ll confirm shortly and you&apos;ll receive a reminder before your appointment.
           </p>
 
           <div className="rounded-2xl p-5 text-left space-y-3" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
@@ -227,7 +230,7 @@ if (paymentMethod === 'online' && selectedSvc) {
             </div>
           </div>
 
-          <p className="text-xs mt-4" style={{ color: '#9CA3AF' }}>You'll receive an SMS reminder 24 hours before your appointment.</p>
+          <p className="text-xs mt-4" style={{ color: '#9CA3AF' }}>You&apos;ll receive an SMS reminder 24 hours before your appointment.</p>
         </div>
       </div>
     </>
@@ -440,19 +443,34 @@ if (paymentMethod === 'online' && selectedSvc) {
               </div>
             )}
 
+            {/* SMS Consent */}
+            <div className="rounded-2xl p-4 flex items-start gap-3" style={{ background: '#FDFBF7', border: `2px solid ${smsConsent ? '#2D6A4F' : '#EDE9DF'}` }}>
+              <input
+                type="checkbox"
+                id="sms-consent"
+                checked={smsConsent}
+                onChange={e => setSmsConsent(e.target.checked)}
+                className="mt-0.5 flex-shrink-0"
+                style={{ width: '16px', height: '16px', accentColor: '#1A3329', cursor: 'pointer' }}
+              />
+              <label htmlFor="sms-consent" style={{ color: '#4B5563', fontSize: '12px', fontWeight: 400, marginBottom: 0, cursor: 'pointer', lineHeight: 1.6 }}>
+                I agree to receive SMS appointment reminders from {profile.business_name} via PawBooking. Message frequency varies. Message & data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
+              </label>
+            </div>
+
             {error && (
               <div className="px-4 py-3 rounded-xl text-sm" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading}
+            <button type="submit" disabled={loading || !smsConsent}
               className="submit-btn w-full py-4 rounded-xl font-semibold text-sm">
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
 
             <p className="text-center text-xs" style={{ color: '#9CA3AF' }}>
-              Your request will be confirmed by {profile.business_name}. You'll receive an SMS reminder before your appointment.
+              Your request will be confirmed by {profile.business_name}. You&apos;ll receive an SMS reminder before your appointment.
             </p>
 
           </form>
