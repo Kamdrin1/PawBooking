@@ -130,22 +130,24 @@ export default function BookingPage() {
 
     if (error) { setError(error.message); setLoading(false); return }
 
-// Send email notification to groomer
-fetch('/api/notify-booking', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    clientName, clientPhone, clientEmail,
-    dogName, dogBreed,
-    serviceName: selectedService?.name || 'Appointment',
-    servicePrice: selectedService?.price || 0,
-    date, time, notes,
-    paymentMethod,
-    businessName: profile!.business_name,
-  })
-})
+    // Send email notification to groomer
+    fetch('/api/notify-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName, clientPhone, clientEmail,
+        dogName, dogBreed,
+        serviceName: selectedService?.name || 'Appointment',
+        servicePrice: selectedService?.price || 0,
+        date, time, notes,
+        paymentMethod,
+        businessName: profile!.business_name,
+      })
+    })
 
-setSubmitted(true)
+    setSubmitted(true)
+    setLoading(false)
+  }
 
   if (notFound) return (
     <>
@@ -157,7 +159,7 @@ setSubmitted(true)
         <div className="text-center">
           <div className="text-5xl mb-4">🐾</div>
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#1A3329', fontFamily: 'Playfair Display, serif' }}>Groomer not found</h1>
-          <p style={{ color: '#9CA3AF' }}>This booking link doesn't exist or has been removed.</p>
+          <p style={{ color: '#9CA3AF' }}>This booking link doesn&apos;t exist or has been removed.</p>
         </div>
       </div>
     </>
@@ -295,7 +297,6 @@ setSubmitted(true)
         <div className="max-w-lg mx-auto px-6 py-8">
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Service Selection */}
             {services.length > 0 && (
               <div>
                 <h2 className="font-semibold mb-3" style={{ color: '#1A3329' }}>Select a Service</h2>
@@ -323,7 +324,6 @@ setSubmitted(true)
               </div>
             )}
 
-            {/* Date & Time */}
             <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Date & Time</h2>
               <div className="grid grid-cols-2 gap-3">
@@ -344,7 +344,6 @@ setSubmitted(true)
               </div>
             </div>
 
-            {/* Your Info */}
             <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Your Info</h2>
               <div className="space-y-3">
@@ -374,7 +373,6 @@ setSubmitted(true)
               </div>
             </div>
 
-            {/* Dog Info */}
             <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Dog Info</h2>
               <div className="grid grid-cols-2 gap-3">
@@ -395,7 +393,6 @@ setSubmitted(true)
               </div>
             </div>
 
-            {/* Payment Method — only shows if groomer accepts both */}
             {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online') && (
               <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                 <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>How would you like to pay?</h2>
@@ -419,7 +416,6 @@ setSubmitted(true)
               </div>
             )}
 
-            {/* Notes */}
             <div className="rounded-2xl p-5" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329' }}>Additional Notes <span className="font-normal text-sm" style={{ color: '#9CA3AF' }}>(optional)</span></h2>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
@@ -428,7 +424,6 @@ setSubmitted(true)
                 style={{ background: '#F5F2EB', border: '1px solid #EDE9DF' }} />
             </div>
 
-            {/* Summary */}
             {selectedService && date && time && (
               <div className="rounded-2xl p-5" style={{ background: '#D8F3DC', border: '1px solid #B7E4C7' }}>
                 <h2 className="font-semibold mb-3 text-sm uppercase tracking-wide" style={{ color: '#1A5C36' }}>Booking Summary</h2>
