@@ -68,14 +68,13 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
   ]
 
   const basicLocked = [
-    'Unlimited appointments',
-    'Rebooking reminders',
-    'Auto review requests after every job',
-    'Smart personalized messages',
-    'Monthly revenue & booking reports',
-    'Early access to new features',
-    'Priority support',
-  ]
+  'Unlimited appointments',
+  'Rebooking reminders',
+  'Auto review requests after every job',
+  'Monthly revenue & booking reports',
+  'Early access to new features',
+  'Priority support',
+]
 
   const proFeatures = [
     'Everything in Basic',
