@@ -12,7 +12,7 @@ const supabase = createClient(
 // ─── Stripe Price IDs ─────────────────────────────────────────────────────────
 const PRICE_IDS = {
   basic: 'price_1TbwBnE12BO3MSKAMUPsrCqn',          // $30/mo
-  pro:   'price_1TejNuE12BO3MSKAYAHT2gyJITH_PRO_PRICE_ID',                 // $50/mo — swap this once created in Stripe
+  pro:   'price_1TejNuE12BO3MSKAYAHT2gyJ',            // $50/mo
 }
 
 export async function POST(req: Request) {
