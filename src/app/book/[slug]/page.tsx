@@ -129,9 +129,23 @@ export default function BookingPage() {
     })
 
     if (error) { setError(error.message); setLoading(false); return }
-    setSubmitted(true)
-    setLoading(false)
-  }
+
+// Send email notification to groomer
+fetch('/api/notify-booking', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    clientName, clientPhone, clientEmail,
+    dogName, dogBreed,
+    serviceName: selectedService?.name || 'Appointment',
+    servicePrice: selectedService?.price || 0,
+    date, time, notes,
+    paymentMethod,
+    businessName: profile!.business_name,
+  })
+})
+
+setSubmitted(true)
 
   if (notFound) return (
     <>
