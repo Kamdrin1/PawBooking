@@ -153,10 +153,9 @@ export default function DashboardPage() {
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [serviceError, setServiceError] = useState('')
   const [monthlyApptCount, setMonthlyApptCount] = useState(0)
+  const [newPaymentTypes, setNewPaymentTypes] = useState<string[]>([])
   const router = useRouter()
   const supabase = createClient()
-  const [newPaymentType, setNewPaymentType] = useState<'none' | 'deposit' | 'full'>('none')
-  const [newDepositAmount, setNewDepositAmount] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -173,7 +172,6 @@ export default function DashboardPage() {
         .order('appointment_time', { ascending: true })
       setAppointments(apptData || [])
 
-      // Count this month's appointments for Basic plan limit
       const monthStart = new Date()
       monthStart.setDate(1)
       const { count } = await supabase
@@ -208,6 +206,7 @@ export default function DashboardPage() {
   async function handleAddService() {
     setServiceError('')
     if (!newServiceName.trim()) { setServiceError('Service name is required'); return }
+    if (newPaymentTypes.length === 0) { setServiceError('Select at least one payment type'); return }
     const duplicate = services.find(s => s.name.toLowerCase() === newServiceName.toLowerCase().trim())
     if (duplicate) { setServiceError(`"${newServiceName}" already exists`); return }
     const { data: { user } } = await supabase.auth.getUser()
@@ -217,15 +216,18 @@ export default function DashboardPage() {
       name: newServiceName.trim(),
       price: parseFloat(newServicePrice) || 0,
       duration_minutes: 60,
-      payment_type: newPaymentType,
-      deposit_amount: newPaymentType === 'deposit' ? parseFloat(newDepositAmount) || 0 : 0,
+      payment_type: newPaymentTypes.includes('online') && newPaymentTypes.includes('in_person')
+        ? 'full'
+        : newPaymentTypes.includes('online')
+        ? 'full'
+        : 'none',
+      deposit_amount: 0,
     }).select().single()
     if (error) { setServiceError(error.message); return }
     setServices(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewServiceName('')
     setNewServicePrice('')
-    setNewPaymentType('none')
-    setNewDepositAmount('')
+    setNewPaymentTypes([])
   }
 
   async function handleUpdateService() {
@@ -246,6 +248,14 @@ export default function DashboardPage() {
     if (!confirm('Delete this service?')) return
     await supabase.from('services').delete().eq('id', id)
     setServices(prev => prev.filter(s => s.id !== id))
+  }
+
+  function getServicePaymentLabel(service: Service) {
+    const hasInPerson = service.payment_type === 'none' || (service.payment_type === 'full' && profile?.payment_methods?.includes('in_person'))
+    const hasOnline = service.payment_type === 'full'
+    if (hasOnline && hasInPerson) return '💵 Pay in Person · 💳 Pay Online'
+    if (hasOnline) return '💳 Pay Online'
+    return '💵 Pay in Person'
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -371,17 +381,12 @@ export default function DashboardPage() {
             ))}
           </nav>
 
-          {/* Basic Plan Appointment Counter */}
           {isBasic && (
             <div className="px-4 pb-4">
               <div className="rounded-xl p-3" style={{ background: monthlyApptCount >= 30 ? '#FEE2E2' : '#F5F2EB', border: `1px solid ${monthlyApptCount >= 30 ? '#FECACA' : '#EDE9DF'}` }}>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs font-semibold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>
-                    Appointments
-                  </div>
-                  <div className="text-xs font-bold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>
-                    {monthlyApptCount}/30
-                  </div>
+                  <div className="text-xs font-semibold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>Appointments</div>
+                  <div className="text-xs font-bold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>{monthlyApptCount}/30</div>
                 </div>
                 <div className="w-full rounded-full h-1.5" style={{ background: '#EDE9DF' }}>
                   <div className="h-1.5 rounded-full transition-all" style={{
@@ -683,35 +688,33 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mb-3">
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Requirement</label>
+                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Options <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(select all that apply)</span></label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'none', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
-                        ...(profile?.payment_methods?.includes('online') ? [{ value: 'full', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
+                        ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'in_person', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
+                        ...(profile?.payment_methods?.includes('online') ? [{ value: 'online', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
                       ].map(opt => (
                         <button key={opt.value} type="button"
-                          onClick={() => setNewPaymentType(opt.value as 'none' | 'deposit' | 'full')}
+                          onClick={() => setNewPaymentTypes(prev =>
+                            prev.includes(opt.value) ? prev.filter(p => p !== opt.value) : [...prev, opt.value]
+                          )}
                           className="p-3 rounded-xl text-left transition-all"
                           style={{
-                            border: newPaymentType === opt.value ? '2px solid #1A3329' : '2px solid #EDE9DF',
-                            background: newPaymentType === opt.value ? '#D8F3DC' : '#F5F2EB',
+                            border: newPaymentTypes.includes(opt.value) ? '2px solid #1A3329' : '2px solid #EDE9DF',
+                            background: newPaymentTypes.includes(opt.value) ? '#D8F3DC' : '#F5F2EB',
                           }}>
-                          <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
+                            <div className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0"
+                              style={{ borderColor: newPaymentTypes.includes(opt.value) ? '#1A3329' : '#D1C9B8', background: newPaymentTypes.includes(opt.value) ? '#1A3329' : 'transparent' }}>
+                              {newPaymentTypes.includes(opt.value) && <span className="text-white" style={{ fontSize: '10px' }}>✓</span>}
+                            </div>
+                          </div>
                           <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
                         </button>
                       ))}
                     </div>
                   </div>
-
-                  {newPaymentType === 'deposit' && (
-                    <div className="mb-3">
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Deposit Amount ($)</label>
-                      <input type="number" value={newDepositAmount} onChange={e => setNewDepositAmount(e.target.value)}
-                        placeholder="25"
-                        className="w-full px-4 py-3 rounded-xl text-sm"
-                        style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
-                    </div>
-                  )}
 
                   {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
                   <button onClick={handleAddService}
@@ -757,11 +760,7 @@ export default function DashboardPage() {
                               <div>
                                 <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{service.name}</div>
                                 <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>
-                                  {profile?.payment_methods?.includes('in_person') && profile?.payment_methods?.includes('online')
-                                    ? '💵 Pay in Person · 💳 Pay Online'
-                                    : profile?.payment_methods?.includes('online')
-                                    ? '💳 Pay Online'
-                                    : '💵 Pay in Person'}
+                                  {getServicePaymentLabel(service)}
                                 </div>
                               </div>
                             </div>
