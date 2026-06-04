@@ -9,13 +9,22 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// ─── Stripe Price IDs ─────────────────────────────────────────────────────────
+const PRICE_IDS = {
+  basic: 'price_1TbwBnE12BO3MSKAMUPsrCqn',          // $30/mo
+  pro:   'price_1TejNuE12BO3MSKAYAHT2gyJITH_PRO_PRICE_ID',                 // $50/mo — swap this once created in Stripe
+}
+
 export async function POST(req: Request) {
   try {
-    const { userId, email, businessName } = await req.json()
+    const { userId, email, businessName, plan } = await req.json()
 
     if (!userId || !email) {
       return NextResponse.json({ error: 'Missing userId or email' }, { status: 400 })
     }
+
+    const selectedPlan = plan === 'pro' ? 'pro' : 'basic'
+    const priceId = PRICE_IDS[selectedPlan]
 
     const customer = await stripe.customers.create({
       email,
@@ -25,6 +34,7 @@ export async function POST(req: Request) {
 
     await supabase.from('profiles').update({
       stripe_customer_id: customer.id,
+      plan: selectedPlan,
     }).eq('id', userId)
 
     const session = await stripe.checkout.sessions.create({
@@ -32,18 +42,19 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{
-        price: 'price_1TbwBnE12BO3MSKAMUPsrCqn',
+        price: priceId,
         quantity: 1,
       }],
       subscription_data: {
         trial_period_days: 30,
-        metadata: { supabase_user_id: userId },
+        metadata: { supabase_user_id: userId, plan: selectedPlan },
       },
       metadata: {
         supabase_user_id: userId,
+        plan: selectedPlan,
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/signup`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/choose-plan?userId=${userId}&email=${encodeURIComponent(email)}&businessName=${encodeURIComponent(businessName || '')}`,
     })
 
     return NextResponse.json({ url: session.url })

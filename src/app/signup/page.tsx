@@ -45,15 +45,13 @@ export default function SignupPage() {
     if (signUpError) { setError(signUpError.message); setLoading(false); return }
     if (!data.user) { setError('Something went wrong. Please try again.'); setLoading(false); return }
 
-    // Step 2 — Immediately sign in to establish a persistent session
-    // before Stripe redirects away from the page
+    // Step 2 — Sign in immediately to establish session
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
       console.error('Sign in after signup failed:', signInError.message)
-      // Non-fatal — continue anyway
     }
 
-    // Step 3 — Create profile
+    // Step 3 — Create profile (no plan yet — set after plan selection)
     const { error: profileError } = await supabase.from('profiles').upsert({
       id: data.user.id,
       email,
@@ -61,37 +59,8 @@ export default function SignupPage() {
     }, { onConflict: 'id' })
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
-    // Step 4 — Create Stripe checkout session with 30-day trial
-    try {
-      const res = await fetch('/api/create-subscription-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: data.user.id,
-          email,
-          businessName,
-        }),
-      })
-
-      if (!res.ok) {
-        const errData = await res.json()
-        console.error('Stripe checkout error:', errData)
-        router.push('/onboarding')
-        return
-      }
-
-      const result = await res.json()
-
-      if (result.url) {
-        window.location.href = result.url
-      } else {
-        console.error('No Stripe URL returned:', result)
-        router.push('/onboarding')
-      }
-    } catch (err) {
-      console.error('Stripe checkout failed:', err)
-      router.push('/onboarding')
-    }
+    // Step 4 — Redirect to plan selection
+    router.push(`/choose-plan?userId=${data.user.id}&email=${encodeURIComponent(email)}&businessName=${encodeURIComponent(businessName)}`)
   }
 
   return (
@@ -169,7 +138,7 @@ export default function SignupPage() {
 
           <button type="submit" disabled={loading}
             className="w-full bg-[#2D6A4F] text-white rounded-xl py-3 font-semibold hover:bg-[#1A3329] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 shadow-md hover:shadow-lg">
-            {loading ? 'Creating account...' : 'Create Free Account →'}
+            {loading ? 'Creating account...' : 'Continue →'}
           </button>
         </form>
 
