@@ -59,20 +59,28 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
 
   const isPro = profile?.plan === 'pro'
 
-  const basicFeatures = [
+  const basicIncluded = [
     'Online booking page',
     'Up to 30 appointments/mo',
     'SMS appointment reminders',
     'Instant booking notifications',
-    'Basic business profile',
+    'Client history & dog notes',
+  ]
+
+  const basicLocked = [
+    'Unlimited appointments',
+    'Auto review requests',
+    'Smart personalized messages',
+    'Early access to new features',
+    'Priority support',
   ]
 
   const proFeatures = [
     'Everything in Basic',
     'Unlimited appointments',
-    'Automated review requests',
-    'Client history & notes',
-    'Smart follow-up messages',
+    'Auto review requests after every job',
+    'Smart personalized messages',
+    'Early access to new features',
     'Priority support',
   ]
 
@@ -146,14 +154,30 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
                 <span className="text-3xl font-bold" style={{ color: !isPro ? 'white' : '#1A3329', fontFamily: 'Playfair Display, serif' }}>$30</span>
                 <span className="text-xs" style={{ color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF' }}>/mo</span>
               </div>
+
+              {/* Included */}
               <div className="flex flex-col gap-2 flex-1">
-                {basicFeatures.map(f => (
+                {basicIncluded.map(f => (
                   <div key={f} className="flex items-start gap-2">
                     <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.15)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={!isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <span className="text-xs leading-relaxed" style={{ color: !isPro ? 'rgba(255,255,255,0.8)' : '#374151' }}>{f}</span>
+                  </div>
+                ))}
+
+                {/* Divider */}
+                <div className="my-1" style={{ borderTop: !isPro ? '1px solid rgba(255,255,255,0.1)' : '1px solid #EDE9DF' }} />
+
+                {/* Locked */}
+                {basicLocked.map(f => (
+                  <div key={f} className="flex items-start gap-2">
+                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.06)' : '#F3F4F6'} />
+                      <path d="M7 7l6 6M13 7l-6 6" stroke={!isPro ? 'rgba(255,255,255,0.25)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-xs leading-relaxed line-through" style={{ color: !isPro ? 'rgba(255,255,255,0.25)' : '#C4C9D1' }}>{f}</span>
                   </div>
                 ))}
               </div>
