@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: Request) {
   try {
-    const { clientName, clientPhone, clientEmail, dogName, dogBreed, serviceName, servicePrice, date, time, paymentMethod, businessName, notes } = await req.json()
+    const body = await req.json()
+    const { clientName, clientPhone, clientEmail, dogName, dogBreed, serviceName, servicePrice, date, time, paymentMethod, businessName, notes } = body
+
+    console.log('notify-booking called for:', clientName, dogName)
+    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY)
+
+    const resend = new Resend(process.env.RESEND_API_KEY)
 
     const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
@@ -15,9 +19,9 @@ export async function POST(req: Request) {
     const hour = parseInt(h)
     const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: 'PawBooking <notifications@pawbooking.net>',
-to: 'monchigameing@gmail.com',
+      to: 'monchigameing@gmail.com',
       subject: `🐾 New Booking — ${clientName} & ${dogName}`,
       html: `
         <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; background: #F5F2EB; padding: 32px; border-radius: 16px;">
@@ -25,7 +29,6 @@ to: 'monchigameing@gmail.com',
             <h1 style="color: white; margin: 0; font-size: 22px;">🐾 New Appointment Booked</h1>
             <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">${businessName}</p>
           </div>
-
           <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
             <table style="width: 100%; border-collapse: collapse;">
               <tr style="border-bottom: 1px solid #EDE9DF;">
@@ -66,17 +69,17 @@ to: 'monchigameing@gmail.com',
               </tr>` : ''}
             </table>
           </div>
-
           <div style="text-align: center;">
             <a href="https://www.pawbooking.net/dashboard" style="background: #1A3329; color: white; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600;">View Dashboard</a>
           </div>
-
           <p style="text-align: center; color: #9CA3AF; font-size: 11px; margin-top: 24px;">PawBooking · Automated appointment reminders for dog groomers</p>
         </div>
       `
     })
 
-    return NextResponse.json({ success: true })
+    console.log('Resend result:', JSON.stringify(result))
+    return NextResponse.json({ success: true, result })
+
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('Email notification error:', message)
