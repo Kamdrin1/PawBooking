@@ -57,6 +57,25 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
     setSavingName(false)
   }
 
+  const isPro = profile?.plan === 'pro'
+
+  const basicFeatures = [
+    'Online booking page',
+    'Up to 30 appointments/mo',
+    'SMS appointment reminders',
+    'Instant booking notifications',
+    'Basic business profile',
+  ]
+
+  const proFeatures = [
+    'Everything in Basic',
+    'Unlimited appointments',
+    'Automated review requests',
+    'Client history & notes',
+    'Smart follow-up messages',
+    'Priority support',
+  ]
+
   return (
     <>
       <header className="px-8 py-6" style={{ borderBottom: '1px solid #EDE9DF', background: '#FDFBF7' }}>
@@ -64,6 +83,8 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
         <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
       </header>
       <div className="px-8 py-7 max-w-2xl space-y-4">
+
+        {/* Business Name */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm font-semibold" style={{ color: '#1A3329' }}>Business Name</div>
@@ -100,41 +121,95 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
           )}
         </div>
 
+        {/* Plan Cards */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Your Plan</div>
-          <div className="rounded-xl p-4 mb-4" style={{ background: profile?.plan === 'pro' ? '#1A3329' : '#F5F2EB', border: '1px solid #EDE9DF' }}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-semibold capitalize" style={{ color: profile?.plan === 'pro' ? 'white' : '#1A3329' }}>
-                  {profile?.plan === 'pro' ? '⭐ Pro Plan' : '📋 Basic Plan'}
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
+
+            {/* Basic Card */}
+            <div className="rounded-2xl p-5 relative flex flex-col" style={{
+              background: !isPro ? '#1A3329' : '#FFFFFF',
+              border: !isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF',
+            }}>
+              {!isPro && (
+                <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>
+                  Current
                 </div>
-                <div className="text-xs mt-1" style={{ color: profile?.plan === 'pro' ? 'rgba(255,255,255,0.6)' : '#9CA3AF' }}>
-                  {profile?.plan === 'pro' ? '$49/month · All features included' : '$29/month · Core features'}
-                </div>
+              )}
+              <div className="text-xs font-bold uppercase tracking-widest mb-1"
+                style={{ color: !isPro ? 'rgba(255,255,255,0.5)' : '#9CA3AF' }}>
+                Basic
               </div>
-              <div className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: profile?.plan === 'pro' ? 'rgba(216,243,220,0.2)' : '#D8F3DC', color: profile?.plan === 'pro' ? '#D8F3DC' : '#1A5C36' }}>
-                Active
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-bold" style={{ color: !isPro ? 'white' : '#1A3329', fontFamily: 'Playfair Display, serif' }}>$30</span>
+                <span className="text-xs" style={{ color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF' }}>/mo</span>
+              </div>
+              <div className="flex flex-col gap-2 flex-1">
+                {basicFeatures.map(f => (
+                  <div key={f} className="flex items-start gap-2">
+                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.15)' : '#D8F3DC'} />
+                      <path d="M6 10l3 3 5-5" stroke={!isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-xs leading-relaxed" style={{ color: !isPro ? 'rgba(255,255,255,0.8)' : '#374151' }}>{f}</span>
+                  </div>
+                ))}
               </div>
             </div>
+
+            {/* Pro Card */}
+            <div className="rounded-2xl p-5 relative flex flex-col" style={{
+              background: isPro ? '#1A3329' : '#FFFFFF',
+              border: isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF',
+            }}>
+              <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
+                style={{
+                  background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329',
+                  color: 'white',
+                }}>
+                {isPro ? 'Current' : '⭐ Popular'}
+              </div>
+              <div className="text-xs font-bold uppercase tracking-widest mb-1"
+                style={{ color: isPro ? 'rgba(255,255,255,0.5)' : '#9CA3AF' }}>
+                Pro
+              </div>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-bold" style={{ color: isPro ? 'white' : '#1A3329', fontFamily: 'Playfair Display, serif' }}>$50</span>
+                <span className="text-xs" style={{ color: isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF' }}>/mo</span>
+              </div>
+              <div className="flex flex-col gap-2 flex-1">
+                {proFeatures.map(f => (
+                  <div key={f} className="flex items-start gap-2">
+                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill={isPro ? 'rgba(255,255,255,0.15)' : '#D8F3DC'} />
+                      <path d="M6 10l3 3 5-5" stroke={isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-xs leading-relaxed" style={{ color: isPro ? 'rgba(255,255,255,0.8)' : '#374151' }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
-          {profile?.plan !== 'pro' && (
-            <div className="rounded-xl p-4 mb-4" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-              <div className="text-sm font-semibold mb-1" style={{ color: '#1A3329' }}>⭐ Upgrade to Pro — $49/mo</div>
-              <div className="text-xs mb-3" style={{ color: '#6B7280' }}>Unlimited appointments, auto review requests, client history, smart messages & priority support.</div>
-              <button disabled className="w-full py-2.5 rounded-xl text-sm font-semibold"
-                style={{ background: '#E5E7EB', color: '#9CA3AF', cursor: 'not-allowed' }}>
-                Coming Soon
-              </button>
-            </div>
-          )}
-          {profile?.plan === 'pro' && (
+
+          {/* CTA */}
+          {!isPro ? (
             <button onClick={() => router.push('/pricing')}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold"
+              className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ background: '#1A3329' }}>
+              Upgrade to Pro — $50/mo →
+            </button>
+          ) : (
+            <button onClick={() => router.push('/pricing')}
+              className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90"
               style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
               Manage Plan
             </button>
           )}
         </div>
+
       </div>
     </>
   )
