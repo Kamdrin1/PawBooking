@@ -23,20 +23,41 @@ export async function POST(req: Request) {
 
   const getCustomerId = (obj: any): string | null => obj?.customer ?? null
 
+  // Read plan from subscription metadata, fallback to 'basic'
+  function getPlanFromMetadata(metadata: Stripe.Metadata | null): string {
+    const plan = metadata?.plan
+    return plan === 'pro' ? 'pro' : 'basic'
+  }
+
   async function updateProfileByCustomer(customerId: string, updates: Record<string, any>) {
     await supabase.from('profiles').update(updates).eq('stripe_customer_id', customerId)
   }
 
   switch (event.type) {
+
+    case 'checkout.session.completed': {
+      // Fired when the user completes Stripe checkout — most reliable place to set plan
+      const session = event.data.object as Stripe.Checkout.Session
+      const customerId = getCustomerId(session)
+      if (!customerId) break
+      const plan = getPlanFromMetadata(session.metadata)
+      await updateProfileByCustomer(customerId, {
+        plan,
+        subscription_status: 'trialing',
+      })
+      break
+    }
+
     case 'customer.subscription.created': {
       const sub = event.data.object as Stripe.Subscription
       const customerId = getCustomerId(sub)
       if (!customerId) break
+      const plan = getPlanFromMetadata(sub.metadata)
       await updateProfileByCustomer(customerId, {
         stripe_subscription_id: sub.id,
         subscription_status: sub.status,
         trial_ends_at: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
-        plan: 'basic',
+        plan,
       })
       break
     }
@@ -45,11 +66,12 @@ export async function POST(req: Request) {
       const sub = event.data.object as Stripe.Subscription
       const customerId = getCustomerId(sub)
       if (!customerId) break
+      const plan = getPlanFromMetadata(sub.metadata)
       await updateProfileByCustomer(customerId, {
         stripe_subscription_id: sub.id,
         subscription_status: sub.status,
         trial_ends_at: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
-        plan: sub.status === 'active' ? 'basic' : sub.status === 'past_due' ? 'basic' : 'basic',
+        plan,
       })
       break
     }
@@ -60,7 +82,7 @@ export async function POST(req: Request) {
       if (!customerId) break
       await updateProfileByCustomer(customerId, {
         subscription_status: 'canceled',
-        plan: 'free',
+        plan: 'basic',
       })
       break
     }
