@@ -64,7 +64,6 @@ function ReportsPage({ profile, supabase, router }: {
         .order('appointment_date', { ascending: true })
       if (!allAppts) { setLoading(false); return }
 
-      // Monthly revenue — last 6 months
       const monthlyMap: Record<string, number> = {}
       const now = new Date()
       for (let i = 5; i >= 0; i--) {
@@ -79,7 +78,6 @@ function ReportsPage({ profile, supabase, router }: {
       })
       const monthlyRevenue = Object.entries(monthlyMap).map(([month, revenue]) => ({ month, revenue }))
 
-      // Top services
       const serviceMap: Record<string, { count: number; revenue: number }> = {}
       allAppts.forEach(a => {
         const name = a.services?.name || 'Unknown'
@@ -92,7 +90,6 @@ function ReportsPage({ profile, supabase, router }: {
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 5)
 
-      // New vs returning
       const phoneSeen = new Set<string>()
       let newClients = 0, returningClients = 0
       allAppts.forEach(a => {
@@ -176,7 +173,6 @@ function ReportsPage({ profile, supabase, router }: {
           </div>
         ) : reportData ? (
           <div className="space-y-6">
-            {/* Stat Cards */}
             <div className="grid grid-cols-3 gap-4">
               <div className="stat-card rounded-2xl p-6" style={{ background: '#1A3329' }}>
                 <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(216,243,220,0.6)' }}>Total Revenue</div>
@@ -194,8 +190,6 @@ function ReportsPage({ profile, supabase, router }: {
                 <div className="text-sm" style={{ color: '#6B7280' }}>All time</div>
               </div>
             </div>
-
-            {/* Monthly Revenue Chart */}
             <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
               <div className="text-sm font-semibold mb-6" style={{ color: '#1A3329' }}>Monthly Revenue — Last 6 Months</div>
               <div className="flex items-end gap-3 h-40">
@@ -211,10 +205,7 @@ function ReportsPage({ profile, supabase, router }: {
                 ))}
               </div>
             </div>
-
-            {/* Bottom Row */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Top Services */}
               <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                 <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Top Services by Revenue</div>
                 {reportData.topServices.length === 0 ? (
@@ -226,9 +217,7 @@ function ReportsPage({ profile, supabase, router }: {
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
                             <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
-                              style={{ background: i === 0 ? '#1A3329' : '#D8F3DC', color: i === 0 ? 'white' : '#1A5C36' }}>
-                              {i + 1}
-                            </div>
+                              style={{ background: i === 0 ? '#1A3329' : '#D8F3DC', color: i === 0 ? 'white' : '#1A5C36' }}>{i + 1}</div>
                             <span className="text-sm font-medium" style={{ color: '#374151' }}>{s.name}</span>
                           </div>
                           <div className="text-right">
@@ -244,8 +233,6 @@ function ReportsPage({ profile, supabase, router }: {
                   </div>
                 )}
               </div>
-
-              {/* New vs Returning */}
               <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
                 <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>New vs Returning Clients</div>
                 {totalClients === 0 ? (
@@ -306,6 +293,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
   const [newName, setNewName] = useState(profile?.business_name || '')
   const [savingName, setSavingName] = useState(false)
   const [nameError, setNameError] = useState('')
+  const [portalLoading, setPortalLoading] = useState(false)
 
   async function handleSaveName() {
     if (!newName.trim()) { setNameError('Business name is required'); return }
@@ -320,6 +308,24 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
     setSavingName(false)
   }
 
+  async function handleManagePlan() {
+    setPortalLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setPortalLoading(false); return }
+    const res = await fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id }),
+    })
+    const data = await res.json()
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      console.error('Portal error:', data.error)
+      setPortalLoading(false)
+    }
+  }
+
   const isPro = profile?.plan === 'pro'
   const basicIncluded = ['Online booking page', 'Up to 30 appointments/mo', 'SMS appointment reminders', 'Instant booking notifications', 'Client history']
   const basicLocked = ['Unlimited appointments', 'Rebooking reminders', 'Auto review requests after every job', 'Monthly revenue & booking reports', 'Early access to new features', 'Priority support']
@@ -332,6 +338,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
         <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
       </header>
       <div className="px-8 py-7 max-w-2xl space-y-4">
+
         {/* Business Name */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="flex items-center justify-between mb-3">
@@ -367,6 +374,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Your Plan</div>
           <div className="grid grid-cols-2 gap-3 mb-4">
+
             {/* Basic */}
             <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: !isPro ? '#1A3329' : '#FFFFFF', border: !isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF' }}>
               {!isPro && <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}>Current</div>}
@@ -397,10 +405,12 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
                 ))}
               </div>
             </div>
-            {/* Pro */}
+
+            {/* Pro — Most Popular badge always visible */}
             <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: isPro ? '#1A3329' : '#FFFFFF', border: isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF' }}>
-              <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329', color: 'white' }}>
-                {isPro ? 'Current' : '⭐ Popular'}
+              <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
+                style={{ background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329', color: 'white' }}>
+                ⭐ Most Popular
               </div>
               <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: isPro ? 'rgba(255,255,255,0.5)' : '#9CA3AF' }}>Pro</div>
               <div className="flex items-baseline gap-1 mb-4">
@@ -419,14 +429,23 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
                 ))}
               </div>
             </div>
+
           </div>
+
+          {/* CTA — Upgrade or Manage via Stripe Portal */}
           {!isPro ? (
-            <button onClick={() => router.push('/pricing')} className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90" style={{ background: '#1A3329' }}>
+            <button onClick={() => router.push('/pricing')}
+              className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ background: '#1A3329' }}>
               Upgrade to Pro — $50/mo →
             </button>
           ) : (
-            <button onClick={() => router.push('/pricing')} className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90" style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
-              Manage Plan
+            <button
+              onClick={handleManagePlan}
+              disabled={portalLoading}
+              className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
+              {portalLoading ? 'Opening...' : 'Manage Plan'}
             </button>
           )}
         </div>
