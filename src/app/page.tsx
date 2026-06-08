@@ -248,21 +248,21 @@ export default function Home() {
               <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
                 One app. Two plans. No surprises.
               </h2>
-              {/* ✅ Removed "Starts at less than $1 a day." and "No credit card required to start." */}
               <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+            {/* ─── Cards — both flex column so buttons pin to bottom ─── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'stretch' }}>
 
               {/* Basic */}
-              <div className="card" style={{ padding: '32px' }}>
+              <div className="card" style={{ padding: '32px', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '20px', marginBottom: '4px' }}>Basic</h3>
                 <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>Perfect for getting started</p>
                 <div style={{ marginBottom: '24px' }}>
-                  {/* ✅ Updated from $29 to $30 */}
                   <span className="playfair price-large">$30</span>
                   <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
                   {[
                     { text: 'Online booking page', included: true },
                     { text: 'SMS appointment reminders', included: true },
@@ -280,25 +280,24 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
+                {/* Button pinned to bottom */}
                 <Link href="/signup?plan=basic" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
                   Start Free Trial
                 </Link>
               </div>
 
               {/* Pro */}
-              <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
-                {/* ✅ Most Popular badge */}
+              <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'absolute', top: '16px', right: '16px', background: '#E8704A', color: 'white', fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px' }}>
                   ⭐ Most Popular
                 </div>
                 <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px' }}>Pro</h3>
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
                 <div style={{ marginBottom: '24px' }}>
-                  {/* ✅ Updated from $49 to $50 */}
                   <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$50</span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>/mo</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
                   {[
                     'Everything in Basic',
                     'Unlimited appointments',
@@ -314,14 +313,13 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                {/* ✅ Working button instead of Coming Soon */}
+                {/* Button pinned to bottom */}
                 <button onClick={handleProSignup} className="pro-btn">
                   Start Free Trial
                 </button>
               </div>
             </div>
 
-            {/* ✅ Removed "No credit card required to start." */}
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
               🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>.
             </p>
