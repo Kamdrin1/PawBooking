@@ -1,7 +1,14 @@
 'use client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+
+  async function handleProSignup() {
+    router.push('/signup?plan=pro')
+  }
+
   return (
     <>
       <style>{`
@@ -13,8 +20,6 @@ export default function Home() {
         .nav-link:hover { color: #2D6A4F; }
         .btn-primary { background: #1A3329; color: white; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #2D6A4F; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(26,51,41,0.25); }
-        .btn-outline { background: transparent; color: #1A3329; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: 1.5px solid #D1C9B8; }
-        .btn-outline:hover { border-color: #1A3329; background: rgba(26,51,41,0.04); }
         .btn-cta { background: #E8704A; color: white; font-weight: 600; font-size: 15px; padding: 16px 36px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
         .btn-cta:hover { background: #d4603a; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(232,112,74,0.35); }
         .card { background: #FDFBF7; border: 1px solid #EDE9DF; border-radius: 20px; }
@@ -28,6 +33,8 @@ export default function Home() {
         .step-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(45,106,79,0.15); color: #2D6A4F; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .pro-card { background: #1A3329; border-radius: 20px; }
         .star { color: #F59E0B; }
+        .pro-btn { display: block; width: 100%; text-align: center; padding: 13px; border-radius: 12px; font-weight: 600; font-size: 14px; background: white; color: #1A3329; border: none; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+        .pro-btn:hover { background: #D8F3DC; transform: translateY(-1px); }
       `}</style>
 
       <div style={{ background: '#F5F2EB' }}>
@@ -108,9 +115,9 @@ export default function Home() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
               {[
-                { icon: '📵', title: 'No-shows kill your day', desc: 'You drove there. You set up. They forgot. That\'s 2 hours and a full appointment slot gone.', cost: '↑ $85–$150 lost per no-show', costColor: '#E8704A' },
-                { icon: '⭐', title: 'Reviews don\'t ask themselves', desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews', costColor: '#E8704A' },
-                { icon: '📱', title: 'Booking over text is chaos', desc: 'Back-and-forth messages, double bookings, missed requests. There\'s a better way.', cost: '↑ Hours of admin every single week', costColor: '#E8704A' },
+                { icon: '📵', title: 'No-shows kill your day', desc: "You drove there. You set up. They forgot. That's 2 hours and a full appointment slot gone.", cost: '↑ $85–$150 lost per no-show', costColor: '#E8704A' },
+                { icon: '⭐', title: "Reviews don't ask themselves", desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews', costColor: '#E8704A' },
+                { icon: '📱', title: 'Booking over text is chaos', desc: "Back-and-forth messages, double bookings, missed requests. There's a better way.", cost: '↑ Hours of admin every single week', costColor: '#E8704A' },
               ].map((p, i) => (
                 <div key={i} className="card card-hover" style={{ padding: '28px' }}>
                   <div style={{ fontSize: '28px', marginBottom: '16px' }}>{p.icon}</div>
@@ -148,8 +155,8 @@ export default function Home() {
                 {
                   icon: '💬', tag: 'Basic + Pro', tagColor: '#2D6A4F', tagBg: '#D8F3DC',
                   title: 'Automatic SMS Reminders',
-                  desc: 'PawBooking texts your clients automatically — 24 hours before and 2 hours before their appointment.',
-                  bullets: ['24hr + 2hr reminders by default', 'You choose the timing', 'Clients can confirm or cancel by reply', 'Proven to cut no-shows by 34%'],
+                  desc: 'PawBooking texts your clients automatically 24 hours before their appointment.',
+                  bullets: ['24hr reminder by default', 'Proven to cut no-shows by 34%', 'Clients can confirm or cancel by reply', 'Auto rebooking reminders on Pro'],
                 },
                 {
                   icon: '⭐', tag: 'Pro Only', tagColor: '#E8704A', tagBg: '#FDE8D8',
@@ -190,7 +197,7 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '32px', textAlign: 'left' }}>
               {[
                 { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 10 minutes.' },
-                { step: '2', title: 'Share your booking link', desc: 'Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That\'s your whole marketing setup.' },
+                { step: '2', title: 'Share your booking link', desc: "Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That's your whole marketing setup." },
                 { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
               ].map((s, i) => (
                 <div key={i}>
@@ -214,7 +221,7 @@ export default function Home() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
               {[
-                { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: 'I was losing two or three appointments a week to no-shows. Since using PawBooking I\'ve had maybe two in two months. The math is insane.' },
+                { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: "I was losing two or three appointments a week to no-shows. Since using PawBooking I've had maybe two in two months. The math is insane." },
                 { name: 'Jamie R.', role: 'Solo Groomer · Austin, TX', quote: 'The review thing is genius. I gained 26 Google reviews in my first month. My phone is ringing from people who found me because of my rating.' },
                 { name: 'Maria T.', role: 'Mobile Groomer · Denver, CO', quote: 'I used to take bookings over text like an animal. Now clients book themselves and I wake up to a full schedule. Worth every penny.' },
               ].map((t, i) => (
@@ -241,15 +248,18 @@ export default function Home() {
               <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
                 One app. Two plans. No surprises.
               </h2>
-              <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. Starts at less than $1 a day.</p>
+              {/* ✅ Removed "Starts at less than $1 a day." and "No credit card required to start." */}
+              <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
               {/* Basic */}
               <div className="card" style={{ padding: '32px' }}>
                 <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '20px', marginBottom: '4px' }}>Basic</h3>
                 <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>Perfect for getting started</p>
                 <div style={{ marginBottom: '24px' }}>
-                  <span className="playfair price-large">$29</span>
+                  {/* ✅ Updated from $29 to $30 */}
+                  <span className="playfair price-large">$30</span>
                   <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
@@ -258,8 +268,10 @@ export default function Home() {
                     { text: 'SMS appointment reminders', included: true },
                     { text: 'Up to 30 appointments/mo', included: true },
                     { text: 'Instant booking notifications', included: true },
+                    { text: 'Client history', included: true },
+                    { text: 'Rebooking reminders', included: false },
                     { text: 'Auto review requests', included: false },
-                    { text: 'Client history & dog notes', included: false },
+                    { text: 'Monthly revenue & booking reports', included: false },
                     { text: 'Unlimited appointments', included: false },
                   ].map((f, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: f.included ? '#1A3329' : '#D1C9B8', textDecoration: f.included ? 'none' : 'line-through' }}>
@@ -268,27 +280,33 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/signup" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
+                <Link href="/signup?plan=basic" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
                   Start Free Trial
                 </Link>
               </div>
+
               {/* Pro */}
               <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
+                {/* ✅ Most Popular badge */}
+                <div style={{ position: 'absolute', top: '16px', right: '16px', background: '#E8704A', color: 'white', fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px' }}>
+                  ⭐ Most Popular
+                </div>
                 <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px' }}>Pro</h3>
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
                 <div style={{ marginBottom: '24px' }}>
-                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$49</span>
+                  {/* ✅ Updated from $49 to $50 */}
+                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$50</span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>/mo</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
                   {[
                     'Everything in Basic',
                     'Unlimited appointments',
+                    'Rebooking reminders',
                     'Auto review requests after every job',
-                    'Client history & dog notes',
-                    'Smart personalized messages',
-                    'Priority support',
+                    'Monthly revenue & booking reports',
                     'Early access to new features',
+                    'Priority support',
                   ].map((f, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
                       <span style={{ marginRight: '8px', color: '#D8F3DC', fontWeight: 700 }}>✓</span>
@@ -296,13 +314,16 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <button disabled style={{ display: 'block', width: '100%', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.4)', border: 'none', cursor: 'not-allowed' }}>
-                  Coming Soon
+                {/* ✅ Working button instead of Coming Soon */}
+                <button onClick={handleProSignup} className="pro-btn">
+                  Start Free Trial
                 </button>
               </div>
             </div>
+
+            {/* ✅ Removed "No credit card required to start." */}
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
-              🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No credit card required to start.
+              🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>.
             </p>
           </div>
         </section>
