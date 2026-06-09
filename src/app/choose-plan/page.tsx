@@ -133,7 +133,12 @@ function ChoosePlanContent() {
             <span className="text-white text-2xl font-bold" style={{ fontFamily: 'serif' }}>PawBooking</span>
           </div>
           <h1 className="text-white text-3xl font-bold mb-2">Choose your plan</h1>
-          <p className="text-white/60 text-sm">Both plans include a 30-day free trial. No credit card charged today.</p>
+          <p className="text-white/60 text-sm mb-4">Start free for 30 days — pick the plan that fits you best.</p>
+
+          {/* Prominent no-charge badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm" style={{ background: '#D8F3DC', color: '#1A3329' }}>
+            🔒 Your card will NOT be charged for 30 days
+          </div>
         </div>
 
         {/* Plan Cards */}
@@ -230,12 +235,18 @@ function ChoosePlanContent() {
           style={{ background: 'white', color: '#1A3329' }}>
           {loading
             ? 'Redirecting to Stripe...'
-            : `Start 30-Day Free Trial — ${selectedPlan === 'pro' ? '$50' : '$30'}/mo after →`}
+            : `Start Free — ${selectedPlan === 'pro' ? '$50' : '$30'}/mo after 30 days →`}
         </button>
 
-        <p className="text-center text-white/40 text-xs mt-4">
-          No credit card charged today · Cancel anytime
-        </p>
+        {/* Clear no-charge reassurance below button */}
+        <div className="mt-4 rounded-2xl px-5 py-4 text-center" style={{ background: 'rgba(216,243,220,0.1)', border: '1px solid rgba(216,243,220,0.25)' }}>
+          <p className="text-white font-semibold text-sm">
+            🔒 No charge today. Your 30-day free trial starts now.
+          </p>
+          <p className="text-white/50 text-xs mt-1">
+            After 30 days you'll be billed {selectedPlan === 'pro' ? '$50' : '$30'}/mo. Cancel anytime before then and you pay absolutely nothing.
+          </p>
+        </div>
 
       </div>
     </div>
