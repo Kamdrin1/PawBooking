@@ -1,20 +1,43 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import twilio from 'twilio'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
-)
+const TELNYX_API_KEY = process.env.TELNYX_API_KEY!
+const TELNYX_PHONE_NUMBER = process.env.TELNYX_PHONE_NUMBER!
+
+async function sendSMS(to: string, message: string): Promise<boolean> {
+  try {
+    const res = await fetch('https://api.telnyx.com/v2/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${TELNYX_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: TELNYX_PHONE_NUMBER,
+        to,
+        text: message,
+      }),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      console.error('Telnyx SMS error:', err)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('Telnyx fetch error:', err)
+    return false
+  }
+}
 
 export async function GET() {
   try {
-    // ─── 24HR APPOINTMENT REMINDERS (existing) ───────────────────────
+    // ─── 24HR APPOINTMENT REMINDERS ───────────────────────────────────
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     const tomorrowStr = tomorrow.toISOString().split('T')[0]
@@ -39,25 +62,14 @@ export async function GET() {
 
       const message = `Hi ${appt.client_name}! 🐾 This is a reminder that ${appt.dog_name} has a grooming appointment tomorrow at ${formattedTime} with ${appt.profiles?.business_name || 'your groomer'}. See you then! Reply STOP to opt out.`
 
-      try {
-        await twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER!,
-          to: appt.client_phone,
-        })
-
-        await supabase
-          .from('appointments')
-          .update({ reminder_sent: true })
-          .eq('id', appt.id)
-
+      const ok = await sendSMS(appt.client_phone, message)
+      if (ok) {
+        await supabase.from('appointments').update({ reminder_sent: true }).eq('id', appt.id)
         sent++
-      } catch (smsError: any) {
-        console.error(`Failed to send SMS to ${appt.client_phone}:`, smsError.message)
       }
     }
 
-    // ─── REBOOKING REMINDERS (Pro only — 28 days after completed) ────
+    // ─── REBOOKING REMINDERS (Pro only — 28 days after completed) ─────
     const twentyEightDaysAgo = new Date()
     twentyEightDaysAgo.setDate(twentyEightDaysAgo.getDate() - 28)
     const windowStart = new Date(twentyEightDaysAgo)
@@ -78,11 +90,10 @@ export async function GET() {
     let rebookSent = 0
 
     for (const appt of completedAppts || []) {
-      // Only send for Pro plan groomers
       if (appt.profiles?.plan !== 'pro') continue
       if (!appt.client_phone) continue
 
-      // Skip if this client already has a future appointment at this business
+      // Skip if client already has a future appointment
       const today = new Date().toISOString().split('T')[0]
       const { data: futureAppts } = await supabase
         .from('appointments')
@@ -94,11 +105,7 @@ export async function GET() {
         .limit(1)
 
       if (futureAppts && futureAppts.length > 0) {
-        // Client already has a future booking — mark sent to avoid rechecking
-        await supabase
-          .from('appointments')
-          .update({ rebooking_reminder_sent: true })
-          .eq('id', appt.id)
+        await supabase.from('appointments').update({ rebooking_reminder_sent: true }).eq('id', appt.id)
         continue
       }
 
@@ -108,21 +115,10 @@ export async function GET() {
 
       const message = `Hi ${appt.client_name}! 🐾 It's been about a month since ${appt.dog_name}'s last groom at ${businessName}. Time to book again? ${bookingLink} Reply STOP to opt out.`
 
-      try {
-        await twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER!,
-          to: appt.client_phone,
-        })
-
-        await supabase
-          .from('appointments')
-          .update({ rebooking_reminder_sent: true })
-          .eq('id', appt.id)
-
+      const ok = await sendSMS(appt.client_phone, message)
+      if (ok) {
+        await supabase.from('appointments').update({ rebooking_reminder_sent: true }).eq('id', appt.id)
         rebookSent++
-      } catch (smsError: any) {
-        console.error(`Failed to send rebooking SMS to ${appt.client_phone}:`, smsError.message)
       }
     }
 
