@@ -363,9 +363,9 @@ export default function Home() {
             </div>
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>© 2026 PawBooking. Built for dog groomers everywhere.</p>
             <div style={{ display: 'flex', gap: '20px' }}>
-              {['Privacy', 'Terms', 'Contact'].map((l, i) => (
-                <a key={i} href="#" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}>{l}</a>
-              ))}
+             {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href], i) => (
+  <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}>{label}</a>
+))}
             </div>
           </div>
         </footer>
