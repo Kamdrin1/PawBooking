@@ -157,6 +157,8 @@ export default function Home() {
           border: 1px solid rgba(232,112,74,0.15);
           padding: 6px 12px; border-radius: 50px; margin-top: 16px;
         }
+
+        .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
       `}</style>
 
       <div style={{ background: '#F5F2EB' }}>
@@ -164,7 +166,9 @@ export default function Home() {
         {/* NAVBAR */}
         <nav className="sticky-nav">
           <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+
+            {/* Logo — clicks to smooth scroll top */}
+            <a href="#" className="logo-link">
               <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(26,51,41,0.25)' }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
@@ -175,7 +179,8 @@ export default function Home() {
                 </svg>
               </div>
               <span className="playfair" style={{ fontWeight: 700, fontSize: '17px', color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
-            </div>
+            </a>
+
             <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '56px' }}>
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
@@ -191,22 +196,18 @@ export default function Home() {
         {/* HERO */}
         <section style={{ textAlign: 'center', maxWidth: '860px', margin: '0 auto', padding: '96px 24px 80px', position: 'relative' }}>
           <div className="hero-glow" />
-
           <h1 className="playfair" style={{ fontSize: 'clamp(52px, 8vw, 88px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.05, marginBottom: '28px', letterSpacing: '-0.02em' }}>
             Stop losing <span style={{ color: '#2D6A4F', background: 'linear-gradient(135deg, #2D6A4F, #45a070)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>$85</span> every<br />
             time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
           </h1>
-
           <p style={{ fontSize: '19px', color: '#5A6672', maxWidth: '540px', margin: '0 auto 48px', lineHeight: 1.75, fontWeight: 400 }}>
             PawBooking handles your bookings, sends automatic SMS reminders before every appointment, and requests Google reviews after every job — completely on autopilot.
           </p>
-
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
             <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 36px' }}>
               Start Free Trial →
             </Link>
           </div>
-
           <p style={{ fontSize: '13px', color: '#9CA3AF', fontWeight: 500 }}>
             30 days free · No credit card charged today · Cancel anytime
           </p>
@@ -366,7 +367,6 @@ export default function Home() {
               </h2>
               <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts.</p>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
 
               {/* Basic */}
@@ -425,7 +425,6 @@ export default function Home() {
                 <button onClick={handleProSignup} className="pro-btn">Start Free Trial</button>
               </div>
             </div>
-
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '24px' }}>
               🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>.
             </p>
