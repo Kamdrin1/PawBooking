@@ -16,25 +16,260 @@ export default function Home() {
         * { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
         .playfair { font-family: 'Playfair Display', serif; }
         body { background: #F5F2EB; }
+
+        /* NAV */
         .nav-link { color: #1A3329; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.15s; }
         .nav-link:hover { color: #2D6A4F; }
-        .btn-primary { background: #1A3329; color: white; font-weight: 600; font-size: 14px; padding: 14px 28px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
-        .btn-primary:hover { background: #2D6A4F; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(26,51,41,0.25); }
-        .btn-cta { background: #E8704A; color: white; font-weight: 600; font-size: 15px; padding: 16px 36px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; }
-        .btn-cta:hover { background: #d4603a; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(232,112,74,0.35); }
-        .card { background: #FDFBF7; border: 1px solid #EDE9DF; border-radius: 20px; }
-        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(26,51,41,0.08); }
-        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #2D6A4F; }
-        .divider { height: 1px; background: #EDE9DF; }
+        .sticky-nav {
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(245,242,235,0.88);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(237,233,223,0.8);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+          background: linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%);
+          color: white; font-weight: 600; font-size: 14px; padding: 14px 28px;
+          border-radius: 50px; text-decoration: none; display: inline-block;
+          transition: all 0.25s; border: none; cursor: pointer;
+          box-shadow: 0 4px 15px rgba(26,51,41,0.2);
+        }
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 30px rgba(26,51,41,0.35), 0 0 0 1px rgba(45,106,79,0.3);
+        }
+        .btn-cta {
+          background: linear-gradient(135deg, #E8704A 0%, #d4603a 100%);
+          color: white; font-weight: 700; font-size: 16px; padding: 18px 42px;
+          border-radius: 50px; text-decoration: none; display: inline-block;
+          transition: all 0.25s; border: none; cursor: pointer;
+          box-shadow: 0 4px 20px rgba(232,112,74,0.4);
+          letter-spacing: 0.01em;
+        }
+        .btn-cta:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 35px rgba(232,112,74,0.5);
+        }
+
+        /* CARDS */
+        .card {
+          background: #FDFBF7;
+          border: 1px solid rgba(237,233,223,0.8);
+          border-radius: 24px;
+        }
+        .card-premium {
+          background: linear-gradient(145deg, #FDFBF7 0%, #F8F5EF 100%);
+          border: 1px solid rgba(237,233,223,0.9);
+          border-radius: 24px;
+          position: relative;
+          overflow: hidden;
+        }
+        .card-premium::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 24px;
+          padding: 1px;
+          background: linear-gradient(135deg, rgba(45,106,79,0.15), rgba(237,233,223,0.3), rgba(45,106,79,0.08));
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+        }
+        .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 16px 48px rgba(26,51,41,0.1), 0 0 0 1px rgba(45,106,79,0.06);
+        }
+
+        /* SECTION LABEL */
+        .section-label {
+          font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+          text-transform: uppercase; color: #2D6A4F;
+          display: inline-flex; align-items: center; gap: 6px;
+        }
+        .section-label::before {
+          content: '';
+          display: inline-block;
+          width: 20px; height: 1.5px;
+          background: linear-gradient(90deg, #2D6A4F, transparent);
+        }
+        .section-label::after {
+          content: '';
+          display: inline-block;
+          width: 20px; height: 1.5px;
+          background: linear-gradient(270deg, #2D6A4F, transparent);
+        }
+
+        /* PILLS / TAGS */
+        .pill-basic {
+          font-size: 11px; font-weight: 700; padding: 5px 12px;
+          border-radius: 50px;
+          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
+          color: #1A5C36;
+          box-shadow: 0 2px 8px rgba(45,106,79,0.15), inset 0 1px 0 rgba(255,255,255,0.6);
+          border: 1px solid rgba(45,106,79,0.12);
+        }
+        .pill-pro {
+          font-size: 11px; font-weight: 700; padding: 5px 12px;
+          border-radius: 50px;
+          background: linear-gradient(135deg, #FDE8D8, #fad9c4);
+          color: #C25B2E;
+          box-shadow: 0 2px 8px rgba(232,112,74,0.15), inset 0 1px 0 rgba(255,255,255,0.6);
+          border: 1px solid rgba(232,112,74,0.15);
+        }
+
+        /* DIVIDER */
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, #EDE9DF 20%, #EDE9DF 80%, transparent); }
+
+        /* PRICE */
         .price-large { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; color: #1A3329; line-height: 1; }
-        .testimonial-quote { font-style: italic; color: #4B5563; font-size: 14px; line-height: 1.7; }
-        .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(245,242,235,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid #EDE9DF; }
-        .step-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(45,106,79,0.15); color: #2D6A4F; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .pro-card { background: #1A3329; border-radius: 20px; }
+
+        /* TESTIMONIAL */
+        .testimonial-quote { font-style: italic; color: #4B5563; font-size: 14px; line-height: 1.8; }
+
+        /* PRO CARD */
+        .pro-card {
+          background: linear-gradient(145deg, #1A3329 0%, #0f2218 100%);
+          border-radius: 24px;
+          box-shadow: 0 20px 60px rgba(15,34,24,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .pro-btn {
+          display: block; width: 100%; text-align: center; padding: 14px;
+          border-radius: 14px; font-weight: 700; font-size: 14px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+          color: #1A3329; border: none; cursor: pointer;
+          transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .pro-btn:hover {
+          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
+          transform: translateY(-1px);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* STEP CIRCLE */
+        .step-circle {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: rgba(216,243,220,0.12);
+          border: 1px solid rgba(216,243,220,0.2);
+          color: #D8F3DC; font-weight: 700; font-size: 15px;
+          display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+          box-shadow: 0 0 20px rgba(216,243,220,0.1);
+        }
+
+        /* STAR */
         .star { color: #F59E0B; }
-        .pro-btn { display: block; width: 100%; text-align: center; padding: 13px; border-radius: 12px; font-weight: 600; font-size: 14px; background: white; color: #1A3329; border: none; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
-        .pro-btn:hover { background: #D8F3DC; transform: translateY(-1px); }
+
+        /* HERO GLOW */
+        .hero-glow {
+          position: absolute;
+          width: 600px; height: 600px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(45,106,79,0.08) 0%, transparent 70%);
+          pointer-events: none;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        /* STATS BAR */
+        .stat-item {
+          position: relative;
+          padding: 0 24px;
+        }
+        .stat-item:not(:last-child)::after {
+          content: '';
+          position: absolute;
+          right: 0; top: 50%;
+          transform: translateY(-50%);
+          width: 1px; height: 32px;
+          background: rgba(255,255,255,0.08);
+        }
+
+        /* GLOW BORDER CARD */
+        .glow-card {
+          position: relative;
+          background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
+          border-radius: 24px;
+          border: 1px solid rgba(237,233,223,0.6);
+          transition: all 0.25s ease;
+        }
+        .glow-card::after {
+          content: '';
+          position: absolute;
+          inset: -1px;
+          border-radius: 25px;
+          background: linear-gradient(135deg, rgba(45,106,79,0.0), rgba(45,106,79,0.0));
+          transition: all 0.3s ease;
+          pointer-events: none;
+          z-index: -1;
+        }
+        .glow-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(45,106,79,0.2);
+          box-shadow: 0 20px 50px rgba(26,51,41,0.1), 0 0 30px rgba(45,106,79,0.06);
+        }
+        .glow-card:hover::after {
+          background: linear-gradient(135deg, rgba(45,106,79,0.12), rgba(45,106,79,0.04));
+          filter: blur(8px);
+        }
+
+        /* TESTIMONIAL CARD */
+        .testimonial-card {
+          background: linear-gradient(145deg, #FDFBF7, #FAF7F2);
+          border: 1px solid rgba(237,233,223,0.8);
+          border-radius: 24px;
+          transition: all 0.25s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .testimonial-card::before {
+          content: '"';
+          position: absolute;
+          top: -10px; left: 20px;
+          font-size: 120px;
+          font-family: 'Playfair Display', serif;
+          color: rgba(45,106,79,0.05);
+          line-height: 1;
+          pointer-events: none;
+        }
+        .testimonial-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 50px rgba(26,51,41,0.1);
+          border-color: rgba(45,106,79,0.15);
+        }
+
+        /* FEATURE ICON */
+        .feature-icon {
+          width: 52px; height: 52px; border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 24px;
+          background: linear-gradient(135deg, #F0F9F2, #E8F5EB);
+          border: 1px solid rgba(45,106,79,0.1);
+          box-shadow: 0 4px 12px rgba(45,106,79,0.08);
+        }
+
+        /* PROBLEM ICON */
+        .problem-icon {
+          width: 48px; height: 48px; border-radius: 14px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 22px;
+          background: linear-gradient(135deg, #FEF3EE, #FDEADE);
+          border: 1px solid rgba(232,112,74,0.1);
+          margin-bottom: 20px;
+        }
+
+        /* COST BADGE */
+        .cost-badge {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 12px; font-weight: 600; color: #C25B2E;
+          background: linear-gradient(135deg, #FEF0EB, #FDE5D8);
+          border: 1px solid rgba(232,112,74,0.15);
+          padding: 6px 12px; border-radius: 50px;
+          margin-top: 16px;
+        }
       `}</style>
 
       <div style={{ background: '#F5F2EB' }}>
@@ -43,7 +278,12 @@ export default function Home() {
         <nav className="sticky-nav">
           <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{
+                width: '34px', height: '34px', borderRadius: '10px',
+                background: 'linear-gradient(135deg, #1A3329, #2D6A4F)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(26,51,41,0.25)',
+              }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
                   <ellipse cx="20" cy="44" rx="12" ry="15"/>
@@ -52,78 +292,113 @@ export default function Home() {
                   <ellipse cx="80" cy="44" rx="12" ry="15"/>
                 </svg>
               </div>
-              <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
+              <span className="playfair" style={{ fontWeight: 700, fontSize: '17px', color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
             </div>
             <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '56px' }}>
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
               <a href="#pricing" className="nav-link">Pricing</a>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
               <Link href="/login" className="nav-link">Log in</Link>
-              <Link href="/signup" className="nav-link">Sign up</Link>
-              <Link href="/signup" className="btn-primary" style={{ padding: '10px 22px' }}>Start Free Trial</Link>
+              <Link href="/signup" className="btn-primary" style={{ padding: '10px 24px', fontSize: '13px' }}>Start Free Trial</Link>
             </div>
           </div>
         </nav>
 
         {/* HERO */}
-        <section style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto', padding: '80px 24px' }}>
-          <h1 className="playfair" style={{ fontSize: 'clamp(48px, 8vw, 80px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.1, marginBottom: '24px' }}>
-            Stop losing <span style={{ color: '#2D6A4F' }}>$85</span> every<br />
+        <section style={{ textAlign: 'center', maxWidth: '860px', margin: '0 auto', padding: '96px 24px 80px', position: 'relative' }}>
+          <div className="hero-glow" />
+
+          {/* Badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '8px 18px', borderRadius: '50px', marginBottom: '32px',
+            background: 'linear-gradient(135deg, rgba(216,243,220,0.6), rgba(216,243,220,0.3))',
+            border: '1px solid rgba(45,106,79,0.15)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 2px 12px rgba(45,106,79,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2D6A4F', display: 'inline-block', boxShadow: '0 0 8px rgba(45,106,79,0.6)' }} />
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#1A5C36', letterSpacing: '0.02em' }}>Built for solo dog groomers</span>
+          </div>
+
+          <h1 className="playfair" style={{ fontSize: 'clamp(52px, 8vw, 88px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.05, marginBottom: '28px', letterSpacing: '-0.02em' }}>
+            Stop losing <span style={{
+              color: '#2D6A4F',
+              background: 'linear-gradient(135deg, #2D6A4F, #45a070)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>$85</span> every<br />
             time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
           </h1>
-          <p style={{ fontSize: '18px', color: '#6B7280', maxWidth: '520px', margin: '0 auto 40px', lineHeight: 1.7 }}>
+
+          <p style={{ fontSize: '19px', color: '#5A6672', maxWidth: '540px', margin: '0 auto 48px', lineHeight: 1.75, fontWeight: 400 }}>
             PawBooking handles your bookings, sends automatic SMS reminders before every appointment, and requests Google reviews after every job — completely on autopilot.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 32px' }}>
-              Start Free Trial
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
+            <Link href="/signup" className="btn-primary" style={{ fontSize: '15px', padding: '16px 36px' }}>
+              Start Free Trial →
             </Link>
           </div>
-          <p style={{ fontSize: '13px', color: '#1A3329', fontWeight: 500 }}>30 days free. Cancel anytime.</p>
+
+          <p style={{ fontSize: '13px', color: '#9CA3AF', fontWeight: 500 }}>
+            30 days free · No credit card charged today · Cancel anytime
+          </p>
         </section>
 
         {/* STATS BAR */}
-        <div style={{ background: '#1A3329', padding: '32px 24px' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', textAlign: 'center' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #1A3329 0%, #0f2218 100%)',
+          padding: '40px 24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* subtle top glow */}
+          <div style={{
+            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+            width: '600px', height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.3), transparent)',
+          }} />
+          <div style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center' }}>
             {[
               { stat: '−34%', label: 'Fewer no-shows' },
               { stat: '$85+', label: 'Saved per no-show' },
               { stat: '4.9★', label: 'Avg Google rating' },
               { stat: '10min', label: 'To get set up' },
             ].map((s, i) => (
-              <div key={i}>
-                <div className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: 'white', marginBottom: '4px' }}>{s.stat}</div>
-                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{s.label}</div>
+              <div key={i} className="stat-item">
+                <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: 'white', marginBottom: '6px', letterSpacing: '-0.02em' }}>{s.stat}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* PROBLEM SECTION */}
-        <section style={{ background: '#F5F2EB', padding: '80px 24px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <div className="section-label" style={{ marginBottom: '12px' }}>The Real Cost</div>
-              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '16px', lineHeight: 1.2 }}>
+        <section style={{ background: '#F5F2EB', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '940px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>The Real Cost</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
                 You're running a grooming business solo.<br />Admin shouldn't eat your day.
               </h2>
-              <p style={{ color: '#6B7280', maxWidth: '500px', margin: '0 auto', fontSize: '15px', lineHeight: 1.7 }}>
+              <p style={{ color: '#6B7280', maxWidth: '500px', margin: '0 auto', fontSize: '16px', lineHeight: 1.75 }}>
                 Every no-show, every forgotten review request, every booking taken over text — it adds up to real money and real hours out of your week.
               </p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {[
-                { icon: '📵', title: 'No-shows kill your day', desc: "You drove there. You set up. They forgot. That's 2 hours and a full appointment slot gone.", cost: '↑ $85–$150 lost per no-show', costColor: '#E8704A' },
-                { icon: '⭐', title: "Reviews don't ask themselves", desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews', costColor: '#E8704A' },
-                { icon: '📱', title: 'Booking over text is chaos', desc: "Back-and-forth messages, double bookings, missed requests. There's a better way.", cost: '↑ Hours of admin every single week', costColor: '#E8704A' },
+                { icon: '📵', title: 'No-shows kill your day', desc: "You drove there. You set up. They forgot. That's 2 hours and a full appointment slot gone.", cost: '↑ $85–$150 lost per no-show' },
+                { icon: '⭐', title: "Reviews don't ask themselves", desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews' },
+                { icon: '📱', title: 'Booking over text is chaos', desc: "Back-and-forth messages, double bookings, missed requests. There's a better way.", cost: '↑ Hours of admin every single week' },
               ].map((p, i) => (
-                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
-                  <div style={{ fontSize: '28px', marginBottom: '16px' }}>{p.icon}</div>
-                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '10px', fontSize: '16px' }}>{p.title}</h3>
-                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.7, marginBottom: '16px' }}>{p.desc}</p>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: p.costColor }}>{p.cost}</span>
+                <div key={i} className="glow-card" style={{ padding: '32px' }}>
+                  <div className="problem-icon">{p.icon}</div>
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '12px', fontSize: '17px', letterSpacing: '-0.01em' }}>{p.title}</h3>
+                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.75 }}>{p.desc}</p>
+                  <div className="cost-badge">{p.cost}</div>
                 </div>
               ))}
             </div>
@@ -133,49 +408,50 @@ export default function Home() {
         <div className="divider" />
 
         {/* FEATURES */}
-        <section id="features" style={{ background: '#FDFBF7', padding: '80px 24px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <div className="section-label" style={{ marginBottom: '12px' }}>What You Get</div>
-              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '16px' }}>
+        <section id="features" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '940px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>What You Get</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '18px', letterSpacing: '-0.02em' }}>
                 Everything you need. Nothing you don't.
               </h2>
-              <p style={{ color: '#6B7280', maxWidth: '480px', margin: '0 auto', fontSize: '15px', lineHeight: 1.7 }}>
+              <p style={{ color: '#6B7280', maxWidth: '480px', margin: '0 auto', fontSize: '16px', lineHeight: 1.75 }}>
                 Three tools that work together to save you time, cut no-shows, and grow your reputation — automatically.
               </p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {[
                 {
-                  icon: '📅', tag: 'Basic + Pro', tagColor: '#2D6A4F', tagBg: '#D8F3DC',
+                  icon: '📅', tag: 'Basic + Pro', tagClass: 'pill-basic',
                   title: 'Smart Online Booking',
                   desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.',
                   bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'],
                 },
                 {
-                  icon: '💬', tag: 'Basic + Pro', tagColor: '#2D6A4F', tagBg: '#D8F3DC',
+                  icon: '💬', tag: 'Basic + Pro', tagClass: 'pill-basic',
                   title: 'Automatic SMS Reminders',
                   desc: 'PawBooking texts your clients automatically 24 hours before their appointment.',
                   bullets: ['24hr reminder by default', 'Proven to cut no-shows by 34%', 'Clients can confirm or cancel by reply', 'Auto rebooking reminders on Pro'],
                 },
                 {
-                  icon: '⭐', tag: 'Pro Only', tagColor: '#E8704A', tagBg: '#FDE8D8',
+                  icon: '⭐', tag: 'Pro Only', tagClass: 'pill-pro',
                   title: 'Auto Review Requests',
                   desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Completely automatic.',
                   bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'],
                 },
               ].map((f, i) => (
-                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <span style={{ fontSize: '28px' }}>{f.icon}</span>
-                    <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px', background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
+                <div key={i} className="glow-card" style={{ padding: '32px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
+                    <div className="feature-icon">{f.icon}</div>
+                    <span className={f.tagClass}>{f.tag}</span>
                   </div>
-                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '10px', fontSize: '16px' }}>{f.title}</h3>
-                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.7, marginBottom: '16px' }}>{f.desc}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '12px', fontSize: '17px', letterSpacing: '-0.01em' }}>{f.title}</h3>
+                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.75, marginBottom: '20px' }}>{f.desc}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {f.bullets.map((b, j) => (
-                      <div key={j} style={{ fontSize: '13px', color: '#6B7280', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                        <span style={{ color: '#2D6A4F', fontWeight: 700, flexShrink: 0 }}>✓</span> {b}
+                      <div key={j} style={{ fontSize: '13px', color: '#6B7280', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                        <span style={{ color: '#2D6A4F', fontWeight: 700, flexShrink: 0, marginTop: '1px' }}>✓</span>
+                        <span>{b}</span>
                       </div>
                     ))}
                   </div>
@@ -188,22 +464,34 @@ export default function Home() {
         <div className="divider" />
 
         {/* HOW IT WORKS */}
-        <section id="how" style={{ background: '#1A3329', padding: '80px 24px' }}>
-          <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-            <div className="section-label" style={{ marginBottom: '12px', color: '#D8F3DC' }}>Simple Setup</div>
-            <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: 'white', marginBottom: '48px' }}>
+        <section id="how" style={{
+          background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)',
+          padding: '96px 24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* ambient glow */}
+          <div style={{
+            position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)',
+            width: '800px', height: '400px',
+            background: 'radial-gradient(ellipse, rgba(45,106,79,0.15) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+          <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
+            <div className="section-label" style={{ marginBottom: '16px', color: 'rgba(216,243,220,0.7)' }}>Simple Setup</div>
+            <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: 'white', marginBottom: '56px', letterSpacing: '-0.02em' }}>
               Up and running in 10 minutes.
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '32px', textAlign: 'left' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '40px', textAlign: 'left' }}>
               {[
                 { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 10 minutes.' },
                 { step: '2', title: 'Share your booking link', desc: "Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That's your whole marketing setup." },
                 { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
               ].map((s, i) => (
                 <div key={i}>
-                  <div className="step-circle" style={{ marginBottom: '16px', background: 'rgba(216,243,220,0.15)', color: '#D8F3DC' }}>{s.step}</div>
-                  <h3 style={{ fontWeight: 700, color: 'white', marginBottom: '8px', fontSize: '15px' }}>{s.title}</h3>
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', lineHeight: 1.7 }}>{s.desc}</p>
+                  <div className="step-circle" style={{ marginBottom: '20px' }}>{s.step}</div>
+                  <h3 style={{ fontWeight: 700, color: 'white', marginBottom: '10px', fontSize: '16px', letterSpacing: '-0.01em' }}>{s.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px', lineHeight: 1.75 }}>{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -211,26 +499,26 @@ export default function Home() {
         </section>
 
         {/* TESTIMONIALS */}
-        <section style={{ background: '#F5F2EB', padding: '80px 24px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <div className="section-label" style={{ marginBottom: '12px' }}>Early Feedback</div>
-              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329' }}>
+        <section style={{ background: '#F5F2EB', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '940px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>Early Feedback</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>
                 Groomers love it.
               </h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {[
                 { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: "I was losing two or three appointments a week to no-shows. Since using PawBooking I've had maybe two in two months. The math is insane." },
                 { name: 'Jamie R.', role: 'Solo Groomer · Austin, TX', quote: 'The review thing is genius. I gained 26 Google reviews in my first month. My phone is ringing from people who found me because of my rating.' },
                 { name: 'Maria T.', role: 'Mobile Groomer · Denver, CO', quote: 'I used to take bookings over text like an animal. Now clients book themselves and I wake up to a full schedule. Worth every penny.' },
               ].map((t, i) => (
-                <div key={i} className="card card-hover" style={{ padding: '28px' }}>
-                  <div className="star" style={{ fontSize: '13px', marginBottom: '14px' }}>★★★★★</div>
-                  <p className="testimonial-quote" style={{ marginBottom: '20px' }}>"{t.quote}"</p>
-                  <div style={{ borderTop: '1px solid #EDE9DF', paddingTop: '16px' }}>
+                <div key={i} className="testimonial-card" style={{ padding: '32px' }}>
+                  <div className="star" style={{ fontSize: '14px', marginBottom: '16px', letterSpacing: '2px' }}>★★★★★</div>
+                  <p className="testimonial-quote" style={{ marginBottom: '24px', fontSize: '15px' }}>"{t.quote}"</p>
+                  <div style={{ borderTop: '1px solid rgba(237,233,223,0.8)', paddingTop: '18px' }}>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: '#1A3329' }}>{t.name}</div>
-                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{t.role}</div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>{t.role}</div>
                   </div>
                 </div>
               ))}
@@ -241,28 +529,34 @@ export default function Home() {
         <div className="divider" />
 
         {/* PRICING */}
-        <section id="pricing" style={{ background: '#FDFBF7', padding: '80px 24px' }}>
-          <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <div className="section-label" style={{ marginBottom: '12px' }}>Simple Pricing</div>
-              <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 700, color: '#1A3329', marginBottom: '12px' }}>
+        <section id="pricing" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>Simple Pricing</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '14px', letterSpacing: '-0.02em' }}>
                 One app. Two plans. No surprises.
               </h2>
               <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts.</p>
             </div>
 
-            {/* ─── Cards — both flex column so buttons pin to bottom ─── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'stretch' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
 
               {/* Basic */}
-              <div className="card" style={{ padding: '32px', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '20px', marginBottom: '4px' }}>Basic</h3>
-                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>Perfect for getting started</p>
-                <div style={{ marginBottom: '24px' }}>
+              <div style={{
+                padding: '36px',
+                display: 'flex', flexDirection: 'column',
+                background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)',
+                borderRadius: '24px',
+                border: '1px solid rgba(237,233,223,0.8)',
+                boxShadow: '0 4px 20px rgba(26,51,41,0.04)',
+              }}>
+                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Basic</h3>
+                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '28px' }}>Perfect for getting started</p>
+                <div style={{ marginBottom: '28px' }}>
                   <span className="playfair price-large">$30</span>
                   <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px', flex: 1 }}>
                   {[
                     { text: 'Online booking page', included: true },
                     { text: 'SMS appointment reminders', included: true },
@@ -274,30 +568,51 @@ export default function Home() {
                     { text: 'Monthly revenue & booking reports', included: false },
                     { text: 'Unlimited appointments', included: false },
                   ].map((f, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: f.included ? '#1A3329' : '#D1C9B8', textDecoration: f.included ? 'none' : 'line-through' }}>
-                      <span style={{ marginRight: '8px', color: f.included ? '#2D6A4F' : '#D1C9B8', fontWeight: 700 }}>{f.included ? '✓' : '✗'}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: f.included ? '#1A3329' : '#C4BDB0', textDecoration: f.included ? 'none' : 'line-through' }}>
+                      <span style={{ marginRight: '10px', color: f.included ? '#2D6A4F' : '#C4BDB0', fontWeight: 700, fontSize: '13px' }}>{f.included ? '✓' : '✗'}</span>
                       {f.text}
                     </div>
                   ))}
                 </div>
-                {/* Button pinned to bottom */}
-                <Link href="/signup?plan=basic" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.15s' }}>
+                <Link href="/signup?plan=basic" style={{
+                  display: 'block', textAlign: 'center', padding: '14px',
+                  borderRadius: '14px', fontWeight: 600, fontSize: '14px',
+                  border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none',
+                  transition: 'all 0.2s',
+                  background: 'transparent',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
                   Start Free Trial
                 </Link>
               </div>
 
               {/* Pro */}
-              <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ position: 'absolute', top: '16px', right: '16px', background: '#E8704A', color: 'white', fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px' }}>
+              <div className="pro-card" style={{ padding: '36px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                {/* glow orb */}
+                <div style={{
+                  position: 'absolute', top: '-60px', right: '-60px',
+                  width: '200px', height: '200px', borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%)',
+                  pointerEvents: 'none',
+                }} />
+                <div style={{
+                  position: 'absolute', top: '16px', right: '16px',
+                  background: 'linear-gradient(135deg, #E8704A, #d4603a)',
+                  color: 'white', fontSize: '11px', fontWeight: 700,
+                  padding: '5px 12px', borderRadius: '50px',
+                  boxShadow: '0 4px 12px rgba(232,112,74,0.35)',
+                  letterSpacing: '0.02em',
+                }}>
                   ⭐ Most Popular
                 </div>
-                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '20px', marginBottom: '4px' }}>Pro</h3>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
-                <div style={{ marginBottom: '24px' }}>
-                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1 }}>$50</span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>/mo</span>
+                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Pro</h3>
+                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '28px' }}>For groomers serious about growth</p>
+                <div style={{ marginBottom: '28px' }}>
+                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>$50</span>
+                  <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '14px' }}>/mo</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px', flex: 1 }}>
                   {[
                     'Everything in Basic',
                     'Unlimited appointments',
@@ -307,50 +622,67 @@ export default function Home() {
                     'Early access to new features',
                     'Priority support',
                   ].map((f, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
-                      <span style={{ marginRight: '8px', color: '#D8F3DC', fontWeight: 700 }}>✓</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'rgba(255,255,255,0.75)' }}>
+                      <span style={{ marginRight: '10px', color: '#7DD3A0', fontWeight: 700, fontSize: '13px' }}>✓</span>
                       {f}
                     </div>
                   ))}
                 </div>
-                {/* Button pinned to bottom */}
                 <button onClick={handleProSignup} className="pro-btn">
                   Start Free Trial
                 </button>
               </div>
             </div>
 
-            <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
+            <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '24px' }}>
               🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>.
             </p>
           </div>
         </section>
 
         {/* FINAL CTA */}
-        <section style={{ background: '#1A3329', padding: '80px 24px', textAlign: 'center' }}>
-          <div style={{ maxWidth: '520px', margin: '0 auto' }}>
-            <h2 className="playfair" style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 700, color: 'white', marginBottom: '16px', lineHeight: 1.2 }}>
+        <section style={{
+          background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)',
+          padding: '96px 24px', textAlign: 'center',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+            width: '700px', height: '400px',
+            background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+          <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
+            <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
               Ready to stop losing money to no-shows?
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '32px', fontSize: '15px', lineHeight: 1.7 }}>
+            <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '40px', fontSize: '16px', lineHeight: 1.75 }}>
               Join PawBooking today. 30 days free, cancel anytime.
             </p>
             <Link href="/signup" className="btn-cta">
               Start Your Free Trial →
             </Link>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '24px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '28px', marginTop: '28px', flexWrap: 'wrap' }}>
               {['✓ 30 days free', '✓ Cancel anytime', '✓ Setup in 10 minutes'].map((t, i) => (
-                <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>{t}</span>
+                <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>{t}</span>
               ))}
             </div>
           </div>
         </section>
 
         {/* FOOTER */}
-        <footer style={{ background: '#1A3329', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '24px 32px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <footer style={{
+          background: '#0f2218',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          padding: '28px 40px',
+        }}>
+          <div style={{ maxWidth: '940px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ background: 'rgba(216,243,220,0.15)', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+                background: 'rgba(216,243,220,0.1)', width: '26px', height: '26px',
+                borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '1px solid rgba(216,243,220,0.08)',
+              }}>
                 <svg width="12" height="12" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
                   <ellipse cx="20" cy="44" rx="12" ry="15"/>
@@ -359,13 +691,17 @@ export default function Home() {
                   <ellipse cx="80" cy="44" rx="12" ry="15"/>
                 </svg>
               </div>
-              <span className="playfair" style={{ color: 'white', fontWeight: 600, fontSize: '14px' }}>PawBooking</span>
+              <span className="playfair" style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: '14px' }}>PawBooking</span>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>© 2026 PawBooking. Built for dog groomers everywhere.</p>
-            <div style={{ display: 'flex', gap: '20px' }}>
-             {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href], i) => (
-  <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}>{label}</a>
-))}
+            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>© 2026 PawBooking. Built for dog groomers everywhere.</p>
+            <div style={{ display: 'flex', gap: '24px' }}>
+              {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href], i) => (
+                <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)') }
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)') }>
+                  {label}
+                </a>
+              ))}
             </div>
           </div>
         </footer>
