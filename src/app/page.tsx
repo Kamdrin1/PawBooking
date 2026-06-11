@@ -14,10 +14,10 @@ export default function Home() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
         * { font-family: 'DM Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         .playfair { font-family: 'Playfair Display', serif; }
         body { background: #F5F2EB; }
 
-        /* NAV */
         .nav-link { color: #1A3329; font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.15s; }
         .nav-link:hover { color: #2D6A4F; }
         .sticky-nav {
@@ -28,7 +28,6 @@ export default function Home() {
           border-bottom: 1px solid rgba(237,233,223,0.8);
         }
 
-        /* BUTTONS */
         .btn-primary {
           background: linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%);
           color: white; font-weight: 600; font-size: 14px; padding: 14px 28px;
@@ -36,101 +35,44 @@ export default function Home() {
           transition: all 0.25s; border: none; cursor: pointer;
           box-shadow: 0 4px 15px rgba(26,51,41,0.2);
         }
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(26,51,41,0.35), 0 0 0 1px rgba(45,106,79,0.3);
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(26,51,41,0.35), 0 0 0 1px rgba(45,106,79,0.3); }
+
         .btn-cta {
           background: linear-gradient(135deg, #E8704A 0%, #d4603a 100%);
           color: white; font-weight: 700; font-size: 16px; padding: 18px 42px;
           border-radius: 50px; text-decoration: none; display: inline-block;
           transition: all 0.25s; border: none; cursor: pointer;
-          box-shadow: 0 4px 20px rgba(232,112,74,0.4);
-          letter-spacing: 0.01em;
+          box-shadow: 0 4px 20px rgba(232,112,74,0.4); letter-spacing: 0.01em;
         }
-        .btn-cta:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 35px rgba(232,112,74,0.5);
-        }
+        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(232,112,74,0.5); }
 
-        /* CARDS */
-        .card {
-          background: #FDFBF7;
-          border: 1px solid rgba(237,233,223,0.8);
-          border-radius: 24px;
-        }
-        .card-premium {
-          background: linear-gradient(145deg, #FDFBF7 0%, #F8F5EF 100%);
-          border: 1px solid rgba(237,233,223,0.9);
-          border-radius: 24px;
-          position: relative;
-          overflow: hidden;
-        }
-        .card-premium::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 24px;
-          padding: 1px;
-          background: linear-gradient(135deg, rgba(45,106,79,0.15), rgba(237,233,223,0.3), rgba(45,106,79,0.08));
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          pointer-events: none;
-        }
-        .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .card-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 48px rgba(26,51,41,0.1), 0 0 0 1px rgba(45,106,79,0.06);
-        }
+        .card { background: #FDFBF7; border: 1px solid rgba(237,233,223,0.8); border-radius: 24px; }
 
-        /* SECTION LABEL */
         .section-label {
           font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
           text-transform: uppercase; color: #2D6A4F;
           display: inline-flex; align-items: center; gap: 6px;
         }
-        .section-label::before {
-          content: '';
-          display: inline-block;
-          width: 20px; height: 1.5px;
-          background: linear-gradient(90deg, #2D6A4F, transparent);
-        }
-        .section-label::after {
-          content: '';
-          display: inline-block;
-          width: 20px; height: 1.5px;
-          background: linear-gradient(270deg, #2D6A4F, transparent);
-        }
+        .section-label::before { content: ''; display: inline-block; width: 20px; height: 1.5px; background: linear-gradient(90deg, #2D6A4F, transparent); }
+        .section-label::after { content: ''; display: inline-block; width: 20px; height: 1.5px; background: linear-gradient(270deg, #2D6A4F, transparent); }
 
-        /* PILLS / TAGS */
         .pill-basic {
-          font-size: 11px; font-weight: 700; padding: 5px 12px;
-          border-radius: 50px;
-          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
-          color: #1A5C36;
+          font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 50px;
+          background: linear-gradient(135deg, #D8F3DC, #c8eacd); color: #1A5C36;
           box-shadow: 0 2px 8px rgba(45,106,79,0.15), inset 0 1px 0 rgba(255,255,255,0.6);
           border: 1px solid rgba(45,106,79,0.12);
         }
         .pill-pro {
-          font-size: 11px; font-weight: 700; padding: 5px 12px;
-          border-radius: 50px;
-          background: linear-gradient(135deg, #FDE8D8, #fad9c4);
-          color: #C25B2E;
+          font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 50px;
+          background: linear-gradient(135deg, #FDE8D8, #fad9c4); color: #C25B2E;
           box-shadow: 0 2px 8px rgba(232,112,74,0.15), inset 0 1px 0 rgba(255,255,255,0.6);
           border: 1px solid rgba(232,112,74,0.15);
         }
 
-        /* DIVIDER */
         .divider { height: 1px; background: linear-gradient(90deg, transparent, #EDE9DF 20%, #EDE9DF 80%, transparent); }
-
-        /* PRICE */
         .price-large { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; color: #1A3329; line-height: 1; }
-
-        /* TESTIMONIAL */
         .testimonial-quote { font-style: italic; color: #4B5563; font-size: 14px; line-height: 1.8; }
 
-        /* PRO CARD */
         .pro-card {
           background: linear-gradient(145deg, #1A3329 0%, #0f2218 100%);
           border-radius: 24px;
@@ -140,135 +82,80 @@ export default function Home() {
           display: block; width: 100%; text-align: center; padding: 14px;
           border-radius: 14px; font-weight: 700; font-size: 14px;
           background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-          color: #1A3329; border: none; cursor: pointer;
-          transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+          color: #1A3329; border: none; cursor: pointer; transition: all 0.2s;
+          font-family: 'DM Sans', sans-serif;
           box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
         }
-        .pro-btn:hover {
-          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
-          transform: translateY(-1px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
+        .pro-btn:hover { background: linear-gradient(135deg, #D8F3DC, #c8eacd); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-        /* STEP CIRCLE */
         .step-circle {
           width: 40px; height: 40px; border-radius: 50%;
-          background: rgba(216,243,220,0.12);
-          border: 1px solid rgba(216,243,220,0.2);
+          background: rgba(216,243,220,0.12); border: 1px solid rgba(216,243,220,0.2);
           color: #D8F3DC; font-weight: 700; font-size: 15px;
           display: flex; align-items: center; justify-content: center; flex-shrink: 0;
           box-shadow: 0 0 20px rgba(216,243,220,0.1);
         }
 
-        /* STAR */
         .star { color: #F59E0B; }
 
-        /* HERO GLOW */
         .hero-glow {
-          position: absolute;
-          width: 600px; height: 600px;
-          border-radius: 50%;
+          position: absolute; width: 600px; height: 600px; border-radius: 50%;
           background: radial-gradient(circle, rgba(45,106,79,0.08) 0%, transparent 70%);
-          pointer-events: none;
-          top: 50%; left: 50%;
-          transform: translate(-50%, -50%);
+          pointer-events: none; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
 
-        /* STATS BAR */
-        .stat-item {
-          position: relative;
-          padding: 0 24px;
-        }
+        .stat-item { position: relative; padding: 0 24px; }
         .stat-item:not(:last-child)::after {
-          content: '';
-          position: absolute;
-          right: 0; top: 50%;
-          transform: translateY(-50%);
-          width: 1px; height: 32px;
-          background: rgba(255,255,255,0.08);
+          content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+          width: 1px; height: 32px; background: rgba(255,255,255,0.08);
         }
 
-        /* GLOW BORDER CARD */
         .glow-card {
           position: relative;
           background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
-          border-radius: 24px;
-          border: 1px solid rgba(237,233,223,0.6);
+          border-radius: 24px; border: 1px solid rgba(237,233,223,0.6);
           transition: all 0.25s ease;
         }
         .glow-card::after {
-          content: '';
-          position: absolute;
-          inset: -1px;
-          border-radius: 25px;
+          content: ''; position: absolute; inset: -1px; border-radius: 25px;
           background: linear-gradient(135deg, rgba(45,106,79,0.0), rgba(45,106,79,0.0));
-          transition: all 0.3s ease;
-          pointer-events: none;
-          z-index: -1;
+          transition: all 0.3s ease; pointer-events: none; z-index: -1;
         }
-        .glow-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(45,106,79,0.2);
-          box-shadow: 0 20px 50px rgba(26,51,41,0.1), 0 0 30px rgba(45,106,79,0.06);
-        }
-        .glow-card:hover::after {
-          background: linear-gradient(135deg, rgba(45,106,79,0.12), rgba(45,106,79,0.04));
-          filter: blur(8px);
-        }
+        .glow-card:hover { transform: translateY(-4px); border-color: rgba(45,106,79,0.2); box-shadow: 0 20px 50px rgba(26,51,41,0.1), 0 0 30px rgba(45,106,79,0.06); }
+        .glow-card:hover::after { background: linear-gradient(135deg, rgba(45,106,79,0.12), rgba(45,106,79,0.04)); filter: blur(8px); }
 
-        /* TESTIMONIAL CARD */
         .testimonial-card {
           background: linear-gradient(145deg, #FDFBF7, #FAF7F2);
-          border: 1px solid rgba(237,233,223,0.8);
-          border-radius: 24px;
-          transition: all 0.25s ease;
-          position: relative;
-          overflow: hidden;
+          border: 1px solid rgba(237,233,223,0.8); border-radius: 24px;
+          transition: all 0.25s ease; position: relative; overflow: hidden;
         }
         .testimonial-card::before {
-          content: '"';
-          position: absolute;
-          top: -10px; left: 20px;
-          font-size: 120px;
-          font-family: 'Playfair Display', serif;
-          color: rgba(45,106,79,0.05);
-          line-height: 1;
-          pointer-events: none;
+          content: '"'; position: absolute; top: -10px; left: 20px;
+          font-size: 120px; font-family: 'Playfair Display', serif;
+          color: rgba(45,106,79,0.05); line-height: 1; pointer-events: none;
         }
-        .testimonial-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 20px 50px rgba(26,51,41,0.1);
-          border-color: rgba(45,106,79,0.15);
-        }
+        .testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(26,51,41,0.1); border-color: rgba(45,106,79,0.15); }
 
-        /* FEATURE ICON */
         .feature-icon {
           width: 52px; height: 52px; border-radius: 16px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 24px;
+          display: flex; align-items: center; justify-content: center; font-size: 24px;
           background: linear-gradient(135deg, #F0F9F2, #E8F5EB);
-          border: 1px solid rgba(45,106,79,0.1);
-          box-shadow: 0 4px 12px rgba(45,106,79,0.08);
+          border: 1px solid rgba(45,106,79,0.1); box-shadow: 0 4px 12px rgba(45,106,79,0.08);
         }
 
-        /* PROBLEM ICON */
         .problem-icon {
           width: 48px; height: 48px; border-radius: 14px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 22px;
+          display: flex; align-items: center; justify-content: center; font-size: 22px;
           background: linear-gradient(135deg, #FEF3EE, #FDEADE);
-          border: 1px solid rgba(232,112,74,0.1);
-          margin-bottom: 20px;
+          border: 1px solid rgba(232,112,74,0.1); margin-bottom: 20px;
         }
 
-        /* COST BADGE */
         .cost-badge {
           display: inline-flex; align-items: center; gap: 6px;
           font-size: 12px; font-weight: 600; color: #C25B2E;
           background: linear-gradient(135deg, #FEF0EB, #FDE5D8);
           border: 1px solid rgba(232,112,74,0.15);
-          padding: 6px 12px; border-radius: 50px;
-          margin-top: 16px;
+          padding: 6px 12px; border-radius: 50px; margin-top: 16px;
         }
       `}</style>
 
@@ -278,12 +165,7 @@ export default function Home() {
         <nav className="sticky-nav">
           <div style={{ width: '100%', padding: '16px 80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{
-                width: '34px', height: '34px', borderRadius: '10px',
-                background: 'linear-gradient(135deg, #1A3329, #2D6A4F)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                boxShadow: '0 4px 12px rgba(26,51,41,0.25)',
-              }}>
+              <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(26,51,41,0.25)' }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
                   <ellipse cx="20" cy="44" rx="12" ry="15"/>
@@ -310,26 +192,8 @@ export default function Home() {
         <section style={{ textAlign: 'center', maxWidth: '860px', margin: '0 auto', padding: '96px 24px 80px', position: 'relative' }}>
           <div className="hero-glow" />
 
-          {/* Badge */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            padding: '8px 18px', borderRadius: '50px', marginBottom: '32px',
-            background: 'linear-gradient(135deg, rgba(216,243,220,0.6), rgba(216,243,220,0.3))',
-            border: '1px solid rgba(45,106,79,0.15)',
-            backdropFilter: 'blur(8px)',
-            boxShadow: '0 2px 12px rgba(45,106,79,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
-          }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2D6A4F', display: 'inline-block', boxShadow: '0 0 8px rgba(45,106,79,0.6)' }} />
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#1A5C36', letterSpacing: '0.02em' }}>Built for solo dog groomers</span>
-          </div>
-
           <h1 className="playfair" style={{ fontSize: 'clamp(52px, 8vw, 88px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.05, marginBottom: '28px', letterSpacing: '-0.02em' }}>
-            Stop losing <span style={{
-              color: '#2D6A4F',
-              background: 'linear-gradient(135deg, #2D6A4F, #45a070)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>$85</span> every<br />
+            Stop losing <span style={{ color: '#2D6A4F', background: 'linear-gradient(135deg, #2D6A4F, #45a070)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>$85</span> every<br />
             time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
           </h1>
 
@@ -349,24 +213,14 @@ export default function Home() {
         </section>
 
         {/* STATS BAR */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1A3329 0%, #0f2218 100%)',
-          padding: '40px 24px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {/* subtle top glow */}
-          <div style={{
-            position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-            width: '600px', height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.3), transparent)',
-          }} />
+        <div style={{ background: 'linear-gradient(135deg, #1A3329 0%, #0f2218 100%)', padding: '40px 24px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '600px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.3), transparent)' }} />
           <div style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center' }}>
             {[
               { stat: '−34%', label: 'Fewer no-shows' },
               { stat: '$85+', label: 'Saved per no-show' },
               { stat: '4.9★', label: 'Avg Google rating' },
-              { stat: '10min', label: 'To get set up' },
+              { stat: '5min', label: 'To get set up' },
             ].map((s, i) => (
               <div key={i} className="stat-item">
                 <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: 'white', marginBottom: '6px', letterSpacing: '-0.02em' }}>{s.stat}</div>
@@ -421,24 +275,9 @@ export default function Home() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {[
-                {
-                  icon: '📅', tag: 'Basic + Pro', tagClass: 'pill-basic',
-                  title: 'Smart Online Booking',
-                  desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.',
-                  bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'],
-                },
-                {
-                  icon: '💬', tag: 'Basic + Pro', tagClass: 'pill-basic',
-                  title: 'Automatic SMS Reminders',
-                  desc: 'PawBooking texts your clients automatically 24 hours before their appointment.',
-                  bullets: ['24hr reminder by default', 'Proven to cut no-shows by 34%', 'Clients can confirm or cancel by reply', 'Auto rebooking reminders on Pro'],
-                },
-                {
-                  icon: '⭐', tag: 'Pro Only', tagClass: 'pill-pro',
-                  title: 'Auto Review Requests',
-                  desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Completely automatic.',
-                  bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'],
-                },
+                { icon: '📅', tag: 'Basic + Pro', tagClass: 'pill-basic', title: 'Smart Online Booking', desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.', bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'] },
+                { icon: '💬', tag: 'Basic + Pro', tagClass: 'pill-basic', title: 'Automatic SMS Reminders', desc: 'PawBooking texts your clients automatically 24 hours before their appointment.', bullets: ['24hr reminder by default', 'Proven to cut no-shows by 34%', 'Clients can confirm or cancel by reply', 'Auto rebooking reminders on Pro'] },
+                { icon: '⭐', tag: 'Pro Only', tagClass: 'pill-pro', title: 'Auto Review Requests', desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Completely automatic.', bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'] },
               ].map((f, i) => (
                 <div key={i} className="glow-card" style={{ padding: '32px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -464,27 +303,16 @@ export default function Home() {
         <div className="divider" />
 
         {/* HOW IT WORKS */}
-        <section id="how" style={{
-          background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)',
-          padding: '96px 24px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {/* ambient glow */}
-          <div style={{
-            position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)',
-            width: '800px', height: '400px',
-            background: 'radial-gradient(ellipse, rgba(45,106,79,0.15) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
+        <section id="how" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
             <div className="section-label" style={{ marginBottom: '16px', color: 'rgba(216,243,220,0.7)' }}>Simple Setup</div>
             <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 700, color: 'white', marginBottom: '56px', letterSpacing: '-0.02em' }}>
-              Up and running in 10 minutes.
+              Up and running in 5 minutes.
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '40px', textAlign: 'left' }}>
               {[
-                { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 10 minutes.' },
+                { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 5 minutes.' },
                 { step: '2', title: 'Share your booking link', desc: "Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That's your whole marketing setup." },
                 { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
               ].map((s, i) => (
@@ -542,14 +370,7 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
 
               {/* Basic */}
-              <div style={{
-                padding: '36px',
-                display: 'flex', flexDirection: 'column',
-                background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)',
-                borderRadius: '24px',
-                border: '1px solid rgba(237,233,223,0.8)',
-                boxShadow: '0 4px 20px rgba(26,51,41,0.04)',
-              }}>
+              <div style={{ padding: '36px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.04)' }}>
                 <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Basic</h3>
                 <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '28px' }}>Perfect for getting started</p>
                 <div style={{ marginBottom: '28px' }}>
@@ -574,13 +395,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/signup?plan=basic" style={{
-                  display: 'block', textAlign: 'center', padding: '14px',
-                  borderRadius: '14px', fontWeight: 600, fontSize: '14px',
-                  border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none',
-                  transition: 'all 0.2s',
-                  background: 'transparent',
-                }}
+                <Link href="/signup?plan=basic" style={{ display: 'block', textAlign: 'center', padding: '14px', borderRadius: '14px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
                   Start Free Trial
@@ -589,21 +404,8 @@ export default function Home() {
 
               {/* Pro */}
               <div className="pro-card" style={{ padding: '36px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                {/* glow orb */}
-                <div style={{
-                  position: 'absolute', top: '-60px', right: '-60px',
-                  width: '200px', height: '200px', borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%)',
-                  pointerEvents: 'none',
-                }} />
-                <div style={{
-                  position: 'absolute', top: '16px', right: '16px',
-                  background: 'linear-gradient(135deg, #E8704A, #d4603a)',
-                  color: 'white', fontSize: '11px', fontWeight: 700,
-                  padding: '5px 12px', borderRadius: '50px',
-                  boxShadow: '0 4px 12px rgba(232,112,74,0.35)',
-                  letterSpacing: '0.02em',
-                }}>
+                <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg, #E8704A, #d4603a)', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 12px', borderRadius: '50px', boxShadow: '0 4px 12px rgba(232,112,74,0.35)', letterSpacing: '0.02em' }}>
                   ⭐ Most Popular
                 </div>
                 <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Pro</h3>
@@ -613,24 +415,14 @@ export default function Home() {
                   <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '14px' }}>/mo</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px', flex: 1 }}>
-                  {[
-                    'Everything in Basic',
-                    'Unlimited appointments',
-                    'Rebooking reminders',
-                    'Auto review requests after every job',
-                    'Monthly revenue & booking reports',
-                    'Early access to new features',
-                    'Priority support',
-                  ].map((f, i) => (
+                  {['Everything in Basic', 'Unlimited appointments', 'Rebooking reminders', 'Auto review requests after every job', 'Monthly revenue & booking reports', 'Early access to new features', 'Priority support'].map((f, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: 'rgba(255,255,255,0.75)' }}>
                       <span style={{ marginRight: '10px', color: '#7DD3A0', fontWeight: 700, fontSize: '13px' }}>✓</span>
                       {f}
                     </div>
                   ))}
                 </div>
-                <button onClick={handleProSignup} className="pro-btn">
-                  Start Free Trial
-                </button>
+                <button onClick={handleProSignup} className="pro-btn">Start Free Trial</button>
               </div>
             </div>
 
@@ -641,17 +433,8 @@ export default function Home() {
         </section>
 
         {/* FINAL CTA */}
-        <section style={{
-          background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)',
-          padding: '96px 24px', textAlign: 'center',
-          position: 'relative', overflow: 'hidden',
-        }}>
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-            width: '700px', height: '400px',
-            background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
+        <section style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
             <h2 className="playfair" style={{ fontSize: 'clamp(30px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
               Ready to stop losing money to no-shows?
@@ -659,11 +442,9 @@ export default function Home() {
             <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '40px', fontSize: '16px', lineHeight: 1.75 }}>
               Join PawBooking today. 30 days free, cancel anytime.
             </p>
-            <Link href="/signup" className="btn-cta">
-              Start Your Free Trial →
-            </Link>
+            <Link href="/signup" className="btn-cta">Start Your Free Trial →</Link>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '28px', marginTop: '28px', flexWrap: 'wrap' }}>
-              {['✓ 30 days free', '✓ Cancel anytime', '✓ Setup in 10 minutes'].map((t, i) => (
+              {['✓ 30 days free', '✓ Cancel anytime', '✓ Setup in 5 minutes'].map((t, i) => (
                 <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>{t}</span>
               ))}
             </div>
@@ -671,18 +452,10 @@ export default function Home() {
         </section>
 
         {/* FOOTER */}
-        <footer style={{
-          background: '#0f2218',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          padding: '28px 40px',
-        }}>
+        <footer style={{ background: '#0f2218', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px' }}>
           <div style={{ maxWidth: '940px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                background: 'rgba(216,243,220,0.1)', width: '26px', height: '26px',
-                borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '1px solid rgba(216,243,220,0.08)',
-              }}>
+              <div style={{ background: 'rgba(216,243,220,0.1)', width: '26px', height: '26px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(216,243,220,0.08)' }}>
                 <svg width="12" height="12" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/>
                   <ellipse cx="20" cy="44" rx="12" ry="15"/>
@@ -697,8 +470,8 @@ export default function Home() {
             <div style={{ display: 'flex', gap: '24px' }}>
               {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href], i) => (
                 <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)') }
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)') }>
+                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}>
                   {label}
                 </a>
               ))}
