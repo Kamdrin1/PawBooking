@@ -93,7 +93,6 @@ export async function GET() {
       if (appt.profiles?.plan !== 'pro') continue
       if (!appt.client_phone) continue
 
-      // Skip if client already has a future appointment
       const today = new Date().toISOString().split('T')[0]
       const { data: futureAppts } = await supabase
         .from('appointments')
@@ -122,7 +121,40 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ success: true, sent, rebookSent })
+    // ─── AUTO REVIEW REQUESTS (Pro only — sent when appointment marked complete) ─────
+    // Find appointments completed in the last hour that haven't had a review request sent
+    const oneHourAgo = new Date()
+    oneHourAgo.setHours(oneHourAgo.getHours() - 1)
+
+    const { data: reviewAppts, error: reviewError } = await supabase
+      .from('appointments')
+      .select('*, profiles(business_name, plan, google_review_link)')
+      .eq('status', 'completed')
+      .eq('review_request_sent', false)
+      .gte('completed_at', oneHourAgo.toISOString())
+
+    if (reviewError) throw reviewError
+
+    let reviewSent = 0
+
+    for (const appt of reviewAppts || []) {
+      if (appt.profiles?.plan !== 'pro') continue
+      if (!appt.client_phone) continue
+      if (!appt.profiles?.google_review_link) continue
+
+      const businessName = appt.profiles?.business_name || 'your groomer'
+      const reviewLink = appt.profiles.google_review_link
+
+      const message = `Hi ${appt.client_name}! 🐾 Thanks for bringing ${appt.dog_name} in today — it was great to see you! If you have a moment, we'd love a quick Google review: ${reviewLink} It really helps us out. Thanks! Reply STOP to opt out.`
+
+      const ok = await sendSMS(appt.client_phone, message)
+      if (ok) {
+        await supabase.from('appointments').update({ review_request_sent: true }).eq('id', appt.id)
+        reviewSent++
+      }
+    }
+
+    return NextResponse.json({ success: true, sent, rebookSent, reviewSent })
   } catch (error) {
     console.error('Reminder error:', error)
     return NextResponse.json({ error: 'Failed to send reminders' }, { status: 500 })

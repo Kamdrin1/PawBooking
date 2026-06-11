@@ -22,6 +22,7 @@ interface Profile {
   business_name: string
   plan: string
   payment_methods: string[]
+  google_review_link: string
 }
 
 interface Service {
@@ -283,9 +284,10 @@ function ReportsPage({ profile, supabase, router }: {
 }
 
 // ─── SETTINGS PAGE ────────────────────────────────────────────────────────────
-function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
+function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supabase, router }: {
   profile: Profile | null
   onBusinessNameUpdate: (name: string) => void
+  onReviewLinkUpdate: (link: string) => void
   supabase: ReturnType<typeof createClient>
   router: ReturnType<typeof useRouter>
 }) {
@@ -294,6 +296,10 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
   const [savingName, setSavingName] = useState(false)
   const [nameError, setNameError] = useState('')
   const [portalLoading, setPortalLoading] = useState(false)
+  const [editingReviewLink, setEditingReviewLink] = useState(false)
+  const [newReviewLink, setNewReviewLink] = useState(profile?.google_review_link || '')
+  const [savingReviewLink, setSavingReviewLink] = useState(false)
+  const [reviewLinkError, setReviewLinkError] = useState('')
 
   async function handleSaveName() {
     if (!newName.trim()) { setNameError('Business name is required'); return }
@@ -306,6 +312,18 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
     onBusinessNameUpdate(newName.trim())
     setEditingName(false)
     setSavingName(false)
+  }
+
+  async function handleSaveReviewLink() {
+    setSavingReviewLink(true)
+    setReviewLinkError('')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({ google_review_link: newReviewLink.trim() }).eq('id', user.id)
+    if (error) { setReviewLinkError(error.message); setSavingReviewLink(false); return }
+    onReviewLinkUpdate(newReviewLink.trim())
+    setEditingReviewLink(false)
+    setSavingReviewLink(false)
   }
 
   async function handleManagePlan() {
@@ -370,6 +388,59 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
           )}
         </div>
 
+        {/* Google Review Link — Pro only */}
+        {isPro && (
+          <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
+            <div className="flex items-center justify-between mb-1">
+              <div>
+                <div className="text-sm font-semibold" style={{ color: '#1A3329' }}>Google Review Link</div>
+                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Sent to clients automatically after every completed appointment</div>
+              </div>
+              {!editingReviewLink && (
+                <button onClick={() => { setEditingReviewLink(true); setNewReviewLink(profile?.google_review_link || '') }}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ml-3"
+                  style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>✏️</button>
+              )}
+            </div>
+            {editingReviewLink ? (
+              <div className="space-y-3 mt-3">
+                <input type="url" value={newReviewLink} onChange={e => setNewReviewLink(e.target.value)}
+                  placeholder="https://g.page/r/your-review-link"
+                  className="w-full px-4 py-3 rounded-xl text-sm"
+                  style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                  onKeyDown={e => e.key === 'Enter' && handleSaveReviewLink()} />
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                  Find your link: Google Maps → your business → Share → Copy link
+                </p>
+                {reviewLinkError && <p className="text-xs" style={{ color: '#DC2626' }}>{reviewLinkError}</p>}
+                <div className="flex gap-2">
+                  <button onClick={handleSaveReviewLink} disabled={savingReviewLink}
+                    className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+                    style={{ background: '#1A3329' }}>{savingReviewLink ? 'Saving...' : 'Save'}</button>
+                  <button onClick={() => { setEditingReviewLink(false); setReviewLinkError('') }}
+                    className="px-4 py-2 rounded-xl text-sm font-semibold"
+                    style={{ background: '#F5F2EB', color: '#6B7280' }}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2">
+                {profile?.google_review_link ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">⭐</span>
+                    <a href={profile.google_review_link} target="_blank" rel="noreferrer"
+                      className="text-sm truncate" style={{ color: '#2D6A4F' }}>{profile.google_review_link}</a>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: '#FEF3C7', border: '1px solid #FDE68A' }}>
+                    <span>⚠️</span>
+                    <span className="text-xs font-medium" style={{ color: '#92400E' }}>Add your Google review link to enable auto review requests</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Plan Cards */}
         <div className="rounded-2xl p-6" style={{ background: '#FDFBF7', border: '1px solid #EDE9DF' }}>
           <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Your Plan</div>
@@ -406,7 +477,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
               </div>
             </div>
 
-            {/* Pro — Most Popular badge always visible */}
+            {/* Pro */}
             <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: isPro ? '#1A3329' : '#FFFFFF', border: isPro ? '2px solid #1A3329' : '1.5px solid #EDE9DF' }}>
               <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full"
                 style={{ background: isPro ? 'rgba(255,255,255,0.15)' : '#1A3329', color: 'white' }}>
@@ -432,7 +503,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, supabase, router }: {
 
           </div>
 
-          {/* CTA — Upgrade or Manage via Stripe Portal */}
           {!isPro ? (
             <button onClick={() => router.push('/pricing')}
               className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -893,6 +963,7 @@ export default function DashboardPage() {
             <SettingsPage
               profile={profile}
               onBusinessNameUpdate={(name) => setProfile(prev => prev ? { ...prev, business_name: name } : prev)}
+              onReviewLinkUpdate={(link) => setProfile(prev => prev ? { ...prev, google_review_link: link } : prev)}
               supabase={supabase}
               router={router}
             />
