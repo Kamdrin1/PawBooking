@@ -122,7 +122,7 @@ export default function BookingPage() {
         * { font-family: 'DM Sans', sans-serif; }
         .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F2EB' }}>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F5F2EB' }}>
         <div className="text-center">
           <div className="text-5xl mb-4">🐾</div>
           <h1 className="playfair text-2xl font-bold mb-2" style={{ color: '#1A3329' }}>Groomer not found</h1>
@@ -142,7 +142,7 @@ export default function BookingPage() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
-        * { font-family: 'DM Sans', sans-serif; }
+        * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
         .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
       <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
@@ -168,7 +168,7 @@ export default function BookingPage() {
             </svg>
           ))}
         </div>
-        <div className="text-center max-w-md relative z-10">
+        <div className="text-center max-w-sm w-full relative z-10">
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
             style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', boxShadow: '0 8px 24px rgba(45,106,79,0.2)' }}>
             <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
@@ -246,17 +246,23 @@ export default function BookingPage() {
         .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,51,41,0.35); }
         .submit-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; }
         label { color: #6B7280; font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
+        .two-col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        @media (max-width: 480px) {
+          .two-col { grid-template-columns: 1fr !important; }
+          .booking-header { padding: 28px 20px 24px !important; }
+          .booking-header-icon { width: 48px !important; height: 48px !important; margin-bottom: 16px !important; }
+          .booking-header-title { font-size: 20px !important; }
+        }
       `}</style>
 
       <div className="min-h-screen" style={{ background: '#F5F2EB' }}>
 
         {/* HEADER */}
-        <div style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', padding: '40px 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div className="booking-header" style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', padding: '40px 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '200px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '600px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.2), transparent)' }} />
 
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
-            style={{ background: 'rgba(216,243,220,0.12)', border: '1px solid rgba(216,243,220,0.15)', boxShadow: '0 0 24px rgba(45,106,79,0.15)' }}>
+          <div className="booking-header-icon" style={{ width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', background: 'rgba(216,243,220,0.12)', border: '1px solid rgba(216,243,220,0.15)', boxShadow: '0 0 24px rgba(45,106,79,0.15)' }}>
             <svg width="26" height="26" viewBox="0 0 100 100" fill="#D8F3DC">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
               <ellipse cx="20" cy="44" rx="12" ry="15"/>
@@ -265,39 +271,37 @@ export default function BookingPage() {
               <ellipse cx="80" cy="44" rx="12" ry="15"/>
             </svg>
           </div>
-          <h1 className="playfair text-2xl font-bold text-white mb-1.5" style={{ letterSpacing: '-0.02em' }}>
+          <h1 className="playfair booking-header-title font-bold text-white mb-1.5" style={{ fontSize: '24px', letterSpacing: '-0.02em' }}>
             {profile.business_name}
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px' }}>
             {profile.service_area || 'Professional Dog Grooming'}
           </p>
-          <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full text-xs font-semibold"
-            style={{ background: 'rgba(216,243,220,0.12)', color: '#D8F3DC', border: '1px solid rgba(216,243,220,0.15)', backdropFilter: 'blur(8px)' }}>
-            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#4ade80', boxShadow: '0 0 6px rgba(74,222,128,0.6)' }} />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', padding: '6px 16px', borderRadius: '50px', background: 'rgba(216,243,220,0.12)', color: '#D8F3DC', border: '1px solid rgba(216,243,220,0.15)', backdropFilter: 'blur(8px)', fontSize: '12px', fontWeight: 600 }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px rgba(74,222,128,0.6)' }} />
             Accepting bookings
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto px-5 py-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div style={{ maxWidth: '520px', margin: '0 auto', padding: '24px 16px 40px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
             {/* SERVICES */}
             {services.length > 0 && (
               <div>
                 <h2 className="font-semibold mb-3" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Select a Service</h2>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {services.map(s => (
                     <div key={s.id} onClick={() => setServiceId(s.id)} className={`service-card ${serviceId === s.id ? 'selected' : ''}`}>
-                      <div className="flex items-center justify-between">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
                           <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{s.name}</div>
                           <div className="text-xs mt-0.5" style={{ color: '#6B7280' }}>{s.duration_minutes} min</div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span className="font-bold text-sm" style={{ color: '#2D6A4F' }}>${s.price}</span>
-                          <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                            style={{ borderColor: serviceId === s.id ? '#1A3329' : '#D1C9B8', background: serviceId === s.id ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : 'transparent' }}>
-                            {serviceId === s.id && <span className="text-white text-xs">✓</span>}
+                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${serviceId === s.id ? '#1A3329' : '#D1C9B8'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: serviceId === s.id ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : 'transparent' }}>
+                            {serviceId === s.id && <span style={{ color: 'white', fontSize: '11px' }}>✓</span>}
                           </div>
                         </div>
                       </div>
@@ -308,119 +312,108 @@ export default function BookingPage() {
             )}
 
             {/* DATE & TIME */}
-            <div className="form-card p-5">
+            <div className="form-card" style={{ padding: '20px' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Date & Time</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="two-col">
                 <div>
                   <label>Preferred Date *</label>
                   <input type="date" value={date} onChange={e => setDate(e.target.value)}
                     required min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 rounded-xl text-sm"
-                    style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
                 </div>
                 <div>
                   <label>Preferred Time *</label>
                   <input type="time" value={time} onChange={e => setTime(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-xl text-sm"
-                    style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
                 </div>
               </div>
             </div>
 
             {/* YOUR INFO */}
-            <div className="form-card p-5">
+            <div className="form-card" style={{ padding: '20px' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Your Info</h2>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="two-col">
                   <div>
                     <label>Your Name *</label>
                     <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
                       placeholder="Jane Smith" required
-                      className="w-full px-4 py-3 rounded-xl text-sm"
-                      style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                   </div>
                   <div>
                     <label>Phone Number *</label>
                     <input type="tel" value={clientPhone} onChange={handlePhoneChange}
                       placeholder="+1 (208) 555-0000" required
-                      className="w-full px-4 py-3 rounded-xl text-sm"
-                      style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                   </div>
                 </div>
                 <div>
                   <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional — for confirmation)</span></label>
                   <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
                     placeholder="jane@email.com"
-                    className="w-full px-4 py-3 rounded-xl text-sm"
-                    style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                 </div>
               </div>
             </div>
 
             {/* DOG INFO */}
-            <div className="form-card p-5">
+            <div className="form-card" style={{ padding: '20px' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Dog Info</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="two-col">
                 <div>
                   <label>Dog&apos;s Name *</label>
                   <input type="text" value={dogName} onChange={e => setDogName(e.target.value)}
                     placeholder="Buddy" required
-                    className="w-full px-4 py-3 rounded-xl text-sm"
-                    style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                 </div>
                 <div>
                   <label>Breed</label>
                   <input type="text" value={dogBreed} onChange={e => setDogBreed(e.target.value)}
                     placeholder="Golden Retriever"
-                    className="w-full px-4 py-3 rounded-xl text-sm"
-                    style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                 </div>
               </div>
             </div>
 
             {/* NOTES */}
-            <div className="form-card p-5">
+            <div className="form-card" style={{ padding: '20px' }}>
               <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>
-                Additional Notes <span className="font-normal text-sm" style={{ color: '#9CA3AF' }}>(optional)</span>
+                Additional Notes <span style={{ fontWeight: 400, fontSize: '13px', color: '#9CA3AF' }}>(optional)</span>
               </h2>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
                 placeholder="Allergies, special instructions, temperament notes..."
-                className="w-full px-4 py-3 rounded-xl text-sm resize-none"
-                style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', resize: 'none', color: '#1A3329' }} />
             </div>
 
             {/* BOOKING SUMMARY */}
             {selectedService && date && time && (
-              <div className="rounded-2xl p-5"
-                style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.15)', boxShadow: '0 4px 16px rgba(45,106,79,0.1)' }}>
-                <h2 className="font-semibold mb-3 text-sm uppercase tracking-widest" style={{ color: '#1A5C36', letterSpacing: '0.1em' }}>Booking Summary</h2>
-                <div className="space-y-2">
+              <div style={{ borderRadius: '20px', padding: '20px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.15)', boxShadow: '0 4px 16px rgba(45,106,79,0.1)' }}>
+                <h2 style={{ fontWeight: 700, marginBottom: '12px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1A5C36' }}>Booking Summary</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {[
                     { label: 'Service', value: selectedService.name },
                     { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) },
                     { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
                   ].map((row, i) => (
-                    <div key={i} className="flex justify-between text-sm">
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                       <span style={{ color: '#2D6A4F' }}>{row.label}</span>
-                      <span className="font-semibold" style={{ color: '#1A3329' }}>{row.value}</span>
+                      <span style={{ fontWeight: 600, color: '#1A3329' }}>{row.value}</span>
                     </div>
                   ))}
-                  <div className="flex justify-between text-sm pt-2" style={{ borderTop: '1px solid rgba(45,106,79,0.2)' }}>
-                    <span className="font-semibold" style={{ color: '#2D6A4F' }}>Total</span>
-                    <span className="font-bold text-base" style={{ color: '#1A3329' }}>${selectedService.price}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingTop: '8px', borderTop: '1px solid rgba(45,106,79,0.2)' }}>
+                    <span style={{ fontWeight: 600, color: '#2D6A4F' }}>Total</span>
+                    <span style={{ fontWeight: 700, fontSize: '16px', color: '#1A3329' }}>${selectedService.price}</span>
                   </div>
                 </div>
               </div>
             )}
 
             {/* SMS CONSENT */}
-            <div className="rounded-2xl p-4 flex items-start gap-3 transition-all"
-              style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: `2px solid ${smsConsent ? 'rgba(45,106,79,0.3)' : 'rgba(237,233,223,0.8)'}`, boxShadow: smsConsent ? '0 4px 12px rgba(45,106,79,0.08)' : 'none' }}>
+            <div style={{ borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: `2px solid ${smsConsent ? 'rgba(45,106,79,0.3)' : 'rgba(237,233,223,0.8)'}`, boxShadow: smsConsent ? '0 4px 12px rgba(45,106,79,0.08)' : 'none', transition: 'all 0.2s' }}>
               <input type="checkbox" id="sms-consent" checked={smsConsent}
                 onChange={e => setSmsConsent(e.target.checked)}
-                className="mt-0.5 flex-shrink-0"
-                style={{ width: '16px', height: '16px', accentColor: '#1A3329', cursor: 'pointer' }} />
+                style={{ width: '18px', height: '18px', marginTop: '2px', flexShrink: 0, accentColor: '#1A3329', cursor: 'pointer' }} />
               <label htmlFor="sms-consent" style={{ color: '#4B5563', fontSize: '12px', fontWeight: 400, marginBottom: 0, cursor: 'pointer', lineHeight: 1.7 }}>
                 I agree to receive SMS appointment reminders from {profile.business_name} via PawBooking. Message frequency varies. Message & data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
               </label>
@@ -428,18 +421,18 @@ export default function BookingPage() {
 
             {/* ERROR */}
             {error && (
-              <div className="px-4 py-3 rounded-xl text-sm" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
+              <div style={{ padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
                 {error}
               </div>
             )}
 
             {/* SUBMIT */}
-            <button type="submit" disabled={loading || !smsConsent}
-              className="submit-btn w-full py-4 rounded-xl font-semibold text-sm">
+            <button type="submit" disabled={loading || !smsConsent} className="submit-btn"
+              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
 
-            <p className="text-center text-xs" style={{ color: '#9CA3AF', lineHeight: 1.7 }}>
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', lineHeight: 1.7 }}>
               Your request will be confirmed by {profile.business_name}. You&apos;ll receive an SMS reminder before your appointment.
             </p>
 
