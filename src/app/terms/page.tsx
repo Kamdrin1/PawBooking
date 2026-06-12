@@ -5,29 +5,63 @@ export default function TermsOfService() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
         * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
         .playfair { font-family: 'Playfair Display', serif; }
-        h2 { color: #1A3329; font-size: 18px; font-weight: 600; margin-top: 32px; margin-bottom: 10px; }
+        h2 { color: #1A3329; font-size: 17px; font-weight: 600; margin-top: 32px; margin-bottom: 10px; }
         p, li { color: #4B5563; font-size: 15px; line-height: 1.8; margin-bottom: 10px; }
         ul { padding-left: 20px; margin-bottom: 10px; }
         a { color: #2D6A4F; }
+
+        .legal-nav {
+          background: #FDFBF7;
+          border-bottom: 1px solid #EDE9DF;
+          padding: 16px 24px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .legal-content {
+          max-width: 720px;
+          margin: 0 auto;
+          padding: 48px 24px 80px;
+        }
+
+        .legal-footer {
+          background: #1A3329;
+          padding: 24px;
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+          .legal-nav { padding: 14px 16px; }
+          .legal-content { padding: 32px 16px 60px; }
+          .legal-h1 { font-size: 28px !important; }
+          h2 { font-size: 16px; margin-top: 24px; }
+          p, li { font-size: 14px; }
+        }
       `}</style>
 
       {/* Nav */}
-      <nav style={{ background: '#FDFBF7', borderBottom: '1px solid #EDE9DF', padding: '16px 40px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="14" height="14" viewBox="0 0 100 100" fill="#D8F3DC">
-            <ellipse cx="50" cy="70" rx="26" ry="20"/>
-            <ellipse cx="20" cy="44" rx="12" ry="15"/>
-            <ellipse cx="38" cy="33" rx="12" ry="15"/>
-            <ellipse cx="62" cy="33" rx="12" ry="15"/>
-            <ellipse cx="80" cy="44" rx="12" ry="15"/>
-          </svg>
-        </div>
-        <span className="playfair" style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>PawBooking</span>
+      <nav className="legal-nav">
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 3px 8px rgba(26,51,41,0.2)' }}>
+            <svg width="14" height="14" viewBox="0 0 100 100" fill="#D8F3DC">
+              <ellipse cx="50" cy="70" rx="26" ry="20"/>
+              <ellipse cx="20" cy="44" rx="12" ry="15"/>
+              <ellipse cx="38" cy="33" rx="12" ry="15"/>
+              <ellipse cx="62" cy="33" rx="12" ry="15"/>
+              <ellipse cx="80" cy="44" rx="12" ry="15"/>
+            </svg>
+          </div>
+          <span className="playfair" style={{ fontWeight: 700, fontSize: '16px', color: '#1A3329', letterSpacing: '-0.01em' }}>PawBooking</span>
+        </a>
       </nav>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '60px 24px' }}>
-        <h1 className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: '#1A3329', marginBottom: '8px' }}>Terms of Service</h1>
-        <p style={{ color: '#9CA3AF', fontSize: '14px', marginBottom: '40px' }}>Last updated: June 9, 2026</p>
+      <div className="legal-content">
+        <h1 className="playfair legal-h1" style={{ fontSize: '34px', fontWeight: 700, color: '#1A3329', marginBottom: '8px' }}>Terms of Service</h1>
+        <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '36px' }}>Last updated: June 9, 2026</p>
 
         <p>By accessing or using PawBooking ("the Service"), you agree to be bound by these Terms of Service. Please read them carefully.</p>
 
@@ -89,11 +123,10 @@ export default function TermsOfService() {
         <a href="mailto:kamdrinoverholt@gmail.com">kamdrinoverholt@gmail.com</a></p>
       </div>
 
-      {/* Footer */}
-      <footer style={{ background: '#1A3329', padding: '24px 40px', display: 'flex', justifyContent: 'center', gap: '24px' }}>
-        <a href="/privacy" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>Privacy</a>
-        <a href="/terms" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>Terms</a>
-        <a href="/contact" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>Contact</a>
+      <footer className="legal-footer">
+        {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href]) => (
+          <a key={label} href={href} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textDecoration: 'none' }}>{label}</a>
+        ))}
       </footer>
     </div>
   )
