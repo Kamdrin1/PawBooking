@@ -112,41 +112,31 @@ function ReportsPage({ profile, supabase, router }: {
   const BlurredContent = () => (
     <div className="relative">
       <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginBottom: '24px' }}>
           {[['Total Revenue', '$2,840'], ['Appointments', '38'], ['Avg per Appt', '$74']].map(([label, val]) => (
-            <div key={label} className="dash-card rounded-2xl p-6">
-              <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>{label}</div>
-              <div className="text-4xl font-bold mb-1 playfair" style={{ color: '#1A3329' }}>{val}</div>
+            <div key={label} className="dash-card rounded-2xl p-5">
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>{label}</div>
+              <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#1A3329' }}>{val}</div>
             </div>
           ))}
         </div>
-        <div className="dash-card rounded-2xl p-6 mb-6">
-          <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Monthly Revenue</div>
-          <div className="flex items-end gap-3 h-32">
+        <div className="dash-card rounded-2xl p-6 mb-4">
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Monthly Revenue</div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '100px' }}>
             {[40, 65, 45, 80, 55, 90].map((h, i) => (
-              <div key={i} className="flex-1 rounded-t-lg" style={{ height: `${h}%`, background: 'linear-gradient(180deg, #2D6A4F, #1A3329)', opacity: 0.7 }} />
+              <div key={i} style={{ flex: 1, borderRadius: '4px 4px 0 0', height: `${h}%`, background: 'linear-gradient(180deg, #2D6A4F, #1A3329)', opacity: 0.7 }} />
             ))}
           </div>
         </div>
-        <div className="dash-card rounded-2xl p-6">
-          <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329' }}>Top Services</div>
-          {['Full Groom', 'Bath & Brush', 'Nail Trim'].map((s, i) => (
-            <div key={s} className="flex items-center justify-between py-2">
-              <span className="text-sm" style={{ color: '#374151' }}>{s}</span>
-              <span className="text-sm font-semibold" style={{ color: '#2D6A4F' }}>${[840, 620, 380][i]}</span>
-            </div>
-          ))}
-        </div>
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl" style={{ background: 'rgba(245,242,235,0.8)', backdropFilter: 'blur(2px)' }}>
-        <div className="text-4xl mb-4">🔒</div>
-        <div className="text-xl font-bold mb-2 text-center playfair" style={{ color: '#1A3329' }}>Reports & Analytics</div>
-        <div className="text-sm mb-6 text-center max-w-xs" style={{ color: '#6B7280' }}>
+        <div style={{ fontSize: '36px', marginBottom: '16px' }}>🔒</div>
+        <div className="playfair" style={{ fontSize: '20px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textAlign: 'center' }}>Reports & Analytics</div>
+        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px', textAlign: 'center', maxWidth: '280px' }}>
           See your revenue trends, top services, and client retention — upgrade to Pro to unlock.
         </div>
         <button onClick={() => router.push('/pricing')}
-          className="px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-          style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.25)' }}>
+          style={{ padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.25)' }}>
           Upgrade to Pro — $50/mo →
         </button>
       </div>
@@ -155,120 +145,110 @@ function ReportsPage({ profile, supabase, router }: {
 
   return (
     <>
-      <header className="px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
-        <div className="flex items-center justify-between">
+      <header className="page-header">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>Reports</h1>
-            <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Your business performance at a glance</p>
+            <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Reports</h1>
+            <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your business performance at a glance</p>
           </div>
-          {isPro && (
-            <div className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>⭐ Pro</div>
-          )}
+          {isPro && <div style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '12px', fontWeight: 700, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)' }}>⭐ Pro</div>}
         </div>
       </header>
-      <div className="px-8 py-7 max-w-5xl">
+      <div className="page-content">
         {!isPro ? <BlurredContent /> : loading ? (
-          <div className="flex items-center justify-center py-20">
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
             <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
           </div>
         ) : reportData ? (
-          <div className="space-y-5">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="stat-card rounded-2xl p-6" style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(216,243,220,0.5)', letterSpacing: '0.12em' }}>Total Revenue</div>
-                <div className="playfair text-4xl font-semibold mb-1 text-white" style={{ letterSpacing: '-0.02em' }}>${reportData.totalRevenue}</div>
-                <div className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>All time</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="report-stats-grid">
+              <div className="stat-card rounded-2xl p-5" style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25)' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(216,243,220,0.5)', marginBottom: '8px' }}>Total Revenue</div>
+                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: 'white', letterSpacing: '-0.02em' }}>${reportData.totalRevenue}</div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>All time</div>
               </div>
-              <div className="stat-card dash-card rounded-2xl p-6">
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>Total Appointments</div>
-                <div className="playfair text-4xl font-semibold mb-1" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>{reportData.totalAppointments}</div>
-                <div className="text-sm" style={{ color: '#6B7280' }}>All time</div>
+              <div className="stat-card dash-card rounded-2xl p-5">
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Appointments</div>
+                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>{reportData.totalAppointments}</div>
+                <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>All time</div>
               </div>
-              <div className="stat-card dash-card rounded-2xl p-6">
-                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>Avg per Appointment</div>
-                <div className="playfair text-4xl font-semibold mb-1" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>${reportData.avgRevenuePerAppt}</div>
-                <div className="text-sm" style={{ color: '#6B7280' }}>All time</div>
+              <div className="stat-card dash-card rounded-2xl p-5">
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Avg per Appt</div>
+                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>${reportData.avgRevenuePerAppt}</div>
+                <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>All time</div>
               </div>
             </div>
-            <div className="dash-card rounded-2xl p-6">
-              <div className="text-sm font-semibold mb-6" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Monthly Revenue — Last 6 Months</div>
-              <div className="flex items-end gap-3 h-40">
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '20px' }}>Monthly Revenue — Last 6 Months</div>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '140px' }}>
                 {reportData.monthlyRevenue.map((m, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                    <div className="text-xs font-semibold" style={{ color: '#2D6A4F' }}>{m.revenue > 0 ? `$${m.revenue}` : ''}</div>
-                    <div className="w-full rounded-t-lg transition-all" style={{
-                      height: `${Math.max((m.revenue / maxRevenue) * 130, m.revenue > 0 ? 8 : 2)}px`,
-                      background: i === reportData.monthlyRevenue.length - 1 ? 'linear-gradient(180deg, #2D6A4F, #1A3329)' : 'linear-gradient(180deg, #D8F3DC, #c8eacd)',
-                    }} />
-                    <div className="text-xs" style={{ color: '#9CA3AF' }}>{m.month}</div>
+                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#2D6A4F' }}>{m.revenue > 0 ? `$${m.revenue}` : ''}</div>
+                    <div style={{ width: '100%', borderRadius: '4px 4px 0 0', height: `${Math.max((m.revenue / maxRevenue) * 110, m.revenue > 0 ? 8 : 2)}px`, background: i === reportData.monthlyRevenue.length - 1 ? 'linear-gradient(180deg, #2D6A4F, #1A3329)' : 'linear-gradient(180deg, #D8F3DC, #c8eacd)' }} />
+                    <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{m.month}</div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="dash-card rounded-2xl p-6">
-                <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Top Services by Revenue</div>
-                {reportData.topServices.length === 0 ? (
-                  <div className="text-sm py-4 text-center" style={{ color: '#9CA3AF' }}>No service data yet</div>
-                ) : (
-                  <div className="space-y-3">
-                    {reportData.topServices.map((s, i) => (
-                      <div key={s.name}>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
-                              style={{ background: i === 0 ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : '#D8F3DC', color: i === 0 ? 'white' : '#1A5C36' }}>{i + 1}</div>
-                            <span className="text-sm font-medium" style={{ color: '#374151' }}>{s.name}</span>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm font-bold" style={{ color: '#2D6A4F' }}>${s.revenue}</div>
-                            <div className="text-xs" style={{ color: '#9CA3AF' }}>{s.count} bookings</div>
-                          </div>
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Top Services by Revenue</div>
+              {reportData.topServices.length === 0 ? (
+                <div style={{ fontSize: '14px', color: '#9CA3AF', textAlign: 'center', padding: '16px 0' }}>No service data yet</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {reportData.topServices.map((s, i) => (
+                    <div key={s.name}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, background: i === 0 ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : '#D8F3DC', color: i === 0 ? 'white' : '#1A5C36' }}>{i + 1}</div>
+                          <span style={{ fontSize: '14px', fontWeight: 500, color: '#374151' }}>{s.name}</span>
                         </div>
-                        <div className="w-full rounded-full h-1.5" style={{ background: '#EDE9DF' }}>
-                          <div className="h-1.5 rounded-full" style={{ width: `${(s.revenue / reportData.topServices[0].revenue) * 100}%`, background: 'linear-gradient(90deg, #2D6A4F, #45a070)' }} />
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#2D6A4F' }}>${s.revenue}</div>
+                          <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{s.count} bookings</div>
                         </div>
                       </div>
-                    ))}
+                      <div style={{ width: '100%', height: '6px', borderRadius: '50px', background: '#EDE9DF' }}>
+                        <div style={{ height: '6px', borderRadius: '50px', width: `${(s.revenue / reportData.topServices[0].revenue) * 100}%`, background: 'linear-gradient(90deg, #2D6A4F, #45a070)' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>New vs Returning Clients</div>
+              {totalClients === 0 ? (
+                <div style={{ fontSize: '14px', color: '#9CA3AF', textAlign: 'center', padding: '16px 0' }}>No client data yet</div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <div className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>{reportData.newVsReturning.new}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280' }}>New Clients</div>
+                    </div>
+                    <div style={{ width: '1px', height: '40px', background: '#EDE9DF' }} />
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <div className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: '#2D6A4F', letterSpacing: '-0.02em' }}>{reportData.newVsReturning.returning}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280' }}>Returning</div>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="dash-card rounded-2xl p-6">
-                <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>New vs Returning Clients</div>
-                {totalClients === 0 ? (
-                  <div className="text-sm py-4 text-center" style={{ color: '#9CA3AF' }}>No client data yet</div>
-                ) : (
-                  <>
-                    <div className="flex items-end gap-4 mb-6">
-                      <div className="flex-1 text-center">
-                        <div className="playfair text-4xl font-bold mb-1" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>{reportData.newVsReturning.new}</div>
-                        <div className="text-xs font-semibold" style={{ color: '#6B7280' }}>New Clients</div>
-                      </div>
-                      <div className="w-px h-12" style={{ background: '#EDE9DF' }} />
-                      <div className="flex-1 text-center">
-                        <div className="playfair text-4xl font-bold mb-1" style={{ color: '#2D6A4F', letterSpacing: '-0.02em' }}>{reportData.newVsReturning.returning}</div>
-                        <div className="text-xs font-semibold" style={{ color: '#6B7280' }}>Returning</div>
-                      </div>
-                    </div>
-                    <div className="mb-2">
-                      <div className="flex justify-between text-xs mb-1.5" style={{ color: '#9CA3AF' }}>
-                        <span>Retention rate</span>
-                        <span style={{ color: '#2D6A4F', fontWeight: 600 }}>{totalClients > 0 ? Math.round((reportData.newVsReturning.returning / totalClients) * 100) : 0}%</span>
-                      </div>
-                      <div className="w-full rounded-full h-2.5 overflow-hidden" style={{ background: '#EDE9DF' }}>
-                        <div className="h-2.5 rounded-full" style={{ width: `${totalClients > 0 ? (reportData.newVsReturning.returning / totalClients) * 100 : 0}%`, background: 'linear-gradient(90deg, #2D6A4F, #45a070)' }} />
-                      </div>
-                    </div>
-                    <p className="text-xs mt-3" style={{ color: '#9CA3AF' }}>
-                      {reportData.newVsReturning.returning > 0 ? `${reportData.newVsReturning.returning} clients have booked more than once 🐾` : 'Build repeat business with rebooking reminders'}
-                    </p>
-                  </>
-                )}
-              </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#9CA3AF', marginBottom: '6px' }}>
+                    <span>Retention rate</span>
+                    <span style={{ color: '#2D6A4F', fontWeight: 600 }}>{totalClients > 0 ? Math.round((reportData.newVsReturning.returning / totalClients) * 100) : 0}%</span>
+                  </div>
+                  <div style={{ width: '100%', height: '10px', borderRadius: '50px', background: '#EDE9DF', overflow: 'hidden' }}>
+                    <div style={{ height: '10px', borderRadius: '50px', width: `${totalClients > 0 ? (reportData.newVsReturning.returning / totalClients) * 100 : 0}%`, background: 'linear-gradient(90deg, #2D6A4F, #45a070)' }} />
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '10px' }}>
+                    {reportData.newVsReturning.returning > 0 ? `${reportData.newVsReturning.returning} clients have booked more than once 🐾` : 'Build repeat business with rebooking reminders'}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         ) : (
-          <div className="text-center py-20" style={{ color: '#9CA3AF' }}>No data available yet</div>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#9CA3AF' }}>No data available yet</div>
         )}
       </div>
     </>
@@ -328,88 +308,80 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
 
   return (
     <>
-      <header className="px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
-        <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>Settings</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage your account and preferences</p>
+      <header className="page-header">
+        <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Settings</h1>
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Manage your account and preferences</p>
       </header>
-      <div className="px-8 py-7 max-w-2xl space-y-4">
+      <div className="page-content" style={{ maxWidth: '600px' }}>
 
-        <div className="dash-card rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Business Name</div>
+        <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Business Name</div>
             {!editingName && (
               <button onClick={() => { setEditingName(true); setNewName(profile?.business_name || '') }}
-                className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>✏️</button>
+                style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>✏️</button>
             )}
           </div>
           {editingName ? (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-sm"
-                style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
                 onKeyDown={e => e.key === 'Enter' && handleSaveName()} />
-              {nameError && <p className="text-xs" style={{ color: '#DC2626' }}>{nameError}</p>}
-              <div className="flex gap-2">
+              {nameError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{nameError}</p>}
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={handleSaveName} disabled={savingName}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
+                  style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingName ? 0.5 : 1 }}>
                   {savingName ? 'Saving...' : 'Save'}
                 </button>
                 <button onClick={() => { setEditingName(false); setNameError('') }}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold"
-                  style={{ background: '#F5F2EB', color: '#6B7280' }}>Cancel</button>
+                  style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
               </div>
             </div>
           ) : (
-            <div className="text-sm" style={{ color: '#6B7280' }}>{profile?.business_name}</div>
+            <div style={{ fontSize: '14px', color: '#6B7280' }}>{profile?.business_name}</div>
           )}
         </div>
 
         {isPro && (
-          <div className="dash-card rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-1">
+          <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '4px' }}>
               <div>
-                <div className="text-sm font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Google Review Link</div>
-                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Sent to clients automatically after every completed appointment</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Google Review Link</div>
+                <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>Sent to clients after every completed appointment</div>
               </div>
               {!editingReviewLink && (
                 <button onClick={() => { setEditingReviewLink(true); setNewReviewLink(profile?.google_review_link || '') }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ml-3"
-                  style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>✏️</button>
+                  style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer', flexShrink: 0, marginLeft: '12px' }}>✏️</button>
               )}
             </div>
             {editingReviewLink ? (
-              <div className="space-y-3 mt-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
                 <input type="url" value={newReviewLink} onChange={e => setNewReviewLink(e.target.value)}
                   placeholder="https://g.page/r/your-review-link"
-                  className="w-full px-4 py-3 rounded-xl text-sm"
-                  style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                  style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
                   onKeyDown={e => e.key === 'Enter' && handleSaveReviewLink()} />
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>Find your link: Google Maps → your business → Share → Copy link</p>
-                {reviewLinkError && <p className="text-xs" style={{ color: '#DC2626' }}>{reviewLinkError}</p>}
-                <div className="flex gap-2">
+                <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Google Maps → your business → Share → Copy link</p>
+                {reviewLinkError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{reviewLinkError}</p>}
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={handleSaveReviewLink} disabled={savingReviewLink}
-                    className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
+                    style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingReviewLink ? 0.5 : 1 }}>
                     {savingReviewLink ? 'Saving...' : 'Save'}
                   </button>
                   <button onClick={() => { setEditingReviewLink(false); setReviewLinkError('') }}
-                    className="px-4 py-2 rounded-xl text-sm font-semibold"
-                    style={{ background: '#F5F2EB', color: '#6B7280' }}>Cancel</button>
+                    style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
                 </div>
               </div>
             ) : (
-              <div className="mt-2">
+              <div style={{ marginTop: '8px' }}>
                 {profile?.google_review_link ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">⭐</span>
-                    <a href={profile.google_review_link} target="_blank" rel="noreferrer" className="text-sm truncate" style={{ color: '#2D6A4F' }}>{profile.google_review_link}</a>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>⭐</span>
+                    <a href={profile.google_review_link} target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: '#2D6A4F', wordBreak: 'break-all' }}>{profile.google_review_link}</a>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: '#FEF3C7', border: '1px solid #FDE68A' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px', background: '#FEF3C7', border: '1px solid #FDE68A' }}>
                     <span>⚠️</span>
-                    <span className="text-xs font-medium" style={{ color: '#92400E' }}>Add your Google review link to enable auto review requests</span>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: '#92400E' }}>Add your Google review link to enable auto review requests</span>
                   </div>
                 )}
               </div>
@@ -417,53 +389,53 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           </div>
         )}
 
-        <div className="dash-card rounded-2xl p-6">
-          <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Plan</div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: !isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: !isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: !isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              {!isPro && <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
-              <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', letterSpacing: '0.1em' }}>Basic</div>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-3xl font-bold playfair" style={{ color: !isPro ? 'white' : '#1A3329', letterSpacing: '-0.02em' }}>$30</span>
-                <span className="text-xs" style={{ color: !isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
+        <div className="dash-card rounded-2xl p-5">
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Your Plan</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: !isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: !isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: !isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
+              {!isPro && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Basic</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
+                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: !isPro ? 'white' : '#1A3329' }}>$30</span>
+                <span style={{ fontSize: '12px', color: !isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
-              <div className="flex flex-col gap-2 flex-1">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {basicIncluded.map(f => (
-                  <div key={f} className="flex items-start gap-2">
-                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={!isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-xs leading-relaxed" style={{ color: !isPro ? 'rgba(255,255,255,0.75)' : '#374151' }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: !isPro ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
-                <div className="my-1" style={{ borderTop: !isPro ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF' }} />
+                <div style={{ borderTop: !isPro ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
                 {basicLocked.map(f => (
-                  <div key={f} className="flex items-start gap-2">
-                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
                       <path d="M7 7l6 6M13 7l-6 6" stroke={!isPro ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <span className="text-xs leading-relaxed line-through" style={{ color: !isPro ? 'rgba(255,255,255,0.2)' : '#C4C9D1' }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: !isPro ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: isPro ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Most Popular</div>
-              <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', letterSpacing: '0.1em' }}>Pro</div>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-3xl font-bold playfair" style={{ color: isPro ? 'white' : '#1A3329', letterSpacing: '-0.02em' }}>$50</span>
-                <span className="text-xs" style={{ color: isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
+            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
+              <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: isPro ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Popular</div>
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Pro</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
+                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isPro ? 'white' : '#1A3329' }}>$50</span>
+                <span style={{ fontSize: '12px', color: isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
-              <div className="flex flex-col gap-2 flex-1">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {proFeatures.map(f => (
-                  <div key={f} className="flex items-start gap-2">
-                    <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isPro ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-xs leading-relaxed" style={{ color: isPro ? 'rgba(255,255,255,0.75)' : '#374151' }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: isPro ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -471,14 +443,12 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           </div>
           {!isPro ? (
             <button onClick={() => router.push('/pricing')}
-              className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.2)' }}>
+              style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.2)' }}>
               Upgrade to Pro — $50/mo →
             </button>
           ) : (
             <button onClick={handleManagePlan} disabled={portalLoading}
-              className="w-full py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50"
-              style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>
+              style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB', opacity: portalLoading ? 0.5 : 1 }}>
               {portalLoading ? 'Opening...' : 'Manage Plan'}
             </button>
           )}
@@ -601,7 +571,7 @@ export default function DashboardPage() {
     return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   }
   function getInitials(name: string) { return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) }
-  function getPaymentLabel(method: string) { return method === 'online' ? '💳 Pay Online' : '💵 Pay in Person' }
+  function getPaymentLabel(method: string) { return method === 'online' ? '💳 Online' : '💵 In Person' }
 
   const avatarColors = [
     { bg: '#D8F3DC', text: '#1A3329' }, { bg: '#FDE8D8', text: '#7C2D12' },
@@ -610,203 +580,284 @@ export default function DashboardPage() {
   function getAvatarColor(name: string) { return avatarColors[name.charCodeAt(0) % avatarColors.length] }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F2EB' }}>
-      <div className="flex flex-col items-center gap-3">
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
         <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
-        <span className="text-sm font-medium" style={{ color: '#2D6A4F' }}>Loading...</span>
+        <span style={{ fontSize: '14px', fontWeight: 500, color: '#2D6A4F' }}>Loading...</span>
       </div>
     </div>
   )
 
   const displayAppts = activeTab === 'today' ? todayAppts : upcomingAppts
 
+  const navItems = [
+    { label: 'Home', emoji: '▤', page: 'dashboard' },
+    { label: 'Appts', emoji: '📅', page: 'appointments' },
+    { label: 'Clients', emoji: '👥', page: 'clients' },
+    { label: 'Services', emoji: '✂️', page: 'services' },
+    { label: 'Reports', emoji: '📊', page: 'reports' },
+    { label: 'Settings', emoji: '⚙', page: 'settings' },
+  ]
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-        body { background: #F5F2EB; }
+        body { background: #F5F2EB; margin: 0; }
         .playfair { font-family: 'Playfair Display', serif; }
-        * { font-family: 'DM Sans', sans-serif; }
-        .nav-item { transition: all 0.2s ease; border-radius: 12px; }
-        .nav-item:hover { background: rgba(45,106,79,0.08); color: #1A3329; }
-        .nav-active { background: linear-gradient(135deg, #1A3329, #2D6A4F) !important; color: white !important; box-shadow: 0 4px 12px rgba(26,51,41,0.2); }
+        * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+
         .dash-card { background: linear-gradient(145deg, #FDFBF7, #F8F5EF); border: 1px solid rgba(237,233,223,0.7); }
         .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(26,51,41,0.1) !important; }
-        .appt-row { transition: all 0.15s ease; border-bottom: 1px solid rgba(237,233,223,0.7); }
+        .appt-row { transition: all 0.15s ease; border-bottom: 1px solid rgba(237,233,223,0.7); cursor: pointer; }
         .appt-row:hover { background: linear-gradient(145deg, #FDFBF7, #F8F5EF); }
         .appt-row:last-child { border-bottom: none; }
-        .btn-new { background: linear-gradient(135deg, #1A3329, #2D6A4F); transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(26,51,41,0.2); }
-        .btn-new:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(26,51,41,0.3); }
-        .action-btn { transition: all 0.15s ease; border-radius: 10px; }
-        .action-btn:hover { background: rgba(237,233,223,0.6); }
+        .btn-new { background: linear-gradient(135deg, #1A3329, #2D6A4F); transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(26,51,41,0.2); border: none; cursor: pointer; color: white; }
+        .action-btn { transition: all 0.15s ease; cursor: pointer; }
         .modal-bg { animation: fadeIn 0.15s ease; }
         .modal-box { animation: scaleIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .tab-btn { transition: all 0.15s ease; border-bottom: 2px solid transparent; }
-        .tab-active-style { border-bottom: 2px solid #1A3329; color: #1A3329; font-weight: 600; }
+        .tab-btn { transition: all 0.15s ease; border-bottom: 2px solid transparent; background: none; border-left: none; border-right: none; border-top: none; cursor: pointer; }
+        .tab-active-style { border-bottom: 2px solid #1A3329 !important; color: #1A3329 !important; font-weight: 600; }
         .service-row { border-bottom: 1px solid rgba(237,233,223,0.7); transition: background 0.15s; }
         .service-row:hover { background: #F5F2EB; }
         .service-row:last-child { border-bottom: none; }
         input:focus, textarea:focus { outline: none; border-color: #2D6A4F !important; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+
+        /* LAYOUT */
+        .dash-layout { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR — desktop only */
+        .sidebar {
+          width: 240px; flex-shrink: 0; display: flex; flex-direction: column;
+          position: sticky; top: 0; height: 100vh;
+          background: linear-gradient(180deg, #FDFBF7 0%, #FAF7F2 100%);
+          border-right: 1px solid rgba(237,233,223,0.8);
+        }
+        .sidebar-nav-item {
+          width: 100%; display: flex; align-items: center; gap: 12px;
+          padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;
+          text-align: left; cursor: pointer; border: none; background: none;
+          transition: all 0.2s ease; color: #6B7280;
+        }
+        .sidebar-nav-item:hover { background: rgba(45,106,79,0.08); color: #1A3329; }
+        .sidebar-nav-active { background: linear-gradient(135deg, #1A3329, #2D6A4F) !important; color: white !important; box-shadow: 0 4px 12px rgba(26,51,41,0.2); }
+
+        /* BOTTOM NAV — mobile only */
+        .bottom-nav {
+          display: none;
+          position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+          background: rgba(253,251,247,0.96); backdrop-filter: blur(16px);
+          border-top: 1px solid rgba(237,233,223,0.8);
+          padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+        }
+        .bottom-nav-inner { display: flex; justify-content: space-around; align-items: center; }
+        .bottom-nav-btn {
+          display: flex; flex-direction: column; align-items: center; gap: 2px;
+          padding: 6px 8px; border-radius: 10px; border: none; background: none;
+          cursor: pointer; min-width: 48px; transition: all 0.15s;
+        }
+        .bottom-nav-btn-active .bottom-nav-emoji { 
+          background: linear-gradient(135deg, #1A3329, #2D6A4F);
+          border-radius: 8px; padding: 4px 8px;
+        }
+        .bottom-nav-emoji { font-size: 18px; line-height: 1; padding: 4px 8px; }
+        .bottom-nav-label { font-size: 10px; font-weight: 500; color: #9CA3AF; }
+        .bottom-nav-btn-active .bottom-nav-label { color: #1A3329; font-weight: 600; }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-x: hidden; }
+        .page-header {
+          padding: 20px 32px;
+          border-bottom: 1px solid rgba(237,233,223,0.8);
+          background: rgba(253,251,247,0.9);
+          backdrop-filter: blur(8px);
+          position: sticky; top: 0; z-index: 20;
+        }
+        .page-content { padding: 24px 32px; }
+
+        /* REPORT STATS GRID */
+        .report-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+          .sidebar { display: none !important; }
+          .bottom-nav { display: block !important; }
+          .main-content { padding-bottom: 80px; }
+          .page-header { padding: 16px 16px; position: sticky; top: 0; }
+          .page-content { padding: 16px 16px; }
+          .report-stats-grid { grid-template-columns: 1fr !important; }
+          .dash-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .revenue-card { grid-column: span 2; }
+          .appt-row { padding: 12px 16px !important; }
+          .appt-meta { display: none !important; }
+          .modal-inner { padding: 16px !important; }
+          .modal-actions { padding: 0 16px 16px !important; }
+          .service-edit-row { flex-wrap: wrap; gap: 8px; }
+          .service-price-input { width: 100% !important; }
+        }
+
+        @media (max-width: 480px) {
+          .bottom-nav-label { display: none; }
+          .bottom-nav-emoji { font-size: 20px; }
+        }
+
         .scrollbar-none::-webkit-scrollbar { display: none; }
       `}</style>
 
-      <div className="min-h-screen flex" style={{ background: '#F5F2EB' }}>
+      <div className="dash-layout">
 
-        {/* SIDEBAR */}
-        <aside className="w-60 flex-shrink-0 flex flex-col sticky top-0 h-screen" style={{ background: 'linear-gradient(180deg, #FDFBF7 0%, #FAF7F2 100%)', borderRight: '1px solid rgba(237,233,223,0.8)' }}>
-          <div className="px-6 pt-8 pb-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.6)' }}>
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 12px rgba(26,51,41,0.25)' }}>
+        {/* DESKTOP SIDEBAR */}
+        <aside className="sidebar">
+          <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(237,233,223,0.6)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(26,51,41,0.25)', flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 100 100" fill="#D8F3DC">
                   <ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/>
                   <ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/>
                 </svg>
               </div>
-              <span className="font-bold text-base playfair" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
+              <span className="playfair" style={{ fontWeight: 700, fontSize: '16px', color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
             </div>
-            <div style={{ background: 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', borderRadius: '12px', padding: '10px 12px', border: '1px solid rgba(45,106,79,0.08)' }}>
-              <div className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>Business</div>
-              <div className="font-semibold text-sm truncate" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{profile?.business_name || 'My Grooming'}</div>
-              <div className="text-xs mt-0.5 capitalize font-medium" style={{ color: '#2D6A4F' }}>{profile?.plan || 'Basic'} Plan</div>
+            <div style={{ background: 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', borderRadius: '10px', padding: '10px 12px', border: '1px solid rgba(45,106,79,0.08)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '2px' }}>Business</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.business_name || 'My Grooming'}</div>
+              <div style={{ fontSize: '12px', color: '#2D6A4F', fontWeight: 500, marginTop: '2px', textTransform: 'capitalize' }}>{profile?.plan || 'Basic'} Plan</div>
             </div>
           </div>
 
-          <nav className="flex-1 px-4 py-5 space-y-0.5">
-            {[
-              { label: 'Dashboard', emoji: '▤', page: 'dashboard' },
-              { label: 'Appointments', emoji: '📅', page: 'appointments' },
-              { label: 'Clients', emoji: '👥', page: 'clients' },
-              { label: 'Edit Services', emoji: '✂️', page: 'services' },
-              { label: 'Reports', emoji: '📊', page: 'reports' },
-              { label: 'Settings', emoji: '⚙', page: 'settings' },
-            ].map((item, i) => (
-              <button key={i}
-                onClick={() => setActivePage(item.page as typeof activePage)}
-                className={`nav-item w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-left ${activePage === item.page ? 'nav-active' : ''}`}
-                style={{ color: activePage === item.page ? 'white' : '#6B7280' }}>
-                <span className="text-base">{item.emoji}</span>
-                <span className="flex-1">{item.label}</span>
-                {item.page === 'reports' && isBasic && <span className="text-xs" style={{ color: '#D1D5DB' }}>🔒</span>}
+          <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {navItems.map((item, i) => (
+              <button key={i} onClick={() => setActivePage(item.page as typeof activePage)}
+                className={`sidebar-nav-item ${activePage === item.page ? 'sidebar-nav-active' : ''}`}>
+                <span style={{ fontSize: '16px' }}>{item.emoji}</span>
+                <span style={{ flex: 1 }}>{item.label === 'Home' ? 'Dashboard' : item.label === 'Appts' ? 'Appointments' : item.label}</span>
+                {item.page === 'reports' && isBasic && <span style={{ fontSize: '12px', color: '#D1D5DB' }}>🔒</span>}
               </button>
             ))}
           </nav>
 
           {isBasic && (
-            <div className="px-4 pb-4">
-              <div className="rounded-xl p-3" style={{ background: monthlyApptCount >= 30 ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', border: `1px solid ${monthlyApptCount >= 30 ? '#FECACA' : 'rgba(45,106,79,0.1)'}` }}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs font-semibold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>Appointments</div>
-                  <div className="text-xs font-bold" style={{ color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>{monthlyApptCount}/30</div>
+            <div style={{ padding: '0 12px 12px' }}>
+              <div style={{ borderRadius: '10px', padding: '10px 12px', background: monthlyApptCount >= 30 ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', border: `1px solid ${monthlyApptCount >= 30 ? '#FECACA' : 'rgba(45,106,79,0.1)'}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>Appointments</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>{monthlyApptCount}/30</span>
                 </div>
-                <div className="w-full rounded-full h-1.5" style={{ background: 'rgba(237,233,223,0.8)' }}>
-                  <div className="h-1.5 rounded-full transition-all" style={{ width: `${apptLimitPct}%`, background: monthlyApptCount >= 30 ? '#DC2626' : monthlyApptCount >= 24 ? '#F59E0B' : 'linear-gradient(90deg, #2D6A4F, #45a070)' }} />
+                <div style={{ width: '100%', height: '6px', borderRadius: '50px', background: 'rgba(237,233,223,0.8)' }}>
+                  <div style={{ height: '6px', borderRadius: '50px', width: `${apptLimitPct}%`, background: monthlyApptCount >= 30 ? '#DC2626' : monthlyApptCount >= 24 ? '#F59E0B' : 'linear-gradient(90deg, #2D6A4F, #45a070)', transition: 'width 0.3s' }} />
                 </div>
-                <div className="text-xs mt-1.5" style={{ color: '#9CA3AF' }}>
-                  {monthlyApptCount >= 30 ? 'Limit reached · Upgrade for unlimited' : `${30 - monthlyApptCount} remaining this month`}
+                <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
+                  {monthlyApptCount >= 30 ? 'Limit reached · Upgrade' : `${30 - monthlyApptCount} remaining`}
                 </div>
               </div>
             </div>
           )}
 
-          <div className="px-4 pb-6" style={{ borderTop: '1px solid rgba(237,233,223,0.6)', paddingTop: '16px' }}>
-            <button onClick={handleSignOut} className="nav-item w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left" style={{ color: '#9CA3AF' }}>
+          <div style={{ padding: '12px', borderTop: '1px solid rgba(237,233,223,0.6)' }}>
+            <button onClick={handleSignOut} className="sidebar-nav-item" style={{ color: '#9CA3AF' }}>
               <span>↪</span> Sign out
             </button>
           </div>
         </aside>
 
+        {/* MOBILE BOTTOM NAV */}
+        <nav className="bottom-nav">
+          <div className="bottom-nav-inner">
+            {navItems.map((item, i) => (
+              <button key={i} onClick={() => setActivePage(item.page as typeof activePage)}
+                className={`bottom-nav-btn ${activePage === item.page ? 'bottom-nav-btn-active' : ''}`}>
+                <span className="bottom-nav-emoji">{item.emoji}</span>
+                <span className="bottom-nav-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+
         {/* MAIN */}
-        <main className="flex-1 overflow-auto scrollbar-none">
+        <main className="main-content scrollbar-none">
 
           {/* DASHBOARD */}
           {activePage === 'dashboard' && (
             <>
-              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
-                <div>
-                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>
-                    {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}
-                  </h1>
-                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                </div>
+              <header className="page-header">
+                <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>
+                  {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}
+                </h1>
+                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
               </header>
-              <div className="px-8 py-7 space-y-5 max-w-5xl">
+              <div className="page-content">
 
                 {/* STAT CARDS */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="stat-card dash-card rounded-2xl p-6">
-                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>Today</div>
-                    <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>{todayAppts.length}</div>
-                    <div className="text-sm" style={{ color: '#6B7280' }}>Appointments</div>
+                <div className="dash-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                  <div className="stat-card dash-card rounded-2xl" style={{ padding: '20px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Today</div>
+                    <div className="playfair" style={{ fontSize: '40px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em', lineHeight: 1 }}>{todayAppts.length}</div>
+                    <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>Appointments</div>
                   </div>
-                  <div className="stat-card dash-card rounded-2xl p-6">
-                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>This Month</div>
-                    <div className="playfair text-5xl font-semibold mb-1" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>{thisMonthAppts.length}</div>
-                    <div className="text-sm" style={{ color: '#6B7280' }}>Total bookings</div>
+                  <div className="stat-card dash-card rounded-2xl" style={{ padding: '20px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Month</div>
+                    <div className="playfair" style={{ fontSize: '40px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em', lineHeight: 1 }}>{thisMonthAppts.length}</div>
+                    <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>Bookings</div>
                   </div>
-                  <div className="stat-card rounded-2xl p-6" style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
-                    <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(216,243,220,0.5)', letterSpacing: '0.12em' }}>Revenue</div>
-                    <div className="playfair text-5xl font-semibold mb-1 text-white" style={{ letterSpacing: '-0.02em' }}>${monthRevenue}</div>
-                    <div className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Est. this month</div>
+                  <div className="stat-card revenue-card rounded-2xl" style={{ padding: '20px', background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25)' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(216,243,220,0.5)', marginBottom: '8px' }}>Revenue</div>
+                    <div className="playfair" style={{ fontSize: '40px', fontWeight: 600, color: 'white', letterSpacing: '-0.02em', lineHeight: 1 }}>${monthRevenue}</div>
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>Est. this month</div>
                   </div>
                 </div>
 
-                {/* FULL-WIDTH BOOKING LINK */}
-                <div className="dash-card rounded-2xl p-5 flex items-center justify-between gap-6">
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-sm mb-1" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Booking Link</div>
-                    <div className="text-xs font-mono truncate" style={{ color: '#9CA3AF' }}>{bookingUrl}</div>
+                {/* BOOKING LINK */}
+                <div className="dash-card rounded-2xl" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '4px' }}>Your Booking Link</div>
+                    <div style={{ fontSize: '12px', fontFamily: 'monospace', color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bookingUrl}</div>
                   </div>
-                  <button
-                    onClick={() => { navigator.clipboard.writeText(bookingUrl); alert('Copied!') }}
-                    className="action-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>
-                    Copy Link
+                  <button onClick={() => { navigator.clipboard.writeText(bookingUrl); alert('Copied!') }}
+                    style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', cursor: 'pointer', flexShrink: 0, boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>
+                    Copy
                   </button>
                 </div>
 
-                {/* APPOINTMENTS TABLE */}
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
-                  <div className="flex" style={{ borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
+                {/* APPOINTMENTS */}
+                <div className="rounded-2xl" style={{ overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
+                  <div style={{ display: 'flex', borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
                     {(['today', 'upcoming'] as const).map(tab => (
                       <button key={tab} onClick={() => setActiveTab(tab)}
-                        className={`tab-btn flex-1 py-4 text-sm px-6 text-left ${activeTab === tab ? 'tab-active-style' : ''}`}
-                        style={{ color: activeTab === tab ? '#1A3329' : '#9CA3AF' }}>
-                        {tab === 'today' ? `Today  ·  ${todayAppts.length}` : `Upcoming  ·  ${upcomingAppts.length}`}
+                        className={`tab-btn ${activeTab === tab ? 'tab-active-style' : ''}`}
+                        style={{ flex: 1, padding: '14px 16px', fontSize: '14px', textAlign: 'left', color: activeTab === tab ? '#1A3329' : '#9CA3AF' }}>
+                        {tab === 'today' ? `Today · ${todayAppts.length}` : `Upcoming · ${upcomingAppts.length}`}
                       </button>
                     ))}
                   </div>
                   {displayAppts.length === 0 ? (
-                    <div className="py-20 text-center">
-                      <div className="text-4xl mb-4">🐾</div>
-                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No appointments {activeTab === 'today' ? 'today' : 'coming up'}</div>
-                      <div className="text-sm mb-6" style={{ color: '#9CA3AF' }}>Add one to fill your schedule</div>
-                      <button onClick={() => router.push('/appointments/new')} className="btn-new px-6 py-2.5 rounded-xl text-white text-sm font-semibold">Add Appointment</button>
+                    <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', marginBottom: '12px' }}>🐾</div>
+                      <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>No appointments {activeTab === 'today' ? 'today' : 'coming up'}</div>
+                      <div style={{ fontSize: '13px', color: '#9CA3AF', marginBottom: '20px' }}>Add one to fill your schedule</div>
+                      <button onClick={() => router.push('/appointments/new')} className="btn-new" style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 600 }}>Add Appointment</button>
                     </div>
                   ) : displayAppts.map(appt => {
                     const color = getAvatarColor(appt.client_name)
                     return (
-                      <div key={appt.id} onClick={() => setSelectedAppt(appt)} className="appt-row flex items-center justify-between px-6 py-4 cursor-pointer">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
-                          <div>
-                            <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{appt.client_name}</div>
-                            <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
-                              <span>{appt.dog_name}</span>
-                              {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
-                              <span>·</span><span>{getPaymentLabel(appt.payment_method)}</span>
+                      <div key={appt.id} onClick={() => setSelectedAppt(appt)} className="appt-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0, background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{appt.client_name}</div>
+                            <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {appt.dog_name}{appt.services?.name ? ` · ${appt.services.name}` : ''}
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-6">
-                          {activeTab === 'upcoming' && <div className="text-sm" style={{ color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>}
-                          <div className="text-right">
-                            <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
-                            {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                          {activeTab === 'upcoming' && <div className="appt-meta" style={{ fontSize: '13px', color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>}
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontWeight: 600, fontSize: '13px', color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
+                            {appt.services?.price ? <div style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>${appt.services.price}</div> : null}
                           </div>
-                          <div style={{ color: '#D1D5DB' }}>›</div>
+                          <div style={{ color: '#D1D5DB', fontSize: '16px' }}>›</div>
                         </div>
                       </div>
                     )
@@ -816,49 +867,44 @@ export default function DashboardPage() {
             </>
           )}
 
-          {/* APPOINTMENTS */}
+          {/* APPOINTMENTS PAGE */}
           {activePage === 'appointments' && (
             <>
-              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
+              <header className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>Appointments</h1>
-                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>All your upcoming appointments</p>
+                  <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Appointments</h1>
+                  <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>All your upcoming appointments</p>
                 </div>
-                <button onClick={() => router.push('/appointments/new')} className="btn-new flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">+ New Appointment</button>
+                <button onClick={() => router.push('/appointments/new')} className="btn-new" style={{ padding: '10px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600 }}>+ New</button>
               </header>
-              <div className="px-8 py-7 max-w-5xl">
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
+              <div className="page-content">
+                <div className="rounded-2xl" style={{ overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
                   {appointments.length === 0 ? (
-                    <div className="py-20 text-center">
-                      <div className="text-4xl mb-4">📅</div>
-                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No appointments yet</div>
-                      <div className="text-sm mb-6" style={{ color: '#9CA3AF' }}>Add one to get started</div>
-                      <button onClick={() => router.push('/appointments/new')} className="btn-new px-6 py-2.5 rounded-xl text-white text-sm font-semibold">Add Appointment</button>
+                    <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', marginBottom: '12px' }}>📅</div>
+                      <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>No appointments yet</div>
+                      <div style={{ fontSize: '13px', color: '#9CA3AF', marginBottom: '20px' }}>Add one to get started</div>
+                      <button onClick={() => router.push('/appointments/new')} className="btn-new" style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 600 }}>Add Appointment</button>
                     </div>
                   ) : appointments.map(appt => {
                     const color = getAvatarColor(appt.client_name)
                     return (
-                      <div key={appt.id} onClick={() => setSelectedAppt(appt)} className="appt-row flex items-center justify-between px-6 py-4 cursor-pointer">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
-                          <div>
-                            <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{appt.client_name}</div>
-                            <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
-                              <span>{appt.dog_name}</span>
-                              {appt.services?.name && <><span>·</span><span>{appt.services.name}</span></>}
-                              <span>·</span><span>{getPaymentLabel(appt.payment_method)}</span>
-                            </div>
+                      <div key={appt.id} onClick={() => setSelectedAppt(appt)} className="appt-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0, background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{appt.client_name}</div>
+                            <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{formatDate(appt.appointment_date)}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-6">
-                          <div className="text-sm" style={{ color: '#6B7280' }}>{formatDate(appt.appointment_date)}</div>
-                          <div className="text-right">
-                            <div className="font-semibold text-sm" style={{ color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
-                            {appt.services?.price ? <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D6A4F' }}>${appt.services.price}</div> : null}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontWeight: 600, fontSize: '13px', color: '#1A3329' }}>{formatTime(appt.appointment_time)}</div>
+                            {appt.services?.price ? <div style={{ fontSize: '12px', fontWeight: 600, color: '#2D6A4F' }}>${appt.services.price}</div> : null}
                           </div>
                           {appt.status === 'completed'
-                            ? <div className="px-2 py-1 rounded-full text-xs font-semibold" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>✓ Done</div>
-                            : <div style={{ color: '#D1D5DB' }}>›</div>}
+                            ? <div style={{ padding: '4px 8px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>✓</div>
+                            : <div style={{ color: '#D1D5DB', fontSize: '16px' }}>›</div>}
                         </div>
                       </div>
                     )
@@ -871,39 +917,33 @@ export default function DashboardPage() {
           {/* CLIENTS */}
           {activePage === 'clients' && (
             <>
-              <header className="px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
-                <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>Clients</h1>
-                <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Your client list and their dogs</p>
+              <header className="page-header">
+                <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Clients</h1>
+                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your client list and their dogs</p>
               </header>
-              <div className="px-8 py-7 max-w-5xl">
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
+              <div className="page-content">
+                <div className="rounded-2xl" style={{ overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
                   {appointments.length === 0 ? (
-                    <div className="py-20 text-center">
-                      <div className="text-4xl mb-4">👥</div>
-                      <div className="font-medium mb-1" style={{ color: '#6B7280' }}>No clients yet</div>
-                      <div className="text-sm" style={{ color: '#9CA3AF' }}>Clients appear here once they book an appointment</div>
+                    <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '36px', marginBottom: '12px' }}>👥</div>
+                      <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>No clients yet</div>
+                      <div style={{ fontSize: '13px', color: '#9CA3AF' }}>Clients appear here once they book</div>
                     </div>
                   ) : [...new Map(appointments.map(a => [a.client_name, a])).values()].map(appt => {
                     const color = getAvatarColor(appt.client_name)
                     const clientAppts = appointments.filter(a => a.client_name === appt.client_name)
                     return (
-                      <div key={appt.client_name} className="appt-row flex items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
-                          <div>
-                            <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{appt.client_name}</div>
-                            <div className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: '#9CA3AF' }}>
-                              <span>🐾 {appt.dog_name}</span>
-                              {appt.dog_breed && <><span>·</span><span>{appt.dog_breed}</span></>}
-                            </div>
+                      <div key={appt.client_name} className="appt-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                          <div style={{ width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0, background: color.bg, color: color.text }}>{getInitials(appt.client_name)}</div>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329' }}>{appt.client_name}</div>
+                            <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>🐾 {appt.dog_name}{appt.dog_breed ? ` · ${appt.dog_breed}` : ''}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-6">
-                          <div className="text-sm" style={{ color: '#6B7280' }}>{clientAppts.length} appointment{clientAppts.length !== 1 ? 's' : ''}</div>
-                          <div className="flex flex-col items-end gap-1">
-                            <a href={`tel:${appt.client_phone}`} className="text-sm font-medium" style={{ color: '#2D6A4F' }}>{appt.client_phone}</a>
-                            {appt.client_email && <a href={`mailto:${appt.client_email}`} className="text-xs" style={{ color: '#9CA3AF' }}>{appt.client_email}</a>}
-                          </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', flexShrink: 0 }}>
+                          <a href={`tel:${appt.client_phone}`} style={{ fontSize: '13px', fontWeight: 500, color: '#2D6A4F', textDecoration: 'none' }}>{appt.client_phone}</a>
+                          <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{clientAppts.length} appt{clientAppts.length !== 1 ? 's' : ''}</div>
                         </div>
                       </div>
                     )
@@ -914,7 +954,6 @@ export default function DashboardPage() {
           )}
 
           {activePage === 'reports' && <ReportsPage profile={profile} supabase={supabase} router={router} />}
-
           {activePage === 'settings' && (
             <SettingsPage
               profile={profile}
@@ -928,92 +967,86 @@ export default function DashboardPage() {
           {/* SERVICES */}
           {activePage === 'services' && (
             <>
-              <header className="flex items-center justify-between px-8 py-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', background: 'rgba(253,251,247,0.9)', backdropFilter: 'blur(8px)' }}>
-                <div>
-                  <h1 className="playfair text-2xl font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>Edit Services</h1>
-                  <p className="text-sm mt-0.5" style={{ color: '#9CA3AF' }}>Manage the services you offer and their prices</p>
-                </div>
+              <header className="page-header">
+                <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Edit Services</h1>
+                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Manage the services you offer and their prices</p>
               </header>
-              <div className="px-8 py-7 max-w-2xl space-y-5">
-                <div className="dash-card rounded-2xl p-6">
-                  <h2 className="font-semibold mb-4" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Add a Service</h2>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="page-content" style={{ maxWidth: '600px' }}>
+                <div className="dash-card rounded-2xl" style={{ padding: '20px', marginBottom: '16px' }}>
+                  <h2 style={{ fontWeight: 600, fontSize: '15px', color: '#1A3329', marginBottom: '16px' }}>Add a Service</h2>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
                     <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Service Name</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6B7280', marginBottom: '6px' }}>Service Name</label>
                       <input type="text" value={newServiceName} onChange={e => setNewServiceName(e.target.value)} placeholder="Full Groom"
-                        className="w-full px-4 py-3 rounded-xl text-sm" style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
                         onKeyDown={e => e.key === 'Enter' && handleAddService()} />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Price ($)</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6B7280', marginBottom: '6px' }}>Price ($)</label>
                       <input type="number" value={newServicePrice} onChange={e => setNewServicePrice(e.target.value)} placeholder="65"
-                        className="w-full px-4 py-3 rounded-xl text-sm" style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}
                         onKeyDown={e => e.key === 'Enter' && handleAddService()} />
                     </div>
                   </div>
-                  <div className="mb-3">
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Payment Options <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(select all that apply)</span></label>
-                    <div className="grid grid-cols-2 gap-2">
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#6B7280', marginBottom: '6px' }}>Payment Options</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                       {[
                         ...(profile?.payment_methods?.includes('in_person') ? [{ value: 'in_person', label: '💵 Pay in Person', desc: 'Cash or Card' }] : []),
                         ...(profile?.payment_methods?.includes('online') ? [{ value: 'online', label: '💳 Pay Online', desc: 'Client pays upfront' }] : []),
                       ].map(opt => (
                         <button key={opt.value} type="button"
                           onClick={() => setNewPaymentTypes(prev => prev.includes(opt.value) ? prev.filter(p => p !== opt.value) : [...prev, opt.value])}
-                          className="p-3 rounded-xl text-left transition-all"
-                          style={{ border: newPaymentTypes.includes(opt.value) ? '2px solid #1A3329' : '2px solid #EDE9DF', background: newPaymentTypes.includes(opt.value) ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#F5F2EB' }}>
-                          <div className="flex items-center justify-between">
-                            <div className="text-xs font-semibold" style={{ color: '#1A3329' }}>{opt.label}</div>
-                            <div className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0"
-                              style={{ borderColor: newPaymentTypes.includes(opt.value) ? '#1A3329' : '#D1C9B8', background: newPaymentTypes.includes(opt.value) ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : 'transparent' }}>
-                              {newPaymentTypes.includes(opt.value) && <span className="text-white" style={{ fontSize: '10px' }}>✓</span>}
-                            </div>
-                          </div>
-                          <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{opt.desc}</div>
+                          style={{ padding: '10px', borderRadius: '10px', textAlign: 'left', cursor: 'pointer', border: newPaymentTypes.includes(opt.value) ? '2px solid #1A3329' : '2px solid #EDE9DF', background: newPaymentTypes.includes(opt.value) ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#F5F2EB' }}>
+                          <div style={{ fontSize: '12px', fontWeight: 600, color: '#1A3329' }}>{opt.label}</div>
+                          <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{opt.desc}</div>
                         </button>
                       ))}
                     </div>
                   </div>
-                  {serviceError && <p className="text-xs mb-3" style={{ color: '#DC2626' }}>{serviceError}</p>}
-                  <button onClick={handleAddService} className="btn-new px-5 py-2.5 rounded-xl text-white text-sm font-semibold">+ Add Service</button>
+                  {serviceError && <p style={{ fontSize: '12px', color: '#DC2626', marginBottom: '10px' }}>{serviceError}</p>}
+                  <button onClick={handleAddService} className="btn-new" style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '14px', fontWeight: 600 }}>+ Add Service</button>
                 </div>
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
-                  <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
-                    <h2 className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Services ({services.length})</h2>
+                <div className="rounded-2xl" style={{ overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
+                    <h2 style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329' }}>Your Services ({services.length})</h2>
                   </div>
                   {services.length === 0 ? (
-                    <div className="py-12 text-center"><div className="text-3xl mb-3">✂️</div><div className="text-sm" style={{ color: '#9CA3AF' }}>No services added yet</div></div>
+                    <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', marginBottom: '8px' }}>✂️</div>
+                      <div style={{ fontSize: '14px', color: '#9CA3AF' }}>No services added yet</div>
+                    </div>
                   ) : services.map(service => (
-                    <div key={service.id} className="service-row px-6 py-4">
+                    <div key={service.id} className="service-row" style={{ padding: '14px 20px' }}>
                       {editingService?.id === service.id ? (
-                        <div className="flex items-center gap-3">
+                        <div className="service-edit-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           <input type="text" value={editingService.name} onChange={e => setEditingService({ ...editingService, name: e.target.value })}
-                            className="flex-1 px-3 py-2 rounded-lg text-sm" style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+                            style={{ flex: 1, minWidth: '120px', padding: '8px 12px', borderRadius: '8px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
                           <input type="number" value={editingService.price} onChange={e => setEditingService({ ...editingService, price: parseFloat(e.target.value) || 0 })}
-                            className="w-24 px-3 py-2 rounded-lg text-sm" style={{ background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
-                          <button onClick={handleUpdateService} className="px-4 py-2 rounded-lg text-xs font-semibold text-white" style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)' }}>Save</button>
-                          <button onClick={() => setEditingService(null)} className="px-4 py-2 rounded-lg text-xs font-semibold" style={{ background: '#F5F2EB', color: '#6B7280' }}>Cancel</button>
+                            className="service-price-input" style={{ width: '80px', padding: '8px 12px', borderRadius: '8px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
+                          <button onClick={handleUpdateService} style={{ padding: '8px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)' }}>Save</button>
+                          <button onClick={() => setEditingService(null)} style={{ padding: '8px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)' }}>✂️</div>
-                            <div>
-                              <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{service.name}</div>
-                              <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{getServicePaymentLabel(service)}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', flexShrink: 0 }}>✂️</div>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329' }}>{service.name}</div>
+                              <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{getServicePaymentLabel(service)}</div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <span className="font-bold text-sm" style={{ color: '#2D6A4F' }}>${service.price}</span>
-                            <button onClick={() => setEditingService(service)} className="text-xs px-3 py-1.5 rounded-lg transition-all" style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF' }}>Edit</button>
-                            <button onClick={() => handleDeleteService(service.id)} className="text-xs px-3 py-1.5 rounded-lg transition-all" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>Delete</button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                            <span style={{ fontWeight: 700, fontSize: '14px', color: '#2D6A4F' }}>${service.price}</span>
+                            <button onClick={() => setEditingService(service)} style={{ padding: '5px 10px', borderRadius: '7px', fontSize: '12px', color: '#6B7280', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB' }}>Edit</button>
+                            <button onClick={() => handleDeleteService(service.id)} style={{ padding: '5px 10px', borderRadius: '7px', fontSize: '12px', color: '#DC2626', border: '1px solid #FECACA', cursor: 'pointer', background: '#FEE2E2' }}>Delete</button>
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>💡 These services appear as options when adding appointments and on your public booking page. Prices are locked for clients.</p>
+                <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '12px' }}>💡 These services appear on your public booking page.</p>
               </div>
             </>
           )}
@@ -1023,83 +1056,77 @@ export default function DashboardPage() {
 
       {/* MODAL */}
       {selectedAppt && (
-        <div className="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
+        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
           onClick={() => setSelectedAppt(null)}>
-          <div className="modal-box w-full max-w-md rounded-2xl overflow-hidden"
-            style={{ background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 25px 60px rgba(15,34,24,0.25)' }}
+          <div className="modal-box" style={{ width: '100%', maxWidth: '480px', borderRadius: '24px 24px 0 0', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 -8px 40px rgba(15,34,24,0.2)', maxHeight: '90vh', overflowY: 'auto' }}
             onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6" style={{ borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold"
-                  style={{ background: getAvatarColor(selectedAppt.client_name).bg, color: getAvatarColor(selectedAppt.client_name).text }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 700, background: getAvatarColor(selectedAppt.client_name).bg, color: getAvatarColor(selectedAppt.client_name).text }}>
                   {getInitials(selectedAppt.client_name)}
                 </div>
                 <div>
-                  <div className="font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{selectedAppt.client_name}</div>
-                  <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{formatDate(selectedAppt.appointment_date)} · {formatTime(selectedAppt.appointment_time)}</div>
+                  <div style={{ fontWeight: 600, fontSize: '16px', color: '#1A3329' }}>{selectedAppt.client_name}</div>
+                  <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{formatDate(selectedAppt.appointment_date)} · {formatTime(selectedAppt.appointment_time)}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {selectedAppt.status === 'completed' && (
-                  <div className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>✓ Completed</div>
+                  <div style={{ padding: '4px 10px', borderRadius: '50px', fontSize: '12px', fontWeight: 700, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>✓ Done</div>
                 )}
-                <button onClick={() => setSelectedAppt(null)} className="w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all" style={{ background: '#F5F2EB', color: '#6B7280' }}>✕</button>
+                <button onClick={() => setSelectedAppt(null)} style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', color: '#6B7280', border: 'none', cursor: 'pointer' }}>✕</button>
               </div>
             </div>
-            <div className="p-6 space-y-5">
-              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'linear-gradient(135deg, #F5F2EB, #F0EDE6)' }}>
+            <div className="modal-inner" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '12px', background: 'linear-gradient(135deg, #F5F2EB, #F0EDE6)' }}>
                 <div>
-                  <div className="text-xs uppercase tracking-widest font-medium mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>Service</div>
-                  <div className="font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{selectedAppt.services?.name || 'Appointment'}</div>
+                  <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', fontWeight: 500, marginBottom: '4px' }}>Service</div>
+                  <div style={{ fontWeight: 600, fontSize: '15px', color: '#1A3329' }}>{selectedAppt.services?.name || 'Appointment'}</div>
                 </div>
-                <div className="playfair text-2xl font-semibold" style={{ color: '#2D6A4F', letterSpacing: '-0.02em' }}>${selectedAppt.services?.price || 0}</div>
+                <div className="playfair" style={{ fontSize: '24px', fontWeight: 600, color: '#2D6A4F' }}>${selectedAppt.services?.price || 0}</div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>Dog</div>
-                <div className="flex gap-2 flex-wrap">
-                  <span className="px-3 py-1.5 rounded-full text-sm font-medium" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>🐾 {selectedAppt.dog_name}</span>
-                  {selectedAppt.dog_breed && <span className="px-3 py-1.5 rounded-full text-sm" style={{ background: '#F5F2EB', color: '#6B7280' }}>{selectedAppt.dog_breed}</span>}
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', fontWeight: 500, marginBottom: '8px' }}>Dog</div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '14px', fontWeight: 500, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>🐾 {selectedAppt.dog_name}</span>
+                  {selectedAppt.dog_breed && <span style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '14px', background: '#F5F2EB', color: '#6B7280' }}>{selectedAppt.dog_breed}</span>}
                 </div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>Contact</div>
-                <div className="space-y-2">
-                  <a href={`tel:${selectedAppt.client_phone}`} className="action-btn flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)' }}>
-                    <span>📞</span><span className="text-sm font-medium" style={{ color: '#1A3329' }}>{selectedAppt.client_phone}</span>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', fontWeight: 500, marginBottom: '8px' }}>Contact</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <a href={`tel:${selectedAppt.client_phone}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)', textDecoration: 'none' }}>
+                    <span>📞</span><span style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329' }}>{selectedAppt.client_phone}</span>
                   </a>
                   {selectedAppt.client_email && (
-                    <a href={`mailto:${selectedAppt.client_email}`} className="action-btn flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)' }}>
-                      <span>✉️</span><span className="text-sm font-medium" style={{ color: '#1A3329' }}>{selectedAppt.client_email}</span>
+                    <a href={`mailto:${selectedAppt.client_email}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)', textDecoration: 'none' }}>
+                      <span>✉️</span><span style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329' }}>{selectedAppt.client_email}</span>
                     </a>
                   )}
                 </div>
               </div>
               {selectedAppt.notes && (
                 <div>
-                  <div className="text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>Notes</div>
-                  <div className="p-3 rounded-xl text-sm" style={{ background: '#F5F2EB', color: '#6B7280', border: '1px solid rgba(237,233,223,0.7)' }}>{selectedAppt.notes}</div>
+                  <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', fontWeight: 500, marginBottom: '8px' }}>Notes</div>
+                  <div style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', color: '#6B7280', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)' }}>{selectedAppt.notes}</div>
                 </div>
               )}
             </div>
-            <div className="flex gap-3 px-6 pb-6">
+            <div className="modal-actions" style={{ display: 'flex', gap: '10px', padding: '0 20px 24px' }}>
               {selectedAppt.status !== 'completed' && (
                 <button onClick={() => handleMarkComplete(selectedAppt.id)} disabled={completingAppt === selectedAppt.id}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold disabled:opacity-50 transition-all"
-                  style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.15)' }}>
+                  style={{ flex: 1, padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#1A5C36', border: '1px solid rgba(45,106,79,0.15)', cursor: 'pointer', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', opacity: completingAppt === selectedAppt.id ? 0.5 : 1 }}>
                   {completingAppt === selectedAppt.id ? 'Saving...' : '✓ Mark Complete'}
                 </button>
               )}
               {selectedAppt.status !== 'completed' && (
                 <button onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
-                  className="py-3 px-4 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white', boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
+                  style={{ padding: '14px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
                   Edit
                 </button>
               )}
               <button onClick={() => { if (confirm('Delete this appointment?')) handleDelete(selectedAppt.id) }}
-                className="py-3 px-4 rounded-xl text-sm font-semibold"
-                style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
+                style={{ padding: '14px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#DC2626', border: '1px solid #FECACA', cursor: 'pointer', background: '#FEE2E2' }}>
                 Delete
               </button>
             </div>
