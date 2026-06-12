@@ -334,7 +334,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
       </header>
       <div className="px-8 py-7 max-w-2xl space-y-4">
 
-        {/* Business Name */}
         <div className="dash-card rounded-2xl p-6">
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm font-semibold" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Business Name</div>
@@ -367,7 +366,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           )}
         </div>
 
-        {/* Google Review Link — Pro only */}
         {isPro && (
           <div className="dash-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-1">
@@ -419,11 +417,9 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           </div>
         )}
 
-        {/* Plan Cards */}
         <div className="dash-card rounded-2xl p-6">
           <div className="text-sm font-semibold mb-4" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Plan</div>
           <div className="grid grid-cols-2 gap-3 mb-4">
-            {/* Basic */}
             <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: !isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: !isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: !isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
               {!isPro && <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
               <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', letterSpacing: '0.1em' }}>Basic</div>
@@ -453,7 +449,6 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
                 ))}
               </div>
             </div>
-            {/* Pro */}
             <div className="rounded-2xl p-5 relative flex flex-col" style={{ background: isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
               <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: isPro ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Most Popular</div>
               <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', letterSpacing: '0.1em' }}>Pro</div>
@@ -594,6 +589,9 @@ export default function DashboardPage() {
   const monthRevenue = thisMonthAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
   const isBasic = profile?.plan !== 'pro'
   const apptLimitPct = Math.min((monthlyApptCount / 30) * 100, 100)
+  const bookingUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
+    : `https://pawbooking.net/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
 
   function formatTime(time: string) {
     const [h, m] = time.split(':'); const hour = parseInt(h)
@@ -629,47 +627,29 @@ export default function DashboardPage() {
         body { background: #F5F2EB; }
         .playfair { font-family: 'Playfair Display', serif; }
         * { font-family: 'DM Sans', sans-serif; }
-
-        /* SIDEBAR */
         .nav-item { transition: all 0.2s ease; border-radius: 12px; }
         .nav-item:hover { background: rgba(45,106,79,0.08); color: #1A3329; }
         .nav-active { background: linear-gradient(135deg, #1A3329, #2D6A4F) !important; color: white !important; box-shadow: 0 4px 12px rgba(26,51,41,0.2); }
-
-        /* CARDS */
         .dash-card { background: linear-gradient(145deg, #FDFBF7, #F8F5EF); border: 1px solid rgba(237,233,223,0.7); }
         .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(26,51,41,0.1) !important; }
-
-        /* APPOINTMENT ROWS */
         .appt-row { transition: all 0.15s ease; border-bottom: 1px solid rgba(237,233,223,0.7); }
         .appt-row:hover { background: linear-gradient(145deg, #FDFBF7, #F8F5EF); }
         .appt-row:last-child { border-bottom: none; }
-
-        /* BUTTONS */
         .btn-new { background: linear-gradient(135deg, #1A3329, #2D6A4F); transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(26,51,41,0.2); }
         .btn-new:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(26,51,41,0.3); }
         .action-btn { transition: all 0.15s ease; border-radius: 10px; }
         .action-btn:hover { background: rgba(237,233,223,0.6); }
-
-        /* MODAL */
         .modal-bg { animation: fadeIn 0.15s ease; }
         .modal-box { animation: scaleIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        /* TABS */
         .tab-btn { transition: all 0.15s ease; border-bottom: 2px solid transparent; }
         .tab-active-style { border-bottom: 2px solid #1A3329; color: #1A3329; font-weight: 600; }
-
-        /* SERVICE ROWS */
         .service-row { border-bottom: 1px solid rgba(237,233,223,0.7); transition: background 0.15s; }
         .service-row:hover { background: #F5F2EB; }
         .service-row:last-child { border-bottom: none; }
-
-        /* INPUTS */
         input:focus, textarea:focus { outline: none; border-color: #2D6A4F !important; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
-
-        /* SCROLLBAR */
         .scrollbar-none::-webkit-scrollbar { display: none; }
       `}</style>
 
@@ -753,6 +733,8 @@ export default function DashboardPage() {
                 </div>
               </header>
               <div className="px-8 py-7 space-y-5 max-w-5xl">
+
+                {/* STAT CARDS */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="stat-card dash-card rounded-2xl p-6">
                     <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.12em' }}>Today</div>
@@ -770,28 +752,22 @@ export default function DashboardPage() {
                     <div className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Est. this month</div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="dash-card rounded-2xl p-5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Booking Link</div>
-                      <div className="text-xs" style={{ color: '#9CA3AF' }}>Share this with clients</div>
-                    </div>
-                    <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`); alert('Copied!') }}
-                      className="action-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                      style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>
-                      Copy Link
-                    </button>
+
+                {/* FULL-WIDTH BOOKING LINK */}
+                <div className="dash-card rounded-2xl p-5 flex items-center justify-between gap-6">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-sm mb-1" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>Your Booking Link</div>
+                    <div className="text-xs font-mono truncate" style={{ color: '#9CA3AF' }}>{bookingUrl}</div>
                   </div>
-                  <div className="dash-card rounded-2xl p-5 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-sm mb-0.5" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>SMS Reminders</div>
-                      <div className="text-xs" style={{ color: '#9CA3AF' }}>Auto-sending 24hr before</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>
-                      <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#2D6A4F', boxShadow: '0 0 6px rgba(45,106,79,0.5)' }} />Active
-                    </div>
-                  </div>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(bookingUrl); alert('Copied!') }}
+                    className="action-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)', boxShadow: '0 2px 8px rgba(45,106,79,0.1)' }}>
+                    Copy Link
+                  </button>
                 </div>
+
+                {/* APPOINTMENTS TABLE */}
                 <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
                   <div className="flex" style={{ borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
                     {(['today', 'upcoming'] as const).map(tab => (
@@ -937,10 +913,8 @@ export default function DashboardPage() {
             </>
           )}
 
-          {/* REPORTS */}
           {activePage === 'reports' && <ReportsPage profile={profile} supabase={supabase} router={router} />}
 
-          {/* SETTINGS */}
           {activePage === 'settings' && (
             <SettingsPage
               profile={profile}
