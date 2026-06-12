@@ -40,18 +40,13 @@ export default function SignupPage() {
     setLoading(true)
     setError('')
 
-    // Step 1 — Create Supabase auth account
     const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
     if (signUpError) { setError(signUpError.message); setLoading(false); return }
     if (!data.user) { setError('Something went wrong. Please try again.'); setLoading(false); return }
 
-    // Step 2 — Sign in immediately to establish session
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) {
-      console.error('Sign in after signup failed:', signInError.message)
-    }
+    if (signInError) console.error('Sign in after signup failed:', signInError.message)
 
-    // Step 3 — Create profile (no plan yet — set after plan selection)
     const { error: profileError } = await supabase.from('profiles').upsert({
       id: data.user.id,
       email,
@@ -59,108 +54,201 @@ export default function SignupPage() {
     }, { onConflict: 'id' })
     if (profileError) { setError(profileError.message); setLoading(false); return }
 
-    // Step 4 — Redirect to plan selection
     router.push(`/choose-plan?userId=${data.user.id}&email=${encodeURIComponent(email)}&businessName=${encodeURIComponent(businessName)}`)
   }
 
   return (
-    <div className="min-h-screen bg-[#1A3329] flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        {pawPositions.map((paw, i) => (
-          <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
-            style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
-            fill="#000000">
-            <ellipse cx="50" cy="70" rx="26" ry="20"/>
-            <ellipse cx="20" cy="44" rx="12" ry="15"/>
-            <ellipse cx="38" cy="33" rx="12" ry="15"/>
-            <ellipse cx="62" cy="33" rx="12" ry="15"/>
-            <ellipse cx="80" cy="44" rx="12" ry="15"/>
-          </svg>
-        ))}
-      </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+        .playfair { font-family: 'Playfair Display', serif; }
+        body { background: #1A3329; }
 
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl relative z-10">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <svg width="32" height="32" viewBox="0 0 100 100" fill="#2D6A4F">
+        .signup-root {
+          min-height: 100vh;
+          min-height: 100dvh;
+          background: #1A3329;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .signup-card {
+          background: white;
+          border-radius: 24px;
+          padding: 36px 32px;
+          width: 100%;
+          max-width: 420px;
+          box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+          position: relative;
+          z-index: 10;
+        }
+
+        .input-field {
+          width: 100%;
+          border: 1.5px solid #E5E7EB;
+          border-radius: 12px;
+          padding: 12px 16px;
+          font-size: 15px;
+          color: #111827;
+          background: white;
+          transition: border-color 0.15s;
+          -webkit-appearance: none;
+        }
+        .input-field:focus { outline: none; border-color: #2D6A4F; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+        .input-field::placeholder { color: #9CA3AF; }
+        .input-password { padding-right: 48px; }
+
+        .btn-primary {
+          width: 100%;
+          background: linear-gradient(135deg, #1A3329, #2D6A4F);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 14px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 4px 15px rgba(26,51,41,0.3);
+          -webkit-appearance: none;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(26,51,41,0.35); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+        .eye-btn {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #9CA3AF;
+          display: flex;
+          align-items: center;
+          padding: 4px;
+          transition: color 0.15s;
+        }
+        .eye-btn:hover { color: #6B7280; }
+
+        @media (max-width: 480px) {
+          .signup-card { padding: 28px 20px; border-radius: 20px; }
+          .signup-logo-text { font-size: 26px !important; }
+        }
+      `}</style>
+
+      <div className="signup-root">
+        {/* Paw background */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', userSelect: 'none' }} aria-hidden="true">
+          {pawPositions.map((paw, i) => (
+            <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
+              style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
+              fill="#000000">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
               <ellipse cx="20" cy="44" rx="12" ry="15"/>
               <ellipse cx="38" cy="33" rx="12" ry="15"/>
               <ellipse cx="62" cy="33" rx="12" ry="15"/>
               <ellipse cx="80" cy="44" rx="12" ry="15"/>
             </svg>
-            <h1 className="text-3xl font-bold text-[#1A3329]">PawBooking</h1>
-          </div>
-          <p className="text-gray-500 mt-1">Create your free account</p>
-          <span className="inline-flex items-center gap-1 bg-[#D8F3DC] text-[#2D6A4F] text-xs font-semibold px-3 py-1 rounded-full mt-2">
-            ✓ 30 days free · No credit card required
-          </span>
+          ))}
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-            <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
-              placeholder="Fluffy Paws Grooming" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
-              placeholder="you@example.com" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div className="relative">
-              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 focus:outline-none focus:border-[#2D6A4F] text-gray-900"
-                placeholder="••••••••" required minLength={6} />
-              <button type="button" onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                    <line x1="1" y1="1" x2="23" y2="23"/>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                )}
-              </button>
+        <div className="signup-card">
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(26,51,41,0.25)', flexShrink: 0 }}>
+                <svg width="18" height="18" viewBox="0 0 100 100" fill="#D8F3DC">
+                  <ellipse cx="50" cy="70" rx="26" ry="20"/>
+                  <ellipse cx="20" cy="44" rx="12" ry="15"/>
+                  <ellipse cx="38" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="62" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="80" cy="44" rx="12" ry="15"/>
+                </svg>
+              </div>
+              <span className="playfair signup-logo-text" style={{ fontSize: '28px', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
+            </div>
+            <p style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '10px' }}>Create your free account</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', fontSize: '12px', fontWeight: 700, padding: '5px 14px', borderRadius: '50px', border: '1px solid rgba(45,106,79,0.12)' }}>
+              ✓ 30 days free · No credit card required
             </div>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <button type="submit" disabled={loading}
-            className="w-full bg-[#2D6A4F] text-white rounded-xl py-3 font-semibold hover:bg-[#1A3329] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 disabled:opacity-50 shadow-md hover:shadow-lg">
-            {loading ? 'Creating account...' : 'Continue →'}
-          </button>
-        </form>
-
-        <div className="flex items-center justify-center gap-2 mt-4">
-          <div className="flex -space-x-1">
-            {['#52B788','#E76F51','#2D6A4F','#F4A261'].map((c, i) => (
-              <div key={i} className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold" style={{ background: c }}>
-                {['S','M','J','R'][i]}
+          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Business Name</label>
+              <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)}
+                className="input-field" placeholder="Fluffy Paws Grooming" required
+                autoComplete="organization" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="input-field" placeholder="you@example.com" required
+                autoComplete="email" inputMode="email" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Password</label>
+              <div style={{ position: 'relative' }}>
+                <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                  className="input-field input-password" placeholder="••••••••" required minLength={6}
+                  autoComplete="new-password" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="eye-btn">
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
               </div>
-            ))}
-          </div>
-          <p className="text-xs text-gray-400">Trusted by <span className="text-[#2D6A4F] font-semibold">37+ dog groomers</span></p>
-        </div>
+              <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '4px' }}>Minimum 6 characters</p>
+            </div>
 
-        <div className="border-t border-gray-100 mt-5 pt-4">
-          <p className="text-center text-xs text-gray-400">No credit card required · Cancel anytime</p>
-          <p className="text-center text-sm text-gray-500 mt-2">
-            Already have an account?{' '}
-            <Link href="/login" className="text-[#2D6A4F] font-semibold">Sign in</Link>
-          </p>
+            {error && (
+              <div style={{ padding: '10px 14px', borderRadius: '10px', background: '#FEE2E2', border: '1px solid #FECACA', fontSize: '13px', color: '#DC2626' }}>
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Creating account...' : 'Continue →'}
+            </button>
+          </form>
+
+          {/* Social proof */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+            <div style={{ display: 'flex' }}>
+              {['#52B788', '#E76F51', '#2D6A4F', '#F4A261'].map((c, i) => (
+                <div key={i} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', background: c, marginLeft: i > 0 ? '-6px' : 0 }}>
+                  {['S', 'M', 'J', 'R'][i]}
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Trusted by <span style={{ color: '#2D6A4F', fontWeight: 600 }}>37+ dog groomers</span></p>
+          </div>
+
+          <div style={{ borderTop: '1px solid #F3F4F6', marginTop: '20px', paddingTop: '16px' }}>
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', marginBottom: '8px' }}>No credit card required · Cancel anytime</p>
+            <p style={{ textAlign: 'center', fontSize: '14px', color: '#9CA3AF' }}>
+              Already have an account?{' '}
+              <Link href="/login" style={{ color: '#2D6A4F', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
