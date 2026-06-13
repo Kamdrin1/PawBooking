@@ -105,7 +105,6 @@ export default function OnboardingPage() {
         body { background: #1A3329; }
 
         .onboard-root {
-          min-height: 100vh;
           min-height: 100dvh;
           background: #1A3329;
           display: flex;
