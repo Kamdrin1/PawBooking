@@ -415,7 +415,7 @@ export default function BookingPage() {
                 onChange={e => setSmsConsent(e.target.checked)}
                 style={{ width: '18px', height: '18px', marginTop: '2px', flexShrink: 0, accentColor: '#1A3329', cursor: 'pointer' }} />
               <label htmlFor="sms-consent" style={{ color: '#4B5563', fontSize: '12px', fontWeight: 400, marginBottom: 0, cursor: 'pointer', lineHeight: 1.7 }}>
-                I agree to receive SMS appointment reminders from {profile.business_name} via PawBooking. Message frequency varies. Message & data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
+                I agree to receive SMS appointment reminders from {profile.business_name} via PawBooking. Message frequency varies. Message & data rates may apply. Your mobile information will not be sold or shared with third parties for promotional or marketing purposes. Reply <strong>STOP</strong> to opt out at any time.
               </label>
             </div>
 
