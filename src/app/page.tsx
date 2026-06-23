@@ -7,6 +7,10 @@ export default function Home() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
 
+  async function handleEssentialSignup() {
+    router.push('/signup?plan=essential')
+  }
+
   async function handleProSignup() {
     router.push('/signup?plan=pro')
   }
@@ -148,11 +152,9 @@ export default function Home() {
 
         .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
 
-        /* HAMBURGER */
         .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
         .hamburger span { display: block; width: 22px; height: 2px; background: #1A3329; border-radius: 2px; transition: all 0.2s; }
 
-        /* MOBILE NAV DRAWER */
         .mobile-nav {
           display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100;
           background: rgba(245,242,235,0.98); backdrop-filter: blur(16px);
@@ -162,14 +164,29 @@ export default function Home() {
         .mobile-nav-link { font-size: 24px; font-weight: 600; color: #1A3329; text-decoration: none; }
         .mobile-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #1A3329; padding: 8px; }
 
-        /* STAT ITEM */
         .stat-item { position: relative; padding: 0 24px; }
         .stat-item:not(:last-child)::after {
           content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
           width: 1px; height: 32px; background: rgba(255,255,255,0.08);
         }
 
-        /* RESPONSIVE */
+        details summary {
+          list-style: none;
+        }
+        details summary::-webkit-details-marker {
+          display: none;
+        }
+        details[open] summary::after {
+          content: '−';
+        }
+        details summary::after {
+          content: '+';
+          float: right;
+          font-weight: 700;
+          color: #2D6A4F;
+          font-size: 20px;
+        }
+
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .desktop-cta { display: none !important; }
@@ -339,9 +356,9 @@ export default function Home() {
             </div>
             <div className="cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
               {[
-                { icon: '📅', tag: 'Basic + Pro', tagClass: 'pill-basic', title: 'Smart Online Booking', desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.', bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Up to 30 appointments/mo on Basic'] },
-                { icon: '💬', tag: 'Basic + Pro', tagClass: 'pill-basic', title: 'Automatic SMS Reminders', desc: 'PawBooking texts your clients automatically 24 hours before their appointment.', bullets: ['24hr reminder by default', 'Proven to cut no-shows by 34%', 'Clients can confirm or cancel by reply', 'Auto rebooking reminders on Pro'] },
-                { icon: '⭐', tag: 'Pro Only', tagClass: 'pill-pro', title: 'Auto Review Requests', desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Completely automatic.', bullets: ['Sent automatically after each job', 'Smart personalized messages', 'Direct link to your Google review page', 'More reviews = more new clients'] },
+                { icon: '📅', tag: 'All Plans', tagClass: 'pill-basic', title: 'Smart Online Booking', desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.', bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Works on mobile & desktop'] },
+                { icon: '💬', tag: 'All Plans', tagClass: 'pill-basic', title: 'Automatic SMS Reminders', desc: 'PawBooking texts your clients automatically 24 hours before their appointment. Proven to reduce no-shows by 34%.', bullets: ['24hr reminder by default', 'Clients can confirm or cancel by reply', 'Catches cancellations early', 'Smart rebooking reminders on Essential+'] },
+                { icon: '⭐', tag: 'Essential + Pro', tagClass: 'pill-pro', title: 'Auto Review Requests', desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Most groomers see 5–15 new reviews per month.', bullets: ['Sent automatically after each job', 'Direct link to your Google review page', 'Smart personalized messages', 'More reviews = more phone calls'] },
               ].map((f, i) => (
                 <div key={i} className="glow-card" style={{ padding: '28px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -390,6 +407,72 @@ export default function Home() {
           </div>
         </section>
 
+        {/* WHAT CLIENTS SEE */}
+        <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '940px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>The Experience</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em', marginBottom: '16px' }}>
+                Your clients get a beautiful booking experience.
+              </h2>
+              <p style={{ color: '#6B7280', maxWidth: '520px', margin: '0 auto', fontSize: '15px', lineHeight: 1.75 }}>
+                They don't see "PawBooking." They see your grooming service, your prices, your availability—ready to book 24/7.
+              </p>
+            </div>
+
+            <div style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', borderRadius: '24px', padding: '40px', textAlign: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(216,243,220,0.1)' }}>
+              <div style={{ position: 'absolute', top: '-50px', right: '-100px', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(45,106,79,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              
+              <div style={{ maxWidth: '320px', margin: '0 auto', position: 'relative' }}>
+                <div style={{ background: '#000', borderRadius: '40px', padding: '12px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+                  <div style={{ background: '#000', height: '28px', borderRadius: '0 0 20px 20px', marginBottom: '8px' }} />
+                  
+                  <div style={{ background: '#F5F2EB', borderRadius: '32px', padding: '28px 20px', textAlign: 'center', minHeight: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+                    <div style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 600, marginBottom: '20px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Saturday · 2:45 PM</div>
+                    
+                    <div style={{ marginBottom: '28px' }}>
+                      <div className="playfair" style={{ fontSize: '24px', fontWeight: 700, color: '#1A3329', marginBottom: '4px' }}>Book with Sarah</div>
+                      <div style={{ fontSize: '12px', color: '#9CA3AF' }}>Mobile Dog Grooming</div>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(237,233,223,0.6)', paddingTop: '20px', marginBottom: '20px' }}>
+                      <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginBottom: '12px', textAlign: 'left' }}>Select Service</div>
+                      {['Standard Groom — $65', 'Bath & Dry — $45', 'Full Spa Package — $95'].map((service, i) => (
+                        <div key={i} style={{ padding: '10px 12px', background: i === 0 ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#FDFBF7', borderRadius: '10px', fontSize: '13px', color: '#1A3329', fontWeight: i === 0 ? 600 : 400, marginBottom: '8px', border: i === 0 ? '1px solid rgba(45,106,79,0.2)' : '1px solid rgba(237,233,223,0.6)', textAlign: 'left' }}>
+                          {service}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(237,233,223,0.6)', paddingTop: '20px' }}>
+                      <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginBottom: '12px', textAlign: 'left' }}>Pick a Time</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        {['10:00 AM', '2:00 PM', '3:30 PM', '4:45 PM'].map((time, i) => (
+                          <div key={i} style={{ padding: '10px', background: i === 1 ? 'linear-gradient(135deg, #E8704A, #d4603a)' : '#FDFBF7', borderRadius: '10px', fontSize: '12px', color: i === 1 ? 'white' : '#1A3329', fontWeight: 600, border: i === 1 ? 'none' : '1px solid rgba(237,233,223,0.6)', cursor: 'pointer' }}>
+                            {time}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(237,233,223,0.6)' }}>
+                      <button style={{ width: '100%', padding: '13px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                        Confirm Booking →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginTop: '32px', position: 'relative', zIndex: 1 }}>
+                Clean, fast, zero friction. Your clients book in 30 seconds.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="divider" />
+
         {/* TESTIMONIALS */}
         <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px' }}>
           <div style={{ maxWidth: '940px', margin: '0 auto' }}>
@@ -420,76 +503,189 @@ export default function Home() {
 
         <div className="divider" />
 
+        {/* FAQ SECTION */}
+        <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div className="section-label" style={{ marginBottom: '16px' }}>Questions?</div>
+              <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>
+                Common questions answered.
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+              {[
+                { q: 'How do my clients actually book?', a: 'You get a custom booking link (like pawbooking.net/book/sarah). Share it on Instagram, Facebook, your website, or text it directly. Clients click, pick a service and time, and confirm instantly with their phone number. You get an SMS notification immediately.' },
+                { q: 'What if a client texts me instead of booking online?', a: 'You can still accept text bookings manually—PawBooking doesn\'t force everyone to book online. But you\'ll be amazed how many prefer the self-service option. Most groomers see 70% of new bookings come through the online link within the first month.' },
+                { q: 'Can I customize the reminder message?', a: 'On Essential and Professional plans, yes. You can customize the 24-hour reminder text and the auto-review request message. Starter plan uses our default friendly messages, which work great for most groomers.' },
+                { q: 'Do you integrate with Instagram, Google, or Facebook?', a: 'Your booking link works everywhere—bio links, posts, comments, email, etc. We\'re building direct Instagram & Google integration in Q2 2026. For now, the link-in-bio approach is super clean and gets instant adoption.' },
+                { q: 'What payment methods do clients use?', a: 'Clients book free through your link. They pay you at the appointment (cash, Venmo, card—however you normally accept payment). PawBooking doesn\'t touch payments, so there\'s no new payment processing for you.' },
+                { q: 'How long does setup actually take?', a: 'Genuinely 5 minutes. Add your name, services, prices, and availability. We give you a booking link. Share it. Done. You don\'t need to connect anything else unless you want to.' },
+                { q: 'Can I pause reminders for a week or special occasion?', a: 'Yes. You can block off dates in your availability calendar. Any bookings during blocked time are prevented, and no reminders send for those dates.' },
+                { q: 'What if I have multiple assistants?', a: 'Right now, PawBooking is built for solo groomers. Multi-user team management is coming in Q3 2026. If you need that sooner, reach out to us.' },
+              ].map((item, i) => (
+                <details key={i} style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', borderRadius: '16px', padding: '20px 24px', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <summary style={{ fontWeight: 600, color: '#1A3329', fontSize: '15px', outline: 'none', userSelect: 'none', cursor: 'pointer' }}>
+                    {item.q}
+                  </summary>
+                  <p style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.75, marginTop: '12px' }}>
+                    {item.a}
+                  </p>
+                </details>
+              ))}
+            </div>
+
+            <div style={{ background: 'linear-gradient(135deg, rgba(232,112,74,0.05), rgba(232,112,74,0.02))', border: '1px solid rgba(232,112,74,0.1)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>Don't see your question?</p>
+              <a href="mailto:hello@pawbooking.net" style={{ color: '#E8704A', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
+                Get in touch →
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <div className="divider" />
+
         {/* PRICING */}
         <section id="pricing" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
-          <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
               <div className="section-label" style={{ marginBottom: '16px' }}>Simple Pricing</div>
               <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '14px', letterSpacing: '-0.02em' }}>
-                One app. Two plans. No surprises.
+                One app. Three plans. Pick what fits.
               </h2>
-              <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts.</p>
+              <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. All plans include 30-day free trial.</p>
             </div>
-            <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'stretch' }}>
 
-              {/* Basic */}
+            {/* ROI CALCULATOR BOX */}
+            <div style={{ background: 'linear-gradient(135deg, #F0F9F2, #E8F5EB)', border: '1px solid rgba(45,106,79,0.1)', borderRadius: '20px', padding: '28px', marginBottom: '48px', maxWidth: '600px', margin: '0 auto 48px' }}>
+              <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '16px', fontSize: '16px' }}>Here's the Math</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500, marginBottom: '4px' }}>2 no-shows/month</div>
+                  <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#E8704A' }}>$170</div>
+                  <div style={{ fontSize: '12px', color: '#6B7280' }}>lost per month</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500, marginBottom: '4px' }}>Our solution costs</div>
+                  <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#2D6A4F' }}>$24–79</div>
+                  <div style={{ fontSize: '12px', color: '#6B7280' }}>per month</div>
+                </div>
+              </div>
+              <div style={{ borderTop: '1px solid rgba(45,106,79,0.1)', paddingTop: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: '13px', color: '#1A3329', fontWeight: 600 }}>You break even in <span style={{ color: '#E8704A', fontWeight: 700 }}>2–5 days</span>. Everything after that is pure profit.</div>
+              </div>
+            </div>
+
+            {/* PRICING GRID - 3 COLUMNS */}
+            <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'stretch' }}>
+
+              {/* Starter */}
               <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.04)' }}>
-                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Basic</h3>
-                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>Perfect for getting started</p>
+                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Starter</h3>
+                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For solo groomers just starting</p>
                 <div style={{ marginBottom: '24px' }}>
-                  <span className="playfair price-large">$30</span>
+                  <span className="playfair price-large">$24</span>
                   <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
+                </div>
+                <div style={{ background: 'rgba(45,106,79,0.05)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px' }}>
+                  <div style={{ fontSize: '12px', color: '#2D6A4F', fontWeight: 600 }}>Best for: 1–3 appointments/week</div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
                   {[
                     { text: 'Online booking page', included: true },
-                    { text: 'SMS appointment reminders', included: true },
-                    { text: 'Up to 30 appointments/mo', included: true },
+                    { text: 'SMS reminders (24hr before)', included: true },
+                    { text: 'Up to 25 appointments/mo', included: true },
                     { text: 'Instant booking notifications', included: true },
                     { text: 'Client history', included: true },
-                    { text: 'Rebooking reminders', included: false },
+                    { text: 'Unlimited appointments', included: false },
                     { text: 'Auto review requests', included: false },
                     { text: 'Monthly reports', included: false },
-                    { text: 'Unlimited appointments', included: false },
+                    { text: 'Priority support', included: false },
                   ].map((f, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: f.included ? '#1A3329' : '#C4BDB0', textDecoration: f.included ? 'none' : 'line-through' }}>
-                      <span style={{ marginRight: '8px', color: f.included ? '#2D6A4F' : '#C4BDB0', fontWeight: 700, fontSize: '12px' }}>{f.included ? '✓' : '✗'}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: f.included ? '#1A3329' : '#C4BDB0' }}>
+                      <span style={{ marginRight: '8px', color: f.included ? '#2D6A4F' : '#C4BDB0', fontWeight: 700, fontSize: '12px' }}>{f.included ? '✓' : '○'}</span>
                       {f.text}
                     </div>
                   ))}
                 </div>
-                <Link href="/signup?plan=basic" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
+                <Link href="/signup?plan=starter" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
                   Start Free Trial
                 </Link>
               </div>
 
-              {/* Pro */}
+              {/* Essential - MOST POPULAR */}
               <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg, #E8704A, #d4603a)', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 10px', borderRadius: '50px', boxShadow: '0 4px 12px rgba(232,112,74,0.35)', letterSpacing: '0.02em' }}>
                   ⭐ Most Popular
                 </div>
-                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Pro</h3>
-                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '24px' }}>For groomers serious about growth</p>
+                <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Essential</h3>
+                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '24px' }}>The sweet spot for growing groomers</p>
                 <div style={{ marginBottom: '24px' }}>
-                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>$50</span>
+                  <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>$44</span>
                   <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '14px' }}>/mo</span>
                 </div>
+                <div style={{ background: 'rgba(216,243,220,0.1)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px', border: '1px solid rgba(216,243,220,0.2)' }}>
+                  <div style={{ fontSize: '12px', color: '#B3E5D8', fontWeight: 600 }}>Best for: 3–7 appointments/week</div>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
-                  {['Everything in Basic', 'Unlimited appointments', 'Rebooking reminders', 'Auto review requests after every job', 'Monthly revenue & booking reports', 'Early access to new features', 'Priority support'].map((f, i) => (
+                  {[
+                    { text: 'Everything in Starter', included: true },
+                    { text: 'Unlimited appointments', included: true },
+                    { text: 'Auto review requests after jobs', included: true },
+                    { text: 'Smart rebooking reminders', included: true },
+                    { text: 'Monthly revenue & booking reports', included: true },
+                    { text: 'Early access to new features', included: true },
+                    { text: 'Priority email support', included: false },
+                  ].map((f, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: 'rgba(255,255,255,0.75)' }}>
                       <span style={{ marginRight: '8px', color: '#7DD3A0', fontWeight: 700, fontSize: '12px' }}>✓</span>
-                      {f}
+                      {f.text}
                     </div>
                   ))}
                 </div>
-                <button onClick={handleProSignup} className="pro-btn">Start Free Trial</button>
+                <button onClick={handleEssentialSignup} className="pro-btn">Start Free Trial</button>
+              </div>
+
+              {/* Professional */}
+              <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.04)' }}>
+                <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Professional</h3>
+                <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For high-volume groomers & teams</p>
+                <div style={{ marginBottom: '24px' }}>
+                  <span className="playfair price-large">$79</span>
+                  <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
+                </div>
+                <div style={{ background: 'rgba(232,112,74,0.05)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px' }}>
+                  <div style={{ fontSize: '12px', color: '#C25B2E', fontWeight: 600 }}>Best for: 7+ appointments/week</div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
+                  {[
+                    { text: 'Everything in Essential', included: true },
+                    { text: 'Priority email & phone support', included: true },
+                    { text: 'Custom branding on booking page', included: true },
+                    { text: 'Advanced analytics & insights', included: true },
+                    { text: 'Team member support (Q3 2026)', included: true },
+                    { text: 'Custom integrations', included: true },
+                  ].map((f, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: '#1A3329' }}>
+                      <span style={{ marginRight: '8px', color: '#E8704A', fontWeight: 700, fontSize: '12px' }}>✓</span>
+                      {f.text}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/signup?plan=pro" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
+                  Start Free Trial
+                </Link>
               </div>
             </div>
-            <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '20px' }}>
-              🐾 Both plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>.
+            
+            <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '32px' }}>
+              🐾 All plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No credit card required.
             </p>
           </div>
         </section>
@@ -499,7 +695,7 @@ export default function Home() {
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
             <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-              Ready to stop losing money to no-shows?
+              Your first month is free. See the impact yourself.
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '36px', fontSize: '16px', lineHeight: 1.75 }}>
               Join PawBooking today. 30 days free, cancel anytime.
