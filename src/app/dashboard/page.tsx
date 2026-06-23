@@ -41,6 +41,8 @@ interface ReportData {
   avgRevenuePerAppt: number
   totalRevenue: number
   totalAppointments: number
+  noShowRate: number
+  reviewsGenerated: number
 }
 
 // ─── REPORTS PAGE ─────────────────────────────────────────────────────────────
@@ -51,10 +53,10 @@ function ReportsPage({ profile, supabase, router }: {
 }) {
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
-  const isPro = profile?.plan === 'pro'
+  const canAccessReports = ['essential', 'professional'].includes(profile?.plan || '')
 
   useEffect(() => {
-    if (!isPro) { setLoading(false); return }
+    if (!canAccessReports) { setLoading(false); return }
     async function loadReports() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
@@ -99,12 +101,14 @@ function ReportsPage({ profile, supabase, router }: {
       const totalRevenue = allAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
       const totalAppointments = allAppts.length
       const avgRevenuePerAppt = totalAppointments > 0 ? Math.round(totalRevenue / totalAppointments) : 0
+      const noShowRate = 0
+      const reviewsGenerated = 0
 
-      setReportData({ monthlyRevenue, topServices, newVsReturning: { new: newClients, returning: returningClients }, avgRevenuePerAppt, totalRevenue, totalAppointments })
+      setReportData({ monthlyRevenue, topServices, newVsReturning: { new: newClients, returning: returningClients }, avgRevenuePerAppt, totalRevenue, totalAppointments, noShowRate, reviewsGenerated })
       setLoading(false)
     }
     loadReports()
-  }, [isPro])
+  }, [canAccessReports])
 
   const maxRevenue = reportData ? Math.max(...reportData.monthlyRevenue.map(m => m.revenue), 1) : 1
   const totalClients = reportData ? reportData.newVsReturning.new + reportData.newVsReturning.returning : 0
@@ -130,14 +134,14 @@ function ReportsPage({ profile, supabase, router }: {
         </div>
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl" style={{ background: 'rgba(245,242,235,0.8)', backdropFilter: 'blur(2px)' }}>
-        <div style={{ fontSize: '36px', marginBottom: '16px' }}>🔒</div>
-        <div className="playfair" style={{ fontSize: '20px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textAlign: 'center' }}>Reports & Analytics</div>
+        <div style={{ fontSize: '36px', marginBottom: '16px' }}>📊</div>
+        <div className="playfair" style={{ fontSize: '20px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textAlign: 'center' }}>Advanced Analytics</div>
         <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px', textAlign: 'center', maxWidth: '280px' }}>
-          See your revenue trends, top services, and client retention — upgrade to Pro to unlock.
+          Revenue trends, no-show rates, top services & client retention — available on Essential and Professional plans.
         </div>
         <button onClick={() => router.push('/pricing')}
           style={{ padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.25)' }}>
-          Upgrade to Pro — $50/mo →
+          Upgrade to Essential — $44/mo →
         </button>
       </div>
     </div>
@@ -151,11 +155,11 @@ function ReportsPage({ profile, supabase, router }: {
             <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Reports</h1>
             <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your business performance at a glance</p>
           </div>
-          {isPro && <div style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '12px', fontWeight: 700, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: '1px solid rgba(45,106,79,0.12)' }}>⭐ Pro</div>}
+          {canAccessReports && <div style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '12px', fontWeight: 700, background: profile?.plan === 'professional' ? 'linear-gradient(135deg, #FDE8D8, #fdd5b9)' : 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: profile?.plan === 'professional' ? '#7C2D12' : '#1A5C36', border: '1px solid rgba(45,106,79,0.12)' }}>⭐ {profile?.plan === 'professional' ? 'Professional' : 'Essential'}</div>}
         </div>
       </header>
       <div className="page-content">
-        {!isPro ? <BlurredContent /> : loading ? (
+        {!canAccessReports ? <BlurredContent /> : loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
             <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
           </div>
@@ -301,10 +305,15 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
     if (data.url) { window.location.href = data.url } else { console.error('Portal error:', data.error); setPortalLoading(false) }
   }
 
-  const isPro = profile?.plan === 'pro'
-  const basicIncluded = ['Online booking page', 'Up to 30 appointments/mo', 'SMS appointment reminders', 'Instant booking notifications', 'Client history']
-  const basicLocked = ['Unlimited appointments', 'Rebooking reminders', 'Auto review requests after every job', 'Monthly revenue & booking reports', 'Early access to new features', 'Priority support']
-  const proFeatures = ['Everything in Basic', 'Unlimited appointments', 'Rebooking reminders', 'Auto review requests after every job', 'Monthly revenue & booking reports', 'Early access to new features', 'Priority support']
+  const isEssential = profile?.plan === 'essential'
+  const isProfessional = profile?.plan === 'professional'
+  const isStarter = profile?.plan === 'starter'
+
+  const starterFeatures = ['Online booking page', 'Up to 25 appointments/mo', 'SMS appointment reminders', 'Instant booking notifications', 'Client history']
+  const starterLocked = ['Unlimited appointments', 'Auto review requests', 'Monthly reports', 'Smart rebooking reminders', 'Priority support']
+  const essentialFeatures = ['Online booking page', 'Unlimited appointments', 'SMS appointment reminders', 'Auto review requests after jobs', 'Monthly revenue & booking reports', 'Smart rebooking reminders', 'Instant booking notifications', 'Client history', 'Priority email support', 'Early access to new features']
+  const essentialLocked = ['Priority phone support', 'Custom booking page branding', 'Team member support', 'Advanced analytics & insights', 'Custom integrations']
+  const professionalFeatures = ['Everything in Essential', 'Priority phone support', 'Custom booking page branding', 'Team member support (Q3 2026)', 'Advanced analytics & insights', 'Custom integrations']
 
   return (
     <>
@@ -342,7 +351,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           )}
         </div>
 
-        {isPro && (
+        {(isEssential || isProfessional) && (
           <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '4px' }}>
               <div>
@@ -391,60 +400,94 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
 
         <div className="dash-card rounded-2xl p-5">
           <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Your Plan</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: !isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: !isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: !isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              {!isPro && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: !isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Basic</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+            {/* STARTER CARD */}
+            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isStarter ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isStarter ? 'none' : '1.5px solid #EDE9DF', boxShadow: isStarter ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
+              {isStarter && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isStarter ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Starter</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: !isPro ? 'white' : '#1A3329' }}>$30</span>
-                <span style={{ fontSize: '12px', color: !isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
+                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isStarter ? 'white' : '#1A3329' }}>$24</span>
+                <span style={{ fontSize: '12px', color: isStarter ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {basicIncluded.map(f => (
+                {starterFeatures.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                     <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
-                      <path d="M6 10l3 3 5-5" stroke={!isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="10" cy="10" r="10" fill={isStarter ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
+                      <path d="M6 10l3 3 5-5" stroke={isStarter ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: !isPro ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: isStarter ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
-                <div style={{ borderTop: !isPro ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
-                {basicLocked.map(f => (
+                <div style={{ borderTop: isStarter ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
+                {starterLocked.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                     <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="10" fill={!isPro ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
-                      <path d="M7 7l6 6M13 7l-6 6" stroke={!isPro ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="10" cy="10" r="10" fill={isStarter ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
+                      <path d="M7 7l6 6M13 7l-6 6" stroke={isStarter ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: !isPro ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: isStarter ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isPro ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isPro ? 'none' : '1.5px solid #EDE9DF', boxShadow: isPro ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: isPro ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Popular</div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isPro ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Pro</div>
+
+            {/* ESSENTIAL CARD */}
+            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isEssential ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isEssential ? 'none' : '1.5px solid #EDE9DF', boxShadow: isEssential ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
+              <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: isEssential ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Popular</div>
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isEssential ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Essential</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isPro ? 'white' : '#1A3329' }}>$50</span>
-                <span style={{ fontSize: '12px', color: isPro ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
+                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isEssential ? 'white' : '#1A3329' }}>$44</span>
+                <span style={{ fontSize: '12px', color: isEssential ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {proFeatures.map(f => (
+                {essentialFeatures.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                     <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="10" fill={isPro ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
-                      <path d="M6 10l3 3 5-5" stroke={isPro ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="10" cy="10" r="10" fill={isEssential ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
+                      <path d="M6 10l3 3 5-5" stroke={isEssential ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isPro ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '11px', color: isEssential ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                  </div>
+                ))}
+                <div style={{ borderTop: isEssential ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
+                {essentialLocked.map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill={isEssential ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
+                      <path d="M7 7l6 6M13 7l-6 6" stroke={isEssential ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <span style={{ fontSize: '11px', color: isEssential ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* PROFESSIONAL CARD */}
+            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isProfessional ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isProfessional ? 'none' : '1.5px solid #EDE9DF', boxShadow: isProfessional ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
+              {isProfessional && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isProfessional ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Professional</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
+                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isProfessional ? 'white' : '#1A3329' }}>$79</span>
+                <span style={{ fontSize: '12px', color: isProfessional ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {professionalFeatures.map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill={isProfessional ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
+                      <path d="M6 10l3 3 5-5" stroke={isProfessional ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span style={{ fontSize: '11px', color: isProfessional ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          {!isPro ? (
+          {!isEssential && !isProfessional ? (
             <button onClick={() => router.push('/pricing')}
               style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.2)' }}>
-              Upgrade to Pro — $50/mo →
+              Upgrade to Essential — $44/mo →
             </button>
           ) : (
             <button onClick={handleManagePlan} disabled={portalLoading}
@@ -557,8 +600,9 @@ export default function DashboardPage() {
   const upcomingAppts = appointments.filter(a => a.appointment_date > today)
   const thisMonthAppts = appointments.filter(a => a.appointment_date.startsWith(new Date().toISOString().slice(0, 7)))
   const monthRevenue = thisMonthAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
-  const isBasic = profile?.plan !== 'pro'
-  const apptLimitPct = Math.min((monthlyApptCount / 30) * 100, 100)
+  const isStarter = profile?.plan === 'starter'
+  const starterLimit = 25
+  const apptLimitPct = Math.min((monthlyApptCount / starterLimit) * 100, 100)
   const bookingUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
     : `https://pawbooking.net/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
@@ -723,7 +767,7 @@ export default function DashboardPage() {
             <div style={{ background: 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', borderRadius: '10px', padding: '10px 12px', border: '1px solid rgba(45,106,79,0.08)' }}>
               <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '2px' }}>Business</div>
               <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.business_name || 'My Grooming'}</div>
-              <div style={{ fontSize: '12px', color: '#2D6A4F', fontWeight: 500, marginTop: '2px', textTransform: 'capitalize' }}>{profile?.plan || 'Basic'} Plan</div>
+              <div style={{ fontSize: '12px', color: '#2D6A4F', fontWeight: 500, marginTop: '2px', textTransform: 'capitalize' }}>{profile?.plan === 'starter' ? 'Starter' : profile?.plan === 'essential' ? 'Essential' : profile?.plan === 'professional' ? 'Professional' : 'Starter'} Plan</div>
             </div>
           </div>
 
@@ -733,23 +777,23 @@ export default function DashboardPage() {
                 className={`sidebar-nav-item ${activePage === item.page ? 'sidebar-nav-active' : ''}`}>
                 <span style={{ fontSize: '16px' }}>{item.emoji}</span>
                 <span style={{ flex: 1 }}>{item.label === 'Home' ? 'Dashboard' : item.label === 'Appts' ? 'Appointments' : item.label}</span>
-                {item.page === 'reports' && isBasic && <span style={{ fontSize: '12px', color: '#D1D5DB' }}>🔒</span>}
+                {item.page === 'reports' && isStarter && <span style={{ fontSize: '12px', color: '#D1D5DB' }}>🔒</span>}
               </button>
             ))}
           </nav>
 
-          {isBasic && (
+          {isStarter && (
             <div style={{ padding: '0 12px 12px' }}>
-              <div style={{ borderRadius: '10px', padding: '10px 12px', background: monthlyApptCount >= 30 ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', border: `1px solid ${monthlyApptCount >= 30 ? '#FECACA' : 'rgba(45,106,79,0.1)'}` }}>
+              <div style={{ borderRadius: '10px', padding: '10px 12px', background: monthlyApptCount >= starterLimit ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : 'linear-gradient(135deg, rgba(216,243,220,0.3), rgba(216,243,220,0.1))', border: `1px solid ${monthlyApptCount >= starterLimit ? '#FECACA' : 'rgba(45,106,79,0.1)'}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: monthlyApptCount >= 30 ? '#DC2626' : '#1A3329' }}>Appointments</span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: monthlyApptCount >= 30 ? '#DC2626' : '#2D6A4F' }}>{monthlyApptCount}/30</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: monthlyApptCount >= starterLimit ? '#DC2626' : '#1A3329' }}>Appointments</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: monthlyApptCount >= starterLimit ? '#DC2626' : '#2D6A4F' }}>{monthlyApptCount}/{starterLimit}</span>
                 </div>
                 <div style={{ width: '100%', height: '6px', borderRadius: '50px', background: 'rgba(237,233,223,0.8)' }}>
-                  <div style={{ height: '6px', borderRadius: '50px', width: `${apptLimitPct}%`, background: monthlyApptCount >= 30 ? '#DC2626' : monthlyApptCount >= 24 ? '#F59E0B' : 'linear-gradient(90deg, #2D6A4F, #45a070)', transition: 'width 0.3s' }} />
+                  <div style={{ height: '6px', borderRadius: '50px', width: `${apptLimitPct}%`, background: monthlyApptCount >= starterLimit ? '#DC2626' : monthlyApptCount >= 20 ? '#F59E0B' : 'linear-gradient(90deg, #2D6A4F, #45a070)', transition: 'width 0.3s' }} />
                 </div>
                 <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
-                  {monthlyApptCount >= 30 ? 'Limit reached · Upgrade' : `${30 - monthlyApptCount} remaining`}
+                  {monthlyApptCount >= starterLimit ? 'Limit reached · Upgrade' : `${starterLimit - monthlyApptCount} remaining`}
                 </div>
               </div>
             </div>
