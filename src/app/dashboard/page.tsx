@@ -321,7 +321,7 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
         <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Settings</h1>
         <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Manage your account and preferences</p>
       </header>
-      <div className="page-content" style={{ maxWidth: '600px' }}>
+      <div className="page-content">
 
         <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -399,86 +399,86 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
         )}
 
         <div className="dash-card rounded-2xl p-5">
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Your Plan</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '24px' }}>Your Plan</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '24px' }} className="plan-grid">
             {/* STARTER CARD */}
-            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isStarter ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isStarter ? 'none' : '1.5px solid #EDE9DF', boxShadow: isStarter ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              {isStarter && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isStarter ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Starter</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isStarter ? 'white' : '#1A3329' }}>$24</span>
+            <div style={{ borderRadius: '16px', padding: '20px', position: 'relative', background: isStarter ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isStarter ? 'none' : '1.5px solid #EDE9DF', boxShadow: isStarter ? '0 8px 24px rgba(15,34,24,0.2)' : 'none', display: 'flex', flexDirection: 'column' }}>
+              {isStarter && <div style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '10px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isStarter ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '8px' }}>Starter</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
+                <span className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: isStarter ? 'white' : '#1A3329' }}>$24</span>
                 <span style={{ fontSize: '12px', color: isStarter ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                 {starterFeatures.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <svg style={{ marginTop: '3px', flexShrink: 0 }} width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isStarter ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={isStarter ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isStarter ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '12px', color: isStarter ? 'rgba(255,255,255,0.8)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
-                <div style={{ borderTop: isStarter ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
+                <div style={{ borderTop: isStarter ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '8px 0' }} />
                 {starterLocked.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <svg style={{ marginTop: '3px', flexShrink: 0 }} width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isStarter ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
                       <path d="M7 7l6 6M13 7l-6 6" stroke={isStarter ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isStarter ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '12px', color: isStarter ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* ESSENTIAL CARD */}
-            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isEssential ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isEssential ? 'none' : '1.5px solid #EDE9DF', boxShadow: isEssential ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: isEssential ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Popular</div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isEssential ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Essential</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isEssential ? 'white' : '#1A3329' }}>$44</span>
+            <div style={{ borderRadius: '16px', padding: '20px', position: 'relative', background: isEssential ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isEssential ? 'none' : '1.5px solid #EDE9DF', boxShadow: isEssential ? '0 8px 24px rgba(15,34,24,0.2)' : 'none', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '10px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px', background: isEssential ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white' }}>⭐ Popular</div>
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isEssential ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '8px' }}>Essential</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
+                <span className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: isEssential ? 'white' : '#1A3329' }}>$44</span>
                 <span style={{ fontSize: '12px', color: isEssential ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                 {essentialFeatures.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <svg style={{ marginTop: '3px', flexShrink: 0 }} width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isEssential ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={isEssential ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isEssential ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '12px', color: isEssential ? 'rgba(255,255,255,0.8)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
-                <div style={{ borderTop: isEssential ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '4px 0' }} />
+                <div style={{ borderTop: isEssential ? '1px solid rgba(255,255,255,0.08)' : '1px solid #EDE9DF', margin: '8px 0' }} />
                 {essentialLocked.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <svg style={{ marginTop: '3px', flexShrink: 0 }} width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isEssential ? 'rgba(255,255,255,0.05)' : '#F3F4F6'} />
                       <path d="M7 7l6 6M13 7l-6 6" stroke={isEssential ? 'rgba(255,255,255,0.2)' : '#D1D5DB'} strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isEssential ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '12px', color: isEssential ? 'rgba(255,255,255,0.2)' : '#C4C9D1', textDecoration: 'line-through', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* PROFESSIONAL CARD */}
-            <div style={{ borderRadius: '16px', padding: '16px', position: 'relative', background: isProfessional ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isProfessional ? 'none' : '1.5px solid #EDE9DF', boxShadow: isProfessional ? '0 8px 24px rgba(15,34,24,0.2)' : 'none' }}>
-              {isProfessional && <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isProfessional ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '4px' }}>Professional</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '12px' }}>
-                <span className="playfair" style={{ fontSize: '28px', fontWeight: 700, color: isProfessional ? 'white' : '#1A3329' }}>$79</span>
+            <div style={{ borderRadius: '16px', padding: '20px', position: 'relative', background: isProfessional ? 'linear-gradient(145deg, #1A3329, #0f2218)' : '#FDFBF7', border: isProfessional ? 'none' : '1.5px solid #EDE9DF', boxShadow: isProfessional ? '0 8px 24px rgba(15,34,24,0.2)' : 'none', display: 'flex', flexDirection: 'column' }}>
+              {isProfessional && <div style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '10px', fontWeight: 700, padding: '4px 10px', borderRadius: '50px', background: 'rgba(255,255,255,0.12)', color: 'white' }}>Current</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: isProfessional ? 'rgba(255,255,255,0.45)' : '#9CA3AF', marginBottom: '8px' }}>Professional</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
+                <span className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: isProfessional ? 'white' : '#1A3329' }}>$79</span>
                 <span style={{ fontSize: '12px', color: isProfessional ? 'rgba(255,255,255,0.35)' : '#9CA3AF' }}>/mo</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                 {professionalFeatures.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <svg style={{ marginTop: '2px', flexShrink: 0 }} width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <svg style={{ marginTop: '3px', flexShrink: 0 }} width="14" height="14" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill={isProfessional ? 'rgba(255,255,255,0.12)' : '#D8F3DC'} />
                       <path d="M6 10l3 3 5-5" stroke={isProfessional ? 'white' : '#1A5C36'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span style={{ fontSize: '11px', color: isProfessional ? 'rgba(255,255,255,0.75)' : '#374151', lineHeight: 1.4 }}>{f}</span>
+                    <span style={{ fontSize: '12px', color: isProfessional ? 'rgba(255,255,255,0.8)' : '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -486,12 +486,12 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
           </div>
           {!isEssential && !isProfessional ? (
             <button onClick={() => router.push('/pricing')}
-              style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.2)' }}>
+              style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.2)' }}>
               Upgrade to Essential — $44/mo →
             </button>
           ) : (
             <button onClick={handleManagePlan} disabled={portalLoading}
-              style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB', opacity: portalLoading ? 0.5 : 1 }}>
+              style={{ width: '100%', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB', opacity: portalLoading ? 0.5 : 1 }}>
               {portalLoading ? 'Opening...' : 'Manage Plan'}
             </button>
           )}
