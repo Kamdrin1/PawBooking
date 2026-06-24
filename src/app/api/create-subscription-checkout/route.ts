@@ -11,8 +11,9 @@ const supabase = createClient(
 
 // ─── Stripe Price IDs ─────────────────────────────────────────────────────────
 const PRICE_IDS = {
-  basic: 'price_1TbwBnE12BO3MSKAMUPsrCqn',          // $30/mo
-  pro:   'price_1TejNuE12BO3MSKAYAHT2gyJ',            // $50/mo
+  starter: 'price_1Tlu9RCz5GQLk9eJXnSY16DX',          // $24/mo
+  essential: 'price_1Tlu9kCz5GQLk9eJmwoHbaMp',        // $44/mo
+  professional: 'price_1TluAFCz5GQLk9eJrLMLvhHl',     // $79/mo
 }
 
 export async function POST(req: Request) {
@@ -23,8 +24,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing userId or email' }, { status: 400 })
     }
 
-    const selectedPlan = plan === 'pro' ? 'pro' : 'basic'
+    const selectedPlan = plan === 'professional' ? 'professional' : plan === 'essential' ? 'essential' : 'starter'
     const priceId = PRICE_IDS[selectedPlan]
+
+    if (!priceId) {
+      return NextResponse.json({ error: `Invalid plan: ${plan}` }, { status: 400 })
+    }
 
     const customer = await stripe.customers.create({
       email,
