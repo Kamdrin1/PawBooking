@@ -176,7 +176,7 @@ export default function SignupPage() {
             </div>
             <p style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '10px' }}>Create your free account</p>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', fontSize: '12px', fontWeight: 700, padding: '5px 14px', borderRadius: '50px', border: '1px solid rgba(45,106,79,0.12)' }}>
-              ✓ 30 days free · No credit card required
+              ✓ 30 days free · No charge today
             </div>
           </div>
 
@@ -241,7 +241,7 @@ export default function SignupPage() {
           </div>
 
           <div style={{ borderTop: '1px solid #F3F4F6', marginTop: '20px', paddingTop: '16px' }}>
-            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', marginBottom: '8px' }}>No credit card required · Cancel anytime</p>
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', marginBottom: '8px' }}>30 days free · Cancel anytime</p>
             <p style={{ textAlign: 'center', fontSize: '14px', color: '#9CA3AF' }}>
               Already have an account?{' '}
               <Link href="/login" style={{ color: '#2D6A4F', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
