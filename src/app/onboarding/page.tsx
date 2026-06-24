@@ -108,9 +108,9 @@ export default function OnboardingPage() {
           min-height: 100dvh;
           background: #1A3329;
           display: flex;
-          align-items: flex-start;
+          align-items: center;
           justify-content: center;
-          padding: 24px 16px 40px;
+          padding: 24px 16px;
           position: relative;
           overflow: hidden;
         }
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
         }
 
         @media (max-width: 480px) {
-          .onboard-root { padding: 16px 12px 32px; }
+          .onboard-root { padding: 16px 12px; }
           .onboard-card { padding: 24px 18px; border-radius: 20px; }
           .onboard-h2 { font-size: 20px !important; }
           .day-btn { font-size: 11px !important; padding: 8px 4px !important; }
