@@ -55,7 +55,7 @@ export default function BookingPage() {
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, business_name, service_area, payment_methods')
-        .ilike('business_name', slug.replace(/-/g, ' '))
+        .eq('slug', slug)
         .single()
 
       if (!profiles) { setNotFound(true); return }
