@@ -289,7 +289,7 @@ export default function Home() {
             </Link>
           </div>
           <p style={{ fontSize: '13px', color: '#9CA3AF', fontWeight: 500 }}>
-            30 days free · No credit card charged today · Cancel anytime
+            30 days free · No charged today · Cancel anytime
           </p>
         </section>
 
@@ -685,7 +685,7 @@ export default function Home() {
             </div>
             
             <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '32px' }}>
-              🐾 All plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No credit card required.
+              🐾 All plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No charge today.
             </p>
           </div>
         </section>
