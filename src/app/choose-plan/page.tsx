@@ -23,22 +23,31 @@ const pawPositions = [
   { top: '95%', left: '5%',  rotate: '-20deg', size: 115, opacity: 0.15 },
 ]
 
-const basicFeatures = [
+const starterFeatures = [
   'Online booking page',
-  'Up to 30 appointments/mo',
+  'Up to 25 appointments/mo',
   'SMS appointment reminders',
   'Instant booking notifications',
   'Client history',
 ]
 
-const proFeatures = [
-  'Everything in Basic',
+const essentialFeatures = [
+  'Everything in Starter',
   'Unlimited appointments',
-  'Rebooking reminders',
-  'Auto review requests after every job',
+  'Auto review requests after jobs',
   'Monthly revenue & booking reports',
+  'Smart rebooking reminders',
+  'Priority email support',
   'Early access to new features',
-  'Priority support',
+]
+
+const professionalFeatures = [
+  'Everything in Essential',
+  'Priority phone support',
+  'Custom booking page branding',
+  'Team member support (Q3 2026)',
+  'Advanced analytics & insights',
+  'Custom integrations',
 ]
 
 function CheckIcon({ light }: { light?: boolean }) {
@@ -53,7 +62,7 @@ function CheckIcon({ light }: { light?: boolean }) {
 function ChoosePlanContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'pro'>('basic')
+  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'essential' | 'professional'>('essential')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -91,6 +100,12 @@ function ChoosePlanContent() {
     }
   }
 
+  const planPrices = {
+    starter: '$24',
+    essential: '$44',
+    professional: '$79',
+  }
+
   return (
     <>
       <style>{`
@@ -113,7 +128,7 @@ function ChoosePlanContent() {
 
         .plan-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 16px;
           margin-bottom: 20px;
         }
@@ -157,10 +172,14 @@ function ChoosePlanContent() {
         .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(0,0,0,0.25); }
         .cta-btn:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
 
+        @media (max-width: 900px) {
+          .plan-grid { grid-template-columns: 1fr !important; }
+        }
+
         @media (max-width: 580px) {
           .plan-grid { grid-template-columns: 1fr !important; }
           .plan-card { padding: 20px 18px; }
-          .choose-root { padding: 20px 14px 40px; align-items: flex-start; }
+          .choose-root { padding: 20px 14px 40px; }
           .header-title { font-size: 24px !important; }
         }
 
@@ -170,7 +189,6 @@ function ChoosePlanContent() {
       `}</style>
 
       <div className="choose-root">
-        {/* Paw background */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', userSelect: 'none' }} aria-hidden="true">
           {pawPositions.map((paw, i) => (
             <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
@@ -185,9 +203,8 @@ function ChoosePlanContent() {
           ))}
         </div>
 
-        <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '680px' }}>
+        <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '1000px' }}>
 
-          {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '12px' }}>
               <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'rgba(216,243,220,0.15)', border: '1px solid rgba(216,243,220,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -208,60 +225,81 @@ function ChoosePlanContent() {
             </div>
           </div>
 
-          {/* Plan Cards */}
           <div className="plan-grid">
 
-            {/* Basic */}
-            <button onClick={() => setSelectedPlan('basic')}
-              className={`plan-card ${selectedPlan === 'basic' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
-              {selectedPlan === 'basic' && (
+            <button onClick={() => setSelectedPlan('starter')}
+              className={`plan-card ${selectedPlan === 'starter' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
+              {selectedPlan === 'starter' && (
                 <div style={{ position: 'absolute', top: '14px', right: '14px', width: '24px', height: '24px', borderRadius: '50%', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10l5 5 7-7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               )}
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', color: selectedPlan === 'basic' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Basic</div>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', color: selectedPlan === 'starter' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Starter</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
-                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'basic' ? '#1A3329' : 'white' }}>$30</span>
-                <span style={{ fontSize: '13px', color: selectedPlan === 'basic' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
+                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'starter' ? '#1A3329' : 'white' }}>$24</span>
+                <span style={{ fontSize: '13px', color: selectedPlan === 'starter' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'basic' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>Perfect for getting started</p>
+              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'starter' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>Perfect for getting started</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {basicFeatures.map(f => (
+                {starterFeatures.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    <CheckIcon light={selectedPlan !== 'basic'} />
-                    <span style={{ fontSize: '13px', color: selectedPlan === 'basic' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
+                    <CheckIcon light={selectedPlan !== 'starter'} />
+                    <span style={{ fontSize: '13px', color: selectedPlan === 'starter' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
                   </div>
                 ))}
               </div>
             </button>
 
-            {/* Pro */}
-            <button onClick={() => setSelectedPlan('pro')}
-              className={`plan-card ${selectedPlan === 'pro' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
-              {/* Popular badge */}
+            <button onClick={() => setSelectedPlan('essential')}
+              className={`plan-card ${selectedPlan === 'essential' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
               <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 12px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: '#E76F51', color: 'white', whiteSpace: 'nowrap' }}>
                 ⭐ Most Popular
               </div>
-              {selectedPlan === 'pro' && (
+              {selectedPlan === 'essential' && (
                 <div style={{ position: 'absolute', top: '14px', right: '14px', width: '24px', height: '24px', borderRadius: '50%', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10l5 5 7-7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               )}
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', marginTop: '8px', color: selectedPlan === 'pro' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Pro</div>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', marginTop: '8px', color: selectedPlan === 'essential' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Essential</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
-                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'pro' ? '#1A3329' : 'white' }}>$50</span>
-                <span style={{ fontSize: '13px', color: selectedPlan === 'pro' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
+                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'essential' ? '#1A3329' : 'white' }}>$44</span>
+                <span style={{ fontSize: '13px', color: selectedPlan === 'essential' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
               </div>
-              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'pro' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>For groomers serious about growth</p>
+              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'essential' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>For serious groomers</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {proFeatures.map(f => (
+                {essentialFeatures.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    <CheckIcon light={selectedPlan !== 'pro'} />
-                    <span style={{ fontSize: '13px', color: selectedPlan === 'pro' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
+                    <CheckIcon light={selectedPlan !== 'essential'} />
+                    <span style={{ fontSize: '13px', color: selectedPlan === 'essential' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </button>
+
+            <button onClick={() => setSelectedPlan('professional')}
+              className={`plan-card ${selectedPlan === 'professional' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
+              {selectedPlan === 'professional' && (
+                <div style={{ position: 'absolute', top: '14px', right: '14px', width: '24px', height: '24px', borderRadius: '50%', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10l5 5 7-7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              )}
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', color: selectedPlan === 'professional' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Professional</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
+                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'professional' ? '#1A3329' : 'white' }}>$79</span>
+                <span style={{ fontSize: '13px', color: selectedPlan === 'professional' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
+              </div>
+              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'professional' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>Maximum growth & support</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {professionalFeatures.map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <CheckIcon light={selectedPlan !== 'professional'} />
+                    <span style={{ fontSize: '13px', color: selectedPlan === 'professional' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -269,27 +307,24 @@ function ChoosePlanContent() {
 
           </div>
 
-          {/* Error */}
           {error && (
             <div style={{ padding: '10px 16px', borderRadius: '10px', background: 'rgba(254,226,226,0.15)', border: '1px solid rgba(252,165,165,0.3)', fontSize: '13px', color: '#FCA5A5', marginBottom: '12px', textAlign: 'center' }}>
               {error}
             </div>
           )}
 
-          {/* CTA */}
           <button onClick={handleContinue} disabled={loading} className="cta-btn">
             {loading
               ? 'Redirecting to Stripe...'
-              : `Start Free — ${selectedPlan === 'pro' ? '$50' : '$30'}/mo after 30 days →`}
+              : `Start Free — ${planPrices[selectedPlan]}/mo after 30 days →`}
           </button>
 
-          {/* Reassurance */}
           <div style={{ marginTop: '16px', borderRadius: '16px', padding: '16px 20px', textAlign: 'center', background: 'rgba(216,243,220,0.1)', border: '1px solid rgba(216,243,220,0.2)' }}>
             <p style={{ color: 'white', fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
               🔒 No charge today. Your 30-day free trial starts now.
             </p>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }}>
-              After 30 days you'll be billed {selectedPlan === 'pro' ? '$50' : '$30'}/mo. Cancel anytime before then and you pay absolutely nothing.
+              After 30 days you'll be billed {planPrices[selectedPlan]}/mo. Cancel anytime before then and you pay absolutely nothing.
             </p>
           </div>
 
