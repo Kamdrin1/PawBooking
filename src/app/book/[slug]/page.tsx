@@ -1,165 +1,165 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
-interface Service {
-  id: string
-  name: string
-  price: number
-  duration_minutes: number
-  payment_type: 'none' | 'deposit' | 'full'
-  deposit_amount: number
+const pawPositions = [
+  { top: '2%',  left: '1%',  rotate: '-25deg', size: 110, opacity: 0.18 },
+  { top: '8%',  left: '75%', rotate: '40deg',  size: 75,  opacity: 0.14 },
+  { top: '3%',  left: '40%', rotate: '-10deg', size: 55,  opacity: 0.12 },
+  { top: '18%', left: '88%', rotate: '20deg',  size: 130, opacity: 0.16 },
+  { top: '22%', left: '5%',  rotate: '35deg',  size: 90,  opacity: 0.15 },
+  { top: '30%', left: '55%', rotate: '-40deg', size: 65,  opacity: 0.11 },
+  { top: '38%', left: '20%', rotate: '15deg',  size: 45,  opacity: 0.13 },
+  { top: '42%', left: '82%', rotate: '-20deg', size: 100, opacity: 0.17 },
+  { top: '52%', left: '3%',  rotate: '50deg',  size: 80,  opacity: 0.14 },
+  { top: '58%', left: '65%', rotate: '-35deg', size: 55,  opacity: 0.12 },
+  { top: '63%', left: '35%', rotate: '25deg',  size: 120, opacity: 0.15 },
+  { top: '68%', left: '90%', rotate: '-15deg', size: 70,  opacity: 0.16 },
+  { top: '72%', left: '12%', rotate: '45deg',  size: 50,  opacity: 0.13 },
+  { top: '78%', left: '50%', rotate: '-30deg', size: 95,  opacity: 0.14 },
+  { top: '82%', left: '78%', rotate: '10deg',  size: 60,  opacity: 0.12 },
+  { top: '88%', left: '25%', rotate: '-45deg', size: 85,  opacity: 0.16 },
+  { top: '92%', left: '60%', rotate: '30deg',  size: 45,  opacity: 0.13 },
+  { top: '95%', left: '5%',  rotate: '-20deg', size: 115, opacity: 0.15 },
+]
+
+function generateSlug(businessName: string): string {
+  return businessName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }
 
-interface Profile {
-  id: string
-  business_name: string
-  service_area: string
-  payment_methods: string[]
-}
-
-function formatPhone(raw: string): string {
-  const digits = raw.replace(/\D/g, '').replace(/^1/, '')
-  if (digits.length === 0) return ''
-  if (digits.length <= 3) return `+1 (${digits}`
-  if (digits.length <= 6) return `+1 (${digits.slice(0, 3)}) ${digits.slice(3)}`
-  return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
-}
-
-export default function BookingPage() {
-  const params = useParams()
-  const slug = params.slug as string
+export default function SignupPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [businessName, setBusinessName] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [services, setServices] = useState<Service[]>([])
-  const [notFound, setNotFound] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const [clientName, setClientName] = useState('')
-  const [clientPhone, setClientPhone] = useState('')
-  const [clientEmail, setClientEmail] = useState('')
-  const [dogName, setDogName] = useState('')
-  const [dogBreed, setDogBreed] = useState('')
-  const [serviceId, setServiceId] = useState('')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
-  const [notes, setNotes] = useState('')
-  const [smsConsent, setSmsConsent] = useState(false)
-
-  useEffect(() => {
-    async function load() {
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, business_name, service_area, payment_methods')
-        .eq('slug', slug)
-        .single()
-
-      if (!profiles) { setNotFound(true); return }
-      setProfile(profiles)
-
-      const { data: serviceData } = await supabase
-        .from('services').select('*').eq('profile_id', profiles.id).order('name', { ascending: true })
-
-      setServices(serviceData || [])
-      if (serviceData && serviceData.length > 0) setServiceId(serviceData[0].id)
-    }
-    load()
-  }, [slug])
-
-  const selectedService = services.find(s => s.id === serviceId)
-
-  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const digits = e.target.value.replace(/\D/g, '').replace(/^1/, '').slice(0, 10)
-    setClientPhone(formatPhone(digits))
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
-    if (!smsConsent) { setError('Please agree to receive SMS reminders to complete your booking.'); return }
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
 
-    const { error } = await supabase.from('appointments').insert({
-      profile_id: profile!.id,
-      client_name: clientName,
-      client_phone: clientPhone,
-      client_email: clientEmail,
-      dog_name: dogName,
-      dog_breed: dogBreed,
-      service_id: serviceId || null,
-      appointment_date: date,
-      appointment_time: time,
-      notes,
-      status: 'pending',
-      payment_method: 'in_person',
-    })
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    if (signUpError) { setError(signUpError.message); setLoading(false); return }
+    if (!data.user) { setError('Something went wrong. Please try again.'); setLoading(false); return }
 
-    if (error) { setError(error.message); setLoading(false); return }
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) console.error('Sign in after signup failed:', signInError.message)
 
-    fetch('/api/notify-booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clientName, clientPhone, clientEmail, dogName, dogBreed,
-        serviceName: selectedService?.name || 'Appointment',
-        servicePrice: selectedService?.price || 0,
-        date, time, notes,
-        paymentMethod: 'in_person',
-        businessName: profile!.business_name,
-      })
-    })
+    const slug = generateSlug(businessName)
 
-    setSubmitted(true); setLoading(false)
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: data.user.id,
+      email,
+      business_name: businessName,
+      slug: slug,
+    }, { onConflict: 'id' })
+    if (profileError) { setError(profileError.message); setLoading(false); return }
+
+    router.push(`/choose-plan?userId=${data.user.id}&email=${encodeURIComponent(email)}&businessName=${encodeURIComponent(businessName)}`)
   }
 
-  if (notFound) return (
+  return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
-        * { font-family: 'DM Sans', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
         .playfair { font-family: 'Playfair Display', serif; }
-      `}</style>
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F5F2EB' }}>
-        <div className="text-center">
-          <div className="text-5xl mb-4">🐾</div>
-          <h1 className="playfair text-2xl font-bold mb-2" style={{ color: '#1A3329' }}>Groomer not found</h1>
-          <p style={{ color: '#9CA3AF' }}>This booking link doesn&apos;t exist or has been removed.</p>
-        </div>
-      </div>
-    </>
-  )
+        body { background: #1A3329; }
 
-  if (!profile) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F2EB' }}>
-      <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
-    </div>
-  )
+        .signup-root {
+          min-height: 100vh;
+          min-height: 100dvh;
+          background: #1A3329;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          position: relative;
+          overflow: hidden;
+        }
 
-  if (submitted) return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
-        * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
-        .playfair { font-family: 'Playfair Display', serif; }
+        .signup-card {
+          background: white;
+          border-radius: 24px;
+          padding: 36px 32px;
+          width: 100%;
+          max-width: 420px;
+          box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+          position: relative;
+          z-index: 10;
+        }
+
+        .input-field {
+          width: 100%;
+          border: 1.5px solid #E5E7EB;
+          border-radius: 12px;
+          padding: 12px 16px;
+          font-size: 15px;
+          color: #111827;
+          background: white;
+          transition: border-color 0.15s;
+          -webkit-appearance: none;
+        }
+        .input-field:focus { outline: none; border-color: #2D6A4F; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
+        .input-field::placeholder { color: #9CA3AF; }
+        .input-password { padding-right: 48px; }
+
+        .btn-primary {
+          width: 100%;
+          background: linear-gradient(135deg, #1A3329, #2D6A4F);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 14px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 4px 15px rgba(26,51,41,0.3);
+          -webkit-appearance: none;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(26,51,41,0.35); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+        .eye-btn {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #9CA3AF;
+          display: flex;
+          align-items: center;
+          padding: 4px;
+          transition: color 0.15s;
+        }
+        .eye-btn:hover { color: #6B7280; }
+
+        @media (max-width: 480px) {
+          .signup-card { padding: 28px 20px; border-radius: 20px; }
+          .signup-logo-text { font-size: 26px !important; }
+        }
       `}</style>
-      <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: '#F5F2EB' }}>
-        <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-          {[
-            { top: '3%', left: '2%', rotate: '-25deg', size: 100, opacity: 0.06 },
-            { top: '8%', left: '78%', rotate: '40deg', size: 70, opacity: 0.05 },
-            { top: '20%', left: '88%', rotate: '20deg', size: 120, opacity: 0.06 },
-            { top: '25%', left: '4%', rotate: '35deg', size: 85, opacity: 0.05 },
-            { top: '48%', left: '85%', rotate: '-20deg', size: 95, opacity: 0.06 },
-            { top: '68%', left: '32%', rotate: '25deg', size: 110, opacity: 0.06 },
-            { top: '85%', left: '52%', rotate: '-30deg', size: 90, opacity: 0.05 },
-            { top: '93%', left: '22%', rotate: '-45deg', size: 80, opacity: 0.06 },
-          ].map((paw, i) => (
+
+      <div className="signup-root">
+        {/* Paw background */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', userSelect: 'none' }} aria-hidden="true">
+          {pawPositions.map((paw, i) => (
             <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
               style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
-              fill="#1A3329">
+              fill="#000000">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
               <ellipse cx="20" cy="44" rx="12" ry="15"/>
               <ellipse cx="38" cy="33" rx="12" ry="15"/>
@@ -168,275 +168,95 @@ export default function BookingPage() {
             </svg>
           ))}
         </div>
-        <div className="text-center max-w-sm w-full relative z-10">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', boxShadow: '0 8px 24px rgba(45,106,79,0.2)' }}>
-            <svg width="36" height="36" viewBox="0 0 100 100" fill="#1A3329">
-              <ellipse cx="50" cy="70" rx="26" ry="20"/>
-              <ellipse cx="20" cy="44" rx="12" ry="15"/>
-              <ellipse cx="38" cy="33" rx="12" ry="15"/>
-              <ellipse cx="62" cy="33" rx="12" ry="15"/>
-              <ellipse cx="80" cy="44" rx="12" ry="15"/>
-            </svg>
-          </div>
-          <h1 className="playfair text-3xl font-bold mb-3" style={{ color: '#1A3329', letterSpacing: '-0.02em' }}>You&apos;re booked!</h1>
-          <p className="text-base mb-6" style={{ color: '#6B7280', lineHeight: 1.7 }}>
-            Your appointment request has been sent to <strong style={{ color: '#1A3329' }}>{profile.business_name}</strong>. They&apos;ll confirm shortly and you&apos;ll receive a reminder before your appointment.
-          </p>
-          <div className="rounded-2xl p-5 text-left space-y-3"
-            style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.06)' }}>
-            {[
-              { label: 'Client', value: clientName },
-              { label: 'Dog', value: dogName },
-              { label: 'Service', value: selectedService?.name },
-              { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) },
-              { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
-            ].map((row, i) => (
-              <div key={i} className="flex justify-between text-sm" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', paddingBottom: '10px' }}>
-                <span style={{ color: '#9CA3AF' }}>{row.label}</span>
-                <span className="font-semibold" style={{ color: '#1A3329' }}>{row.value}</span>
+
+        <div className="signup-card">
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(26,51,41,0.25)', flexShrink: 0 }}>
+                <svg width="18" height="18" viewBox="0 0 100 100" fill="#D8F3DC">
+                  <ellipse cx="50" cy="70" rx="26" ry="20"/>
+                  <ellipse cx="20" cy="44" rx="12" ry="15"/>
+                  <ellipse cx="38" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="62" cy="33" rx="12" ry="15"/>
+                  <ellipse cx="80" cy="44" rx="12" ry="15"/>
+                </svg>
               </div>
-            ))}
-            <div className="flex justify-between text-sm pt-1">
-              <span className="font-semibold" style={{ color: '#9CA3AF' }}>Price</span>
-              <span className="font-bold text-lg" style={{ color: '#2D6A4F' }}>${selectedService?.price}</span>
+              <span className="playfair signup-logo-text" style={{ fontSize: '28px', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
+            </div>
+            <p style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '10px' }}>Create your free account</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', fontSize: '12px', fontWeight: 700, padding: '5px 14px', borderRadius: '50px', border: '1px solid rgba(45,106,79,0.12)' }}>
+              ✓ 30 days free · No charge today
             </div>
           </div>
-          <p className="text-xs mt-4" style={{ color: '#9CA3AF' }}>You&apos;ll receive an SMS reminder 24 hours before your appointment.</p>
-        </div>
-      </div>
-    </>
-  )
 
-  return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
-        * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        .playfair { font-family: 'Playfair Display', serif; }
-        input, textarea, select { color: #1A3329 !important; }
-        input::placeholder, textarea::placeholder { color: #9CA3AF !important; }
-        input:focus, textarea:focus, select:focus {
-          outline: none; border-color: #2D6A4F !important;
-          box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
-        }
-        .service-card {
-          border: 2px solid rgba(237,233,223,0.8); border-radius: 18px; padding: 16px;
-          cursor: pointer; transition: all 0.2s ease;
-          background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
-        }
-        .service-card:hover { border-color: rgba(45,106,79,0.3); box-shadow: 0 4px 16px rgba(26,51,41,0.08); transform: translateY(-1px); }
-        .service-card.selected {
-          border-color: #1A3329;
-          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
-          box-shadow: 0 4px 16px rgba(26,51,41,0.12);
-        }
-        .form-card {
-          background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
-          border: 1px solid rgba(237,233,223,0.8);
-          border-radius: 20px;
-          box-shadow: 0 2px 12px rgba(26,51,41,0.04);
-        }
-        .submit-btn {
-          background: linear-gradient(135deg, #1A3329, #2D6A4F);
-          color: white; transition: all 0.25s ease;
-          box-shadow: 0 4px 15px rgba(26,51,41,0.25);
-        }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,51,41,0.35); }
-        .submit-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; }
-        label { color: #6B7280; font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
-        .two-col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        @media (max-width: 480px) {
-          .two-col { grid-template-columns: 1fr !important; }
-          .booking-header { padding: 28px 20px 24px !important; }
-          .booking-header-icon { width: 48px !important; height: 48px !important; margin-bottom: 16px !important; }
-          .booking-header-title { font-size: 20px !important; }
-        }
-      `}</style>
-
-      <div className="min-h-screen" style={{ background: '#F5F2EB' }}>
-
-        {/* HEADER */}
-        <div className="booking-header" style={{ background: 'linear-gradient(145deg, #1A3329, #0f2218)', padding: '40px 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '200px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '600px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.2), transparent)' }} />
-
-          <div className="booking-header-icon" style={{ width: '56px', height: '56px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', background: 'rgba(216,243,220,0.12)', border: '1px solid rgba(216,243,220,0.15)', boxShadow: '0 0 24px rgba(45,106,79,0.15)' }}>
-            <svg width="26" height="26" viewBox="0 0 100 100" fill="#D8F3DC">
-              <ellipse cx="50" cy="70" rx="26" ry="20"/>
-              <ellipse cx="20" cy="44" rx="12" ry="15"/>
-              <ellipse cx="38" cy="33" rx="12" ry="15"/>
-              <ellipse cx="62" cy="33" rx="12" ry="15"/>
-              <ellipse cx="80" cy="44" rx="12" ry="15"/>
-            </svg>
-          </div>
-          <h1 className="playfair booking-header-title font-bold text-white mb-1.5" style={{ fontSize: '24px', letterSpacing: '-0.02em' }}>
-            {profile.business_name}
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px' }}>
-            {profile.service_area || 'Professional Dog Grooming'}
-          </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', padding: '6px 16px', borderRadius: '50px', background: 'rgba(216,243,220,0.12)', color: '#D8F3DC', border: '1px solid rgba(216,243,220,0.15)', backdropFilter: 'blur(8px)', fontSize: '12px', fontWeight: 600 }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px rgba(74,222,128,0.6)' }} />
-            Accepting bookings
-          </div>
-        </div>
-
-        <div style={{ maxWidth: '520px', margin: '0 auto', padding: '24px 16px 40px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-            {/* SERVICES */}
-            {services.length > 0 && (
-              <div>
-                <h2 className="font-semibold mb-3" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Select a Service</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {services.map(s => (
-                    <div key={s.id} onClick={() => setServiceId(s.id)} className={`service-card ${serviceId === s.id ? 'selected' : ''}`}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div>
-                          <div className="font-semibold text-sm" style={{ color: '#1A3329', letterSpacing: '-0.01em' }}>{s.name}</div>
-                          <div className="text-xs mt-0.5" style={{ color: '#6B7280' }}>{s.duration_minutes} min</div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span className="font-bold text-sm" style={{ color: '#2D6A4F' }}>${s.price}</span>
-                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${serviceId === s.id ? '#1A3329' : '#D1C9B8'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: serviceId === s.id ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : 'transparent' }}>
-                            {serviceId === s.id && <span style={{ color: 'white', fontSize: '11px' }}>✓</span>}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Business Name</label>
+              <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)}
+                className="input-field" placeholder="Fluffy Paws Grooming" required
+                autoComplete="organization" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                className="input-field" placeholder="you@example.com" required
+                autoComplete="email" inputMode="email" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>Password</label>
+              <div style={{ position: 'relative' }}>
+                <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                  className="input-field input-password" placeholder="••••••••" required minLength={6}
+                  autoComplete="new-password" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="eye-btn">
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
               </div>
-            )}
-
-            {/* DATE & TIME */}
-            <div className="form-card" style={{ padding: '20px' }}>
-              <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Date & Time</h2>
-              <div className="two-col">
-                <div>
-                  <label>Preferred Date *</label>
-                  <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                    required min={new Date().toISOString().split('T')[0]}
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
-                </div>
-                <div>
-                  <label>Preferred Time *</label>
-                  <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                    required
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
-                </div>
-              </div>
+              <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '4px' }}>Minimum 6 characters</p>
             </div>
 
-            {/* YOUR INFO */}
-            <div className="form-card" style={{ padding: '20px' }}>
-              <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Your Info</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div className="two-col">
-                  <div>
-                    <label>Your Name *</label>
-                    <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
-                      placeholder="Jane Smith" required
-                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
-                  </div>
-                  <div>
-                    <label>Phone Number *</label>
-                    <input type="tel" value={clientPhone} onChange={handlePhoneChange}
-                      placeholder="+1 (208) 555-0000" required
-                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
-                  </div>
-                </div>
-                <div>
-                  <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional — for confirmation)</span></label>
-                  <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
-                    placeholder="jane@email.com"
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
-                </div>
-              </div>
-            </div>
-
-            {/* DOG INFO */}
-            <div className="form-card" style={{ padding: '20px' }}>
-              <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>Dog Info</h2>
-              <div className="two-col">
-                <div>
-                  <label>Dog&apos;s Name *</label>
-                  <input type="text" value={dogName} onChange={e => setDogName(e.target.value)}
-                    placeholder="Buddy" required
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
-                </div>
-                <div>
-                  <label>Breed</label>
-                  <input type="text" value={dogBreed} onChange={e => setDogBreed(e.target.value)}
-                    placeholder="Golden Retriever"
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
-                </div>
-              </div>
-            </div>
-
-            {/* NOTES */}
-            <div className="form-card" style={{ padding: '20px' }}>
-              <h2 className="font-semibold mb-4" style={{ color: '#1A3329', fontSize: '15px', letterSpacing: '-0.01em' }}>
-                Additional Notes <span style={{ fontWeight: 400, fontSize: '13px', color: '#9CA3AF' }}>(optional)</span>
-              </h2>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-                placeholder="Allergies, special instructions, temperament notes..."
-                style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', resize: 'none', color: '#1A3329' }} />
-            </div>
-
-            {/* BOOKING SUMMARY */}
-            {selectedService && date && time && (
-              <div style={{ borderRadius: '20px', padding: '20px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.15)', boxShadow: '0 4px 16px rgba(45,106,79,0.1)' }}>
-                <h2 style={{ fontWeight: 700, marginBottom: '12px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1A5C36' }}>Booking Summary</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {[
-                    { label: 'Service', value: selectedService.name },
-                    { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) },
-                    { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
-                  ].map((row, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                      <span style={{ color: '#2D6A4F' }}>{row.label}</span>
-                      <span style={{ fontWeight: 600, color: '#1A3329' }}>{row.value}</span>
-                    </div>
-                  ))}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingTop: '8px', borderTop: '1px solid rgba(45,106,79,0.2)' }}>
-                    <span style={{ fontWeight: 600, color: '#2D6A4F' }}>Total</span>
-                    <span style={{ fontWeight: 700, fontSize: '16px', color: '#1A3329' }}>${selectedService.price}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SMS CONSENT */}
-            <div style={{ borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: `2px solid ${smsConsent ? 'rgba(45,106,79,0.3)' : 'rgba(237,233,223,0.8)'}`, boxShadow: smsConsent ? '0 4px 12px rgba(45,106,79,0.08)' : 'none', transition: 'all 0.2s' }}>
-              <input type="checkbox" id="sms-consent" checked={smsConsent}
-                onChange={e => setSmsConsent(e.target.checked)}
-                style={{ width: '18px', height: '18px', marginTop: '2px', flexShrink: 0, accentColor: '#1A3329', cursor: 'pointer' }} />
-              <label htmlFor="sms-consent" style={{ color: '#4B5563', fontSize: '12px', fontWeight: 400, marginBottom: 0, cursor: 'pointer', lineHeight: 1.7 }}>
-                I agree to receive SMS appointment reminders from {profile.business_name} via PawBooking. Message frequency varies. Message & data rates may apply. Your mobile information will not be sold or shared with third parties for promotional or marketing purposes. Reply <strong>STOP</strong> to opt out at any time.
-              </label>
-            </div>
-
-            {/* ERROR */}
             {error && (
-              <div style={{ padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }}>
+              <div style={{ padding: '10px 14px', borderRadius: '10px', background: '#FEE2E2', border: '1px solid #FECACA', fontSize: '13px', color: '#DC2626' }}>
                 {error}
               </div>
             )}
 
-            {/* SUBMIT */}
-            <button type="submit" disabled={loading || !smsConsent} className="submit-btn"
-              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Creating account...' : 'Continue →'}
             </button>
-
-            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', lineHeight: 1.7 }}>
-              Your request will be confirmed by {profile.business_name}. You&apos;ll receive an SMS reminder before your appointment.
-            </p>
-
           </form>
+
+          {/* Social proof */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+            <div style={{ display: 'flex' }}>
+              {['#52B788', '#E76F51', '#2D6A4F', '#F4A261'].map((c, i) => (
+                <div key={i} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', background: c, marginLeft: i > 0 ? '-6px' : 0 }}>
+                  {['S', 'M', 'J', 'R'][i]}
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Trusted by <span style={{ color: '#2D6A4F', fontWeight: 600 }}>37+ dog groomers</span></p>
+          </div>
+
+          <div style={{ borderTop: '1px solid #F3F4F6', marginTop: '20px', paddingTop: '16px' }}>
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', marginBottom: '8px' }}>30 days free · Cancel anytime</p>
+            <p style={{ textAlign: 'center', fontSize: '14px', color: '#9CA3AF' }}>
+              Already have an account?{' '}
+              <Link href="/login" style={{ color: '#2D6A4F', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+            </p>
+          </div>
         </div>
       </div>
     </>
