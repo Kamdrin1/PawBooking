@@ -23,6 +23,7 @@ interface Profile {
   plan: string
   payment_methods: string[]
   google_review_link: string
+  slug: string
 }
 
 interface Service {
@@ -604,8 +605,8 @@ export default function DashboardPage() {
   const starterLimit = 25
   const apptLimitPct = Math.min((monthlyApptCount / starterLimit) * 100, 100)
   const bookingUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
-    : `https://pawbooking.net/book/${profile?.business_name?.toLowerCase().replace(/\s+/g, '-')}`
+    ? `${window.location.origin}/book/${profile?.slug}`
+    : `https://pawbooking.net/book/${profile?.slug}`
 
   function formatTime(time: string) {
     const [h, m] = time.split(':'); const hour = parseInt(h)
