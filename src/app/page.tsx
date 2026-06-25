@@ -537,7 +537,7 @@ export default function Home() {
 
             <div style={{ background: 'linear-gradient(135deg, rgba(232,112,74,0.05), rgba(232,112,74,0.02))', border: '1px solid rgba(232,112,74,0.1)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
               <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>Don't see your question?</p>
-              <a href="mailto:hello@pawbooking.net" style={{ color: '#E8704A', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
+              <a href="mailto:team@pawbooking.net" style={{ color: '#E8704A', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
                 Get in touch →
               </a>
             </div>
