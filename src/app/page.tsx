@@ -8,25 +8,25 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const pawPositions = [
-  { top: '3%',  left: '2%',  rotate: '-25deg', size: 90,  opacity: 0.15 },
-  { top: '8%',  left: '78%', rotate: '40deg',  size: 65,  opacity: 0.12 },
-  { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 0.10 },
-  { top: '15%', left: '88%', rotate: '20deg',  size: 110, opacity: 0.15 },
-  { top: '20%', left: '4%',  rotate: '35deg',  size: 80,  opacity: 0.12 },
-  { top: '28%', left: '58%', rotate: '-40deg', size: 55,  opacity: 0.10 },
-  { top: '35%', left: '18%', rotate: '15deg',  size: 40,  opacity: 0.12 },
-  { top: '42%', left: '85%', rotate: '-20deg', size: 95,  opacity: 0.15 },
-  { top: '50%', left: '2%',  rotate: '50deg',  size: 70,  opacity: 0.12 },
-  { top: '55%', left: '65%', rotate: '-35deg', size: 50,  opacity: 0.10 },
-  { top: '62%', left: '32%', rotate: '25deg',  size: 110, opacity: 0.15 },
-  { top: '68%', left: '90%', rotate: '-15deg', size: 60,  opacity: 0.12 },
-  { top: '72%', left: '10%', rotate: '45deg',  size: 45,  opacity: 0.10 },
-  { top: '78%', left: '52%', rotate: '-30deg', size: 85,  opacity: 0.12 },
-  { top: '83%', left: '75%', rotate: '10deg',  size: 55,  opacity: 0.10 },
-  { top: '88%', left: '22%', rotate: '-45deg', size: 80,  opacity: 0.15 },
-  { top: '93%', left: '60%', rotate: '30deg',  size: 45,  opacity: 0.12 },
-  { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 0.15 },
-]
+    { top: '3%',  left: '2%',  rotate: '-25deg', size: 90,  opacity: 1 },
+    { top: '8%',  left: '78%', rotate: '40deg',  size: 65,  opacity: 1 },
+    { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 1 },
+    { top: '15%', left: '88%', rotate: '20deg',  size: 110, opacity: 1 },
+    { top: '20%', left: '4%',  rotate: '35deg',  size: 80,  opacity: 1 },
+    { top: '28%', left: '58%', rotate: '-40deg', size: 55,  opacity: 1 },
+    { top: '35%', left: '18%', rotate: '15deg',  size: 40,  opacity: 1 },
+    { top: '42%', left: '85%', rotate: '-20deg', size: 95,  opacity: 1 },
+    { top: '50%', left: '2%',  rotate: '50deg',  size: 70,  opacity: 1 },
+    { top: '55%', left: '65%', rotate: '-35deg', size: 50,  opacity: 1 },
+    { top: '62%', left: '32%', rotate: '25deg',  size: 110, opacity: 1 },
+    { top: '68%', left: '90%', rotate: '-15deg', size: 60,  opacity: 1 },
+    { top: '72%', left: '10%', rotate: '45deg',  size: 45,  opacity: 1 },
+    { top: '78%', left: '52%', rotate: '-30deg', size: 85,  opacity: 1 },
+    { top: '83%', left: '75%', rotate: '10deg',  size: 55,  opacity: 1 },
+    { top: '88%', left: '22%', rotate: '-45deg', size: 80,  opacity: 1 },
+    { top: '93%', left: '60%', rotate: '30deg',  size: 45,  opacity: 1 },
+    { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 1 },
+  ]
 
   async function handleEssentialSignup() {
     router.push('/signup?plan=essential')
@@ -208,19 +208,6 @@ export default function Home() {
           font-size: 20px;
         }
 
-        .paw-bg {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          pointer-events: none;
-          z-index: 0;
-          width: 100vw;
-          height: 100vh;
-          overflow: hidden;
-        }
-
         .page-wrapper {
           position: relative;
           z-index: 1;
@@ -266,20 +253,30 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Paw background - FIXED POSITIONING */}
-      <div className="paw-bg" aria-hidden="true">
-        {pawPositions.map((paw, i) => (
-  <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
-    style={{ position: 'fixed', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: 1 }}
-    fill="red">
-    <ellipse cx="50" cy="70" rx="26" ry="20"/>
-    <ellipse cx="20" cy="44" rx="12" ry="15"/>
-    <ellipse cx="38" cy="33" rx="12" ry="15"/>
-    <ellipse cx="62" cy="33" rx="12" ry="15"/>
-    <ellipse cx="80" cy="44" rx="12" ry="15"/>
-  </svg>
-))}
-      </div>
+      {/* RED PAW PRINTS - TEST */}
+      {pawPositions.map((paw, i) => (
+        <svg 
+          key={i} 
+          width={paw.size} 
+          height={paw.size} 
+          viewBox="0 0 100 100"
+          style={{ 
+            position: 'fixed', 
+            top: paw.top, 
+            left: paw.left, 
+            transform: `rotate(${paw.rotate})`, 
+            opacity: 1,
+            zIndex: 0,
+            pointerEvents: 'none'
+          }}
+          fill="red">
+          <ellipse cx="50" cy="70" rx="26" ry="20"/>
+          <ellipse cx="20" cy="44" rx="12" ry="15"/>
+          <ellipse cx="38" cy="33" rx="12" ry="15"/>
+          <ellipse cx="62" cy="33" rx="12" ry="15"/>
+          <ellipse cx="80" cy="44" rx="12" ry="15"/>
+        </svg>
+      ))}
 
       <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
