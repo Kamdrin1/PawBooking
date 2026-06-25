@@ -7,27 +7,6 @@ export default function Home() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const pawPositions = [
-    { top: '3%',  left: '2%',  rotate: '-25deg', size: 90,  opacity: 1 },
-    { top: '8%',  left: '78%', rotate: '40deg',  size: 65,  opacity: 1 },
-    { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 1 },
-    { top: '15%', left: '88%', rotate: '20deg',  size: 110, opacity: 1 },
-    { top: '20%', left: '4%',  rotate: '35deg',  size: 80,  opacity: 1 },
-    { top: '28%', left: '58%', rotate: '-40deg', size: 55,  opacity: 1 },
-    { top: '35%', left: '18%', rotate: '15deg',  size: 40,  opacity: 1 },
-    { top: '42%', left: '85%', rotate: '-20deg', size: 95,  opacity: 1 },
-    { top: '50%', left: '2%',  rotate: '50deg',  size: 70,  opacity: 1 },
-    { top: '55%', left: '65%', rotate: '-35deg', size: 50,  opacity: 1 },
-    { top: '62%', left: '32%', rotate: '25deg',  size: 110, opacity: 1 },
-    { top: '68%', left: '90%', rotate: '-15deg', size: 60,  opacity: 1 },
-    { top: '72%', left: '10%', rotate: '45deg',  size: 45,  opacity: 1 },
-    { top: '78%', left: '52%', rotate: '-30deg', size: 85,  opacity: 1 },
-    { top: '83%', left: '75%', rotate: '10deg',  size: 55,  opacity: 1 },
-    { top: '88%', left: '22%', rotate: '-45deg', size: 80,  opacity: 1 },
-    { top: '93%', left: '60%', rotate: '30deg',  size: 45,  opacity: 1 },
-    { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 1 },
-  ]
-
   async function handleEssentialSignup() {
     router.push('/signup?plan=essential')
   }
@@ -253,30 +232,9 @@ export default function Home() {
         }
       `}</style>
 
-      {/* RED PAW PRINTS - TEST */}
-      {pawPositions.map((paw, i) => (
-        <svg 
-          key={i} 
-          width={paw.size} 
-          height={paw.size} 
-          viewBox="0 0 100 100"
-          style={{ 
-            position: 'fixed', 
-            top: paw.top, 
-            left: paw.left, 
-            transform: `rotate(${paw.rotate})`, 
-            opacity: 1,
-            zIndex: 0,
-            pointerEvents: 'none'
-          }}
-          fill="red">
-          <ellipse cx="50" cy="70" rx="26" ry="20"/>
-          <ellipse cx="20" cy="44" rx="12" ry="15"/>
-          <ellipse cx="38" cy="33" rx="12" ry="15"/>
-          <ellipse cx="62" cy="33" rx="12" ry="15"/>
-          <ellipse cx="80" cy="44" rx="12" ry="15"/>
-        </svg>
-      ))}
+      {/* TEST - SIMPLE RED AND BLUE BOXES */}
+      <div style={{ position: 'fixed', top: '10%', left: '10%', width: '100px', height: '100px', background: 'red', zIndex: 0 }} />
+      <div style={{ position: 'fixed', top: '20%', left: '50%', width: '100px', height: '100px', background: 'blue', zIndex: 0 }} />
 
       <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
