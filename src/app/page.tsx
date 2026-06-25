@@ -210,7 +210,7 @@ export default function Home() {
 
         .page-wrapper {
           position: relative;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .paw-bg {
@@ -218,10 +218,11 @@ export default function Home() {
           top: 0;
           left: 0;
           right: 0;
+          bottom: 0;
           pointer-events: none;
           z-index: 0;
           width: 100%;
-          min-height: 100%;
+          height: 100%;
         }
 
         .page-content {
@@ -269,7 +270,7 @@ export default function Home() {
         }
       `}</style>
 
-      <div className="page-wrapper">
+      <div className="page-wrapper" style={{ minHeight: '100%' }}>
         {/* Paw background */}
         <div className="paw-bg" aria-hidden="true">
           {pawPositions.map((paw, i) => (
