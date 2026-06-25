@@ -232,9 +232,11 @@ export default function Home() {
         }
       `}</style>
 
-      {/* TEST - SIMPLE RED AND BLUE BOXES */}
-      <div style={{ position: 'fixed', top: '10%', left: '10%', width: '100px', height: '100px', background: 'red', zIndex: 9999 }} />
-      <div style={{ position: 'fixed', top: '20%', left: '50%', width: '100px', height: '100px', background: 'blue', zIndex: 9999 }} />
+      {/* PAW BG CONTAINER - absolute positioned */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '600px', overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '100px', height: '100px', background: 'red', zIndex: 0 }} />
+        <div style={{ position: 'absolute', top: '20%', left: '50%', width: '100px', height: '100px', background: 'blue', zIndex: 0 }} />
+      </div>
 
       <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
