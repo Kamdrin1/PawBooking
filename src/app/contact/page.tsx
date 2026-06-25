@@ -92,13 +92,13 @@ export default function Contact() {
 
         {/* Contact Cards */}
         <div style={{ marginBottom: '24px' }}>
-          <a href="mailto:kamdrinoverholt@gmail.com" className="contact-card">
+          <a href="mailto:team@pawbooking.net" className="contact-card">
             <div className="contact-icon" style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '20px' }}>
               ✉️
             </div>
             <div>
               <div style={{ fontWeight: 600, fontSize: '15px', color: '#1A3329', marginBottom: '2px' }}>Email Support</div>
-              <div style={{ fontSize: '14px', color: '#2D6A4F' }}>kamdrinoverholt@gmail.com</div>
+              <div style={{ fontSize: '14px', color: '#2D6A4F' }}>team@pawbooking.net</div>
               <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>We typically respond within 24 hours</div>
             </div>
           </a>
@@ -119,7 +119,7 @@ export default function Contact() {
         <div style={{ padding: '20px 24px', borderRadius: '16px', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', textAlign: 'left' }}>
           <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', marginBottom: '8px' }}>📱 SMS Opt-Out</div>
           <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.7, margin: 0 }}>
-            To stop receiving SMS appointment reminders, reply <strong style={{ color: '#1A3329' }}>STOP</strong> to any message. To resume, reply <strong style={{ color: '#1A3329' }}>START</strong>. For help, reply <strong style={{ color: '#1A3329' }}>HELP</strong> or email us at kamdrinoverholt@gmail.com.
+            To stop receiving SMS appointment reminders, reply <strong style={{ color: '#1A3329' }}>STOP</strong> to any message. To resume, reply <strong style={{ color: '#1A3329' }}>START</strong>. For help, reply <strong style={{ color: '#1A3329' }}>HELP</strong> or email us at team@pawbooking.net.
           </p>
         </div>
       </div>
