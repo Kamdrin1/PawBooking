@@ -214,13 +214,14 @@ export default function Home() {
         }
 
         .paw-bg {
-          position: fixed;
+          position: absolute;
           top: 0;
           left: 0;
           right: 0;
-          bottom: 0;
           pointer-events: none;
           z-index: 0;
+          width: 100%;
+          min-height: 100%;
         }
 
         .page-content {
@@ -273,7 +274,7 @@ export default function Home() {
         <div className="paw-bg" aria-hidden="true">
           {pawPositions.map((paw, i) => (
             <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
-              style={{ position: 'fixed', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
+              style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
               fill="#1A3329">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
               <ellipse cx="20" cy="44" rx="12" ry="15"/>
