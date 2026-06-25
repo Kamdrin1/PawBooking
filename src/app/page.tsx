@@ -233,6 +233,7 @@ export default function Home() {
         <a href="#features" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Features</a>
         <a href="#how" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>How It Works</a>
         <a href="#pricing" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Pricing</a>
+        <a href="/contact" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Contact</a>
         <Link href="/login" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Log in</Link>
         <Link href="/signup" className="btn-primary" onClick={() => setMenuOpen(false)} style={{ fontSize: '15px', padding: '14px 32px' }}>Start Free Trial</Link>
       </div>
@@ -260,6 +261,7 @@ export default function Home() {
               <a href="#features" className="nav-link">Features</a>
               <a href="#how" className="nav-link">How It Works</a>
               <a href="#pricing" className="nav-link">Pricing</a>
+              <a href="/contact" className="nav-link">Contact</a>
             </div>
             <div className="desktop-cta" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
               <Link href="/login" className="nav-link">Log in</Link>
