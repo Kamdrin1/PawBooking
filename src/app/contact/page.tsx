@@ -1,6 +1,27 @@
 export default function Contact() {
+  const pawPositions = [
+    { top: '3%',  left: '2%',  rotate: '-25deg', size: 90,  opacity: 0.06 },
+    { top: '8%',  left: '78%', rotate: '40deg',  size: 65,  opacity: 0.05 },
+    { top: '5%',  left: '42%', rotate: '-10deg', size: 50,  opacity: 0.04 },
+    { top: '15%', left: '88%', rotate: '20deg',  size: 110, opacity: 0.06 },
+    { top: '20%', left: '4%',  rotate: '35deg',  size: 80,  opacity: 0.05 },
+    { top: '28%', left: '58%', rotate: '-40deg', size: 55,  opacity: 0.04 },
+    { top: '35%', left: '18%', rotate: '15deg',  size: 40,  opacity: 0.05 },
+    { top: '42%', left: '85%', rotate: '-20deg', size: 95,  opacity: 0.06 },
+    { top: '50%', left: '2%',  rotate: '50deg',  size: 70,  opacity: 0.05 },
+    { top: '55%', left: '65%', rotate: '-35deg', size: 50,  opacity: 0.04 },
+    { top: '62%', left: '32%', rotate: '25deg',  size: 110, opacity: 0.06 },
+    { top: '68%', left: '90%', rotate: '-15deg', size: 60,  opacity: 0.05 },
+    { top: '72%', left: '10%', rotate: '45deg',  size: 45,  opacity: 0.04 },
+    { top: '78%', left: '52%', rotate: '-30deg', size: 85,  opacity: 0.05 },
+    { top: '83%', left: '75%', rotate: '10deg',  size: 55,  opacity: 0.04 },
+    { top: '88%', left: '22%', rotate: '-45deg', size: 80,  opacity: 0.06 },
+    { top: '93%', left: '60%', rotate: '30deg',  size: 45,  opacity: 0.05 },
+    { top: '96%', left: '8%',  rotate: '-20deg', size: 100, opacity: 0.06 },
+  ]
+
   return (
-    <div style={{ background: '#F5F2EB', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: '#F5F2EB', minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
         * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,6 +35,8 @@ export default function Contact() {
           display: flex;
           align-items: center;
           gap: 10px;
+          position: relative;
+          z-index: 10;
         }
 
         .contact-wrapper {
@@ -21,6 +44,8 @@ export default function Contact() {
           display: flex;
           align-items: center;
           justify-content: center;
+          position: relative;
+          z-index: 10;
         }
 
         .contact-content {
@@ -66,32 +91,6 @@ export default function Contact() {
           margin: 0;
         }
 
-        .divider {
-          height: 1px;
-          background: rgba(237,233,223,0.6);
-          margin: 24px 0;
-        }
-
-        .sms-section {
-          padding: 16px 18px;
-          background: rgba(216,243,220,0.06);
-          border-radius: 14px;
-          border: 1px solid rgba(45,106,79,0.06);
-          text-align: left;
-        }
-
-        .sms-section p {
-          font-size: 13px;
-          color: #6B7280;
-          line-height: 1.7;
-          margin: 0;
-        }
-
-        .sms-section strong {
-          color: #1A3329;
-          font-weight: 600;
-        }
-
         .legal-footer {
           background: #1A3329;
           padding: 24px;
@@ -99,7 +98,8 @@ export default function Contact() {
           justify-content: center;
           gap: 24px;
           flex-wrap: wrap;
-          margin-top: auto;
+          position: relative;
+          z-index: 10;
         }
 
         @media (max-width: 480px) {
@@ -109,6 +109,21 @@ export default function Contact() {
           .contact-desc { font-size: 15px !important; }
         }
       `}</style>
+
+      {/* Paw background */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} aria-hidden="true">
+        {pawPositions.map((paw, i) => (
+          <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
+            style={{ position: 'absolute', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
+            fill="#1A3329">
+            <ellipse cx="50" cy="70" rx="26" ry="20"/>
+            <ellipse cx="20" cy="44" rx="12" ry="15"/>
+            <ellipse cx="38" cy="33" rx="12" ry="15"/>
+            <ellipse cx="62" cy="33" rx="12" ry="15"/>
+            <ellipse cx="80" cy="44" rx="12" ry="15"/>
+          </svg>
+        ))}
+      </div>
 
       {/* Nav */}
       <nav className="legal-nav">
@@ -151,15 +166,6 @@ export default function Contact() {
               <p>Email us anytime</p>
             </div>
           </a>
-
-          <div className="divider" />
-
-          {/* SMS Info */}
-          <div className="sms-section">
-            <p>
-              To stop SMS reminders, reply <strong>STOP</strong>. Reply <strong>START</strong> to resume, or <strong>HELP</strong> for assistance.
-            </p>
-          </div>
         </div>
       </div>
 
