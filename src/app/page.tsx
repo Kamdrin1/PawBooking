@@ -233,8 +233,8 @@ export default function Home() {
       `}</style>
 
       {/* TEST - SIMPLE RED AND BLUE BOXES */}
-      <div style={{ position: 'fixed', top: '10%', left: '10%', width: '100px', height: '100px', background: 'red', zIndex: 0 }} />
-      <div style={{ position: 'fixed', top: '20%', left: '50%', width: '100px', height: '100px', background: 'blue', zIndex: 0 }} />
+      <div style={{ position: 'fixed', top: '10%', left: '10%', width: '100px', height: '100px', background: 'red', zIndex: 9999 }} />
+      <div style={{ position: 'fixed', top: '20%', left: '50%', width: '100px', height: '100px', background: 'blue', zIndex: 9999 }} />
 
       <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
