@@ -234,10 +234,13 @@ export default function Home() {
 
       <div className="page-wrapper" style={{ position: 'relative' }}>
         {/* PAW BG */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '600px', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '5%', left: '8%', width: '120px', height: '120px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', top: '12%', right: '10%', width: '85px', height: '85px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', bottom: '10%', left: '12%', width: '75px', height: '75px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '5%', left: '8%', width: '120px', height: '120px', background: '#1A3329', opacity: 0.08, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', top: '12%', right: '10%', width: '85px', height: '85px', background: '#1A3329', opacity: 0.06, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', bottom: '10%', left: '12%', width: '75px', height: '75px', background: '#1A3329', opacity: 0.05, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', top: '35%', right: '5%', width: '100px', height: '100px', background: '#1A3329', opacity: 0.07, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', top: '60%', left: '6%', width: '95px', height: '95px', background: '#1A3329', opacity: 0.06, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', top: '75%', right: '12%', width: '70px', height: '70px', background: '#1A3329', opacity: 0.05, borderRadius: '50%' }} />
         </div>
 
         {/* MOBILE NAV DRAWER */}
