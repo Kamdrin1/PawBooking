@@ -233,29 +233,29 @@ export default function Home() {
       `}</style>
 
       {/* PAW BG CONTAINER */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '600px', overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-        <svg style={{ position: 'absolute', top: '5%', left: '8%', opacity: 0.08, transform: 'rotate(-25deg)' }} width="120" height="120" viewBox="0 0 100 100" fill="#1A3329">
-          <ellipse cx="50" cy="70" rx="26" ry="20"/>
-          <ellipse cx="20" cy="44" rx="12" ry="15"/>
-          <ellipse cx="38" cy="33" rx="12" ry="15"/>
-          <ellipse cx="62" cy="33" rx="12" ry="15"/>
-          <ellipse cx="80" cy="44" rx="12" ry="15"/>
-        </svg>
-        <svg style={{ position: 'absolute', top: '12%', right: '10%', opacity: 0.06, transform: 'rotate(35deg)' }} width="85" height="85" viewBox="0 0 100 100" fill="#1A3329">
-          <ellipse cx="50" cy="70" rx="26" ry="20"/>
-          <ellipse cx="20" cy="44" rx="12" ry="15"/>
-          <ellipse cx="38" cy="33" rx="12" ry="15"/>
-          <ellipse cx="62" cy="33" rx="12" ry="15"/>
-          <ellipse cx="80" cy="44" rx="12" ry="15"/>
-        </svg>
-        <svg style={{ position: 'absolute', bottom: '10%', left: '12%', opacity: 0.05, transform: 'rotate(15deg)' }} width="75" height="75" viewBox="0 0 100 100" fill="#1A3329">
-          <ellipse cx="50" cy="70" rx="26" ry="20"/>
-          <ellipse cx="20" cy="44" rx="12" ry="15"/>
-          <ellipse cx="38" cy="33" rx="12" ry="15"/>
-          <ellipse cx="62" cy="33" rx="12" ry="15"/>
-          <ellipse cx="80" cy="44" rx="12" ry="15"/>
-        </svg>
-      </div>
+<div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh', overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+  <svg style={{ position: 'absolute', top: '5%', left: '8%', opacity: 0.4, transform: 'rotate(-25deg)' }} width="120" height="120" viewBox="0 0 100 100" fill="#1A3329">
+    <ellipse cx="50" cy="70" rx="26" ry="20"/>
+    <ellipse cx="20" cy="44" rx="12" ry="15"/>
+    <ellipse cx="38" cy="33" rx="12" ry="15"/>
+    <ellipse cx="62" cy="33" rx="12" ry="15"/>
+    <ellipse cx="80" cy="44" rx="12" ry="15"/>
+  </svg>
+  <svg style={{ position: 'absolute', top: '12%', right: '10%', opacity: 0.4, transform: 'rotate(35deg)' }} width="85" height="85" viewBox="0 0 100 100" fill="#1A3329">
+    <ellipse cx="50" cy="70" rx="26" ry="20"/>
+    <ellipse cx="20" cy="44" rx="12" ry="15"/>
+    <ellipse cx="38" cy="33" rx="12" ry="15"/>
+    <ellipse cx="62" cy="33" rx="12" ry="15"/>
+    <ellipse cx="80" cy="44" rx="12" ry="15"/>
+  </svg>
+  <svg style={{ position: 'absolute', bottom: '10%', left: '12%', opacity: 0.4, transform: 'rotate(15deg)' }} width="75" height="75" viewBox="0 0 100 100" fill="#1A3329">
+    <ellipse cx="50" cy="70" rx="26" ry="20"/>
+    <ellipse cx="20" cy="44" rx="12" ry="15"/>
+    <ellipse cx="38" cy="33" rx="12" ry="15"/>
+    <ellipse cx="62" cy="33" rx="12" ry="15"/>
+    <ellipse cx="80" cy="44" rx="12" ry="15"/>
+  </svg>
+</div>
 
       <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
