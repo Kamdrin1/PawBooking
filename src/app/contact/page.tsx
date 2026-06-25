@@ -24,7 +24,7 @@ export default function Contact() {
         }
 
         .contact-content {
-          max-width: 440px;
+          max-width: 500px;
           width: 100%;
           padding: 24px;
           text-align: center;
@@ -33,31 +33,31 @@ export default function Contact() {
         .contact-card {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 16px 18px;
-          border-radius: 14px;
+          gap: 16px;
+          padding: 20px 20px;
+          border-radius: 16px;
           background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
           border: 1px solid rgba(237,233,223,0.8);
           text-align: left;
           transition: all 0.15s;
           text-decoration: none;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
           display: flex;
         }
-        .contact-card:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,51,41,0.06); }
+        .contact-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,51,41,0.08); }
 
         .contact-icon {
-          width: 36px; height: 36px; border-radius: 10px;
+          width: 42px; height: 42px; border-radius: 12px;
           background: linear-gradient(135deg, #D8F3DC, #c8eacd);
           display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0; font-size: 16px;
+          flex-shrink: 0; font-size: 18px;
         }
 
         .contact-text h3 {
           font-weight: 600;
-          font-size: 14px;
+          font-size: 15px;
           color: #1A3329;
-          margin-bottom: 2px;
+          margin-bottom: 3px;
         }
 
         .contact-text p {
@@ -69,21 +69,21 @@ export default function Contact() {
         .divider {
           height: 1px;
           background: rgba(237,233,223,0.6);
-          margin: 20px 0;
+          margin: 24px 0;
         }
 
         .sms-section {
-          padding: 14px 16px;
+          padding: 16px 18px;
           background: rgba(216,243,220,0.06);
-          border-radius: 12px;
+          border-radius: 14px;
           border: 1px solid rgba(45,106,79,0.06);
           text-align: left;
         }
 
         .sms-section p {
-          font-size: 12px;
+          font-size: 13px;
           color: #6B7280;
-          line-height: 1.6;
+          line-height: 1.7;
           margin: 0;
         }
 
@@ -105,8 +105,8 @@ export default function Contact() {
         @media (max-width: 480px) {
           .legal-nav { padding: 14px 16px; }
           .contact-content { padding: 20px 16px; }
-          .contact-h1 { font-size: 26px !important; }
-          .contact-desc { font-size: 14px !important; }
+          .contact-h1 { font-size: 28px !important; }
+          .contact-desc { font-size: 15px !important; }
         }
       `}</style>
 
@@ -128,8 +128,8 @@ export default function Contact() {
 
       <div className="contact-wrapper">
         <div className="contact-content">
-          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', boxShadow: '0 6px 16px rgba(26,51,41,0.15)' }}>
-            <svg width="20" height="20" viewBox="0 0 100 100" fill="#D8F3DC">
+          <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 8px 24px rgba(26,51,41,0.15)' }}>
+            <svg width="22" height="22" viewBox="0 0 100 100" fill="#D8F3DC">
               <ellipse cx="50" cy="70" rx="26" ry="20"/>
               <ellipse cx="20" cy="44" rx="12" ry="15"/>
               <ellipse cx="38" cy="33" rx="12" ry="15"/>
@@ -138,8 +138,8 @@ export default function Contact() {
             </svg>
           </div>
 
-          <h1 className="playfair contact-h1" style={{ fontSize: '28px', fontWeight: 700, color: '#1A3329', marginBottom: '10px', letterSpacing: '-0.02em' }}>Get in Touch</h1>
-          <p className="contact-desc" style={{ color: '#6B7280', fontSize: '14px', lineHeight: 1.6, marginBottom: '28px' }}>
+          <h1 className="playfair contact-h1" style={{ fontSize: '32px', fontWeight: 700, color: '#1A3329', marginBottom: '12px', letterSpacing: '-0.02em' }}>Get in Touch</h1>
+          <p className="contact-desc" style={{ color: '#6B7280', fontSize: '16px', lineHeight: 1.7, marginBottom: '32px' }}>
             Questions about PawBooking? Reach out and we'll get back to you within 24 hours.
           </p>
 
