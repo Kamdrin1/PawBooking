@@ -269,16 +269,16 @@ export default function Home() {
       {/* Paw background - FIXED POSITIONING */}
       <div className="paw-bg" aria-hidden="true">
         {pawPositions.map((paw, i) => (
-          <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
-            style={{ position: 'fixed', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: paw.opacity }}
-            fill="#1A3329">
-            <ellipse cx="50" cy="70" rx="26" ry="20"/>
-            <ellipse cx="20" cy="44" rx="12" ry="15"/>
-            <ellipse cx="38" cy="33" rx="12" ry="15"/>
-            <ellipse cx="62" cy="33" rx="12" ry="15"/>
-            <ellipse cx="80" cy="44" rx="12" ry="15"/>
-          </svg>
-        ))}
+  <svg key={i} width={paw.size} height={paw.size} viewBox="0 0 100 100"
+    style={{ position: 'fixed', top: paw.top, left: paw.left, transform: `rotate(${paw.rotate})`, opacity: 1 }}
+    fill="red">
+    <ellipse cx="50" cy="70" rx="26" ry="20"/>
+    <ellipse cx="20" cy="44" rx="12" ry="15"/>
+    <ellipse cx="38" cy="33" rx="12" ry="15"/>
+    <ellipse cx="62" cy="33" rx="12" ry="15"/>
+    <ellipse cx="80" cy="44" rx="12" ry="15"/>
+  </svg>
+))}
       </div>
 
       <div className="page-wrapper">
