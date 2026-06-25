@@ -232,14 +232,14 @@ export default function Home() {
         }
       `}</style>
 
-      {/* PAW BG CONTAINER */}
-<div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
-  <div style={{ position: 'absolute', top: '5%', left: '8%', width: '120px', height: '120px', background: '#1A3329', opacity: 0.08, borderRadius: '50%', transform: 'rotate(-25deg)' }} />
-  <div style={{ position: 'absolute', top: '12%', right: '10%', width: '85px', height: '85px', background: '#1A3329', opacity: 0.06, borderRadius: '50%', transform: 'rotate(35deg)' }} />
-  <div style={{ position: 'absolute', bottom: '10%', left: '12%', width: '75px', height: '75px', background: '#1A3329', opacity: 0.05, borderRadius: '50%', transform: 'rotate(15deg)' }} />
-</div>
+      <div className="page-wrapper" style={{ position: 'relative' }}>
+        {/* PAW BG */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '600px', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: '5%', left: '8%', width: '120px', height: '120px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', top: '12%', right: '10%', width: '85px', height: '85px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', bottom: '10%', left: '12%', width: '75px', height: '75px', background: '#1A3329', opacity: 0.4, borderRadius: '50%' }} />
+        </div>
 
-      <div className="page-wrapper">
         {/* MOBILE NAV DRAWER */}
         <div className={`mobile-nav ${menuOpen ? 'open' : ''}`}>
           <button className="mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
