@@ -17,9 +17,9 @@ export default function Contact() {
         }
 
         .contact-content {
-          max-width: 600px;
+          max-width: 520px;
           margin: 0 auto;
-          padding: 48px 24px 80px;
+          padding: 64px 24px 80px;
           text-align: center;
         }
 
@@ -27,17 +27,63 @@ export default function Contact() {
           display: flex;
           align-items: center;
           gap: 16px;
-          padding: 20px 24px;
+          padding: 24px;
           border-radius: 16px;
           background: linear-gradient(145deg, #FDFBF7, #F8F5EF);
           border: 1px solid rgba(237,233,223,0.8);
           text-align: left;
           transition: all 0.15s;
           text-decoration: none;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
           display: flex;
         }
         .contact-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,51,41,0.08); }
+
+        .contact-icon {
+          width: 40px; height: 40px; border-radius: 12px;
+          background: linear-gradient(135deg, #D8F3DC, #c8eacd);
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0; font-size: 18px;
+        }
+
+        .contact-text h3 {
+          fontWeight: 600;
+          fontSize: 15px;
+          color: #1A3329;
+          margin-bottom: 2px;
+        }
+
+        .contact-text p {
+          fontSize: 14px;
+          color: #2D6A4F;
+          margin: 0;
+        }
+
+        .divider {
+          height: 1px;
+          background: rgba(237,233,223,0.6);
+          margin: 32px 0;
+        }
+
+        .sms-section {
+          padding: 20px;
+          background: rgba(216,243,220,0.08);
+          border-radius: 14px;
+          border: 1px solid rgba(45,106,79,0.08);
+          text-align: left;
+        }
+
+        .sms-section p {
+          fontSize: 13px;
+          color: #6B7280;
+          line-height: 1.7;
+          margin: 0;
+        }
+
+        .sms-section strong {
+          color: #1A3329;
+          font-weight: 600;
+        }
 
         .legal-footer {
           background: #1A3329;
@@ -50,11 +96,9 @@ export default function Contact() {
 
         @media (max-width: 480px) {
           .legal-nav { padding: 14px 16px; }
-          .contact-content { padding: 32px 16px 60px; }
+          .contact-content { padding: 40px 16px 60px; }
           .contact-h1 { font-size: 28px !important; }
           .contact-desc { font-size: 15px !important; }
-          .contact-card { padding: 16px 18px; gap: 12px; }
-          .contact-icon { width: 38px !important; height: 38px !important; font-size: 17px !important; }
         }
       `}</style>
 
@@ -75,8 +119,8 @@ export default function Contact() {
       </nav>
 
       <div className="contact-content">
-        <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 24px rgba(26,51,41,0.2)' }}>
-          <svg width="28" height="28" viewBox="0 0 100 100" fill="#D8F3DC">
+        <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 24px rgba(26,51,41,0.2)' }}>
+          <svg width="24" height="24" viewBox="0 0 100 100" fill="#D8F3DC">
             <ellipse cx="50" cy="70" rx="26" ry="20"/>
             <ellipse cx="20" cy="44" rx="12" ry="15"/>
             <ellipse cx="38" cy="33" rx="12" ry="15"/>
@@ -85,41 +129,26 @@ export default function Contact() {
           </svg>
         </div>
 
-        <h1 className="playfair contact-h1" style={{ fontSize: '34px', fontWeight: 700, color: '#1A3329', marginBottom: '12px', letterSpacing: '-0.02em' }}>Get in Touch</h1>
-        <p className="contact-desc" style={{ color: '#6B7280', fontSize: '16px', lineHeight: 1.7, marginBottom: '40px' }}>
-          Have a question about PawBooking? We're here to help. Reach out and we'll get back to you as soon as possible.
+        <h1 className="playfair contact-h1" style={{ fontSize: '32px', fontWeight: 700, color: '#1A3329', marginBottom: '12px', letterSpacing: '-0.02em' }}>Get in Touch</h1>
+        <p className="contact-desc" style={{ color: '#6B7280', fontSize: '15px', lineHeight: 1.7, marginBottom: '36px' }}>
+          Questions about PawBooking? We're here to help. Reach out and we'll get back to you within 24 hours.
         </p>
 
-        {/* Contact Cards */}
-        <div style={{ marginBottom: '24px' }}>
-          <a href="mailto:team@pawbooking.net" className="contact-card">
-            <div className="contact-icon" style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '20px' }}>
-              ✉️
-            </div>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '15px', color: '#1A3329', marginBottom: '2px' }}>Email Support</div>
-              <div style={{ fontSize: '14px', color: '#2D6A4F' }}>team@pawbooking.net</div>
-              <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>We typically respond within 24 hours</div>
-            </div>
-          </a>
+        {/* Email Card */}
+        <a href="mailto:team@pawbooking.net" className="contact-card">
+          <div className="contact-icon">✉️</div>
+          <div className="contact-text">
+            <h3>team@pawbooking.net</h3>
+            <p>Email us anytime</p>
+          </div>
+        </a>
 
-          <a href="https://pawbooking.net" className="contact-card">
-            <div className="contact-icon" style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '20px' }}>
-              🌐
-            </div>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '15px', color: '#1A3329', marginBottom: '2px' }}>Website</div>
-              <div style={{ fontSize: '14px', color: '#2D6A4F' }}>pawbooking.net</div>
-              <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>Learn more about PawBooking</div>
-            </div>
-          </a>
-        </div>
+        <div className="divider" />
 
-        {/* SMS Opt-out */}
-        <div style={{ padding: '20px 24px', borderRadius: '16px', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', textAlign: 'left' }}>
-          <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', marginBottom: '8px' }}>📱 SMS Opt-Out</div>
-          <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.7, margin: 0 }}>
-            To stop receiving SMS appointment reminders, reply <strong style={{ color: '#1A3329' }}>STOP</strong> to any message. To resume, reply <strong style={{ color: '#1A3329' }}>START</strong>. For help, reply <strong style={{ color: '#1A3329' }}>HELP</strong> or email us at team@pawbooking.net.
+        {/* SMS Info */}
+        <div className="sms-section">
+          <p>
+            To stop SMS reminders, reply <strong>STOP</strong> to any message. Reply <strong>START</strong> to resume, or <strong>HELP</strong> for assistance.
           </p>
         </div>
       </div>
