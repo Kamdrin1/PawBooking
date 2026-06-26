@@ -255,14 +255,14 @@ export default function Home() {
       <div className="page-wrapper" style={{ position: 'relative' }}>
         {/* PAW PRINTS - ON ACTUAL LANDING PAGE ONLY */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-          <PawPrint size={120} opacity={0.08} top="8%" left="6%" />
-          <PawPrint size={85} opacity={0.06} top="15%" right="8%" />
-          <PawPrint size={95} opacity={0.07} top="32%" left="3%" />
-          <PawPrint size={110} opacity={0.05} top="42%" right="5%" />
-          <PawPrint size={100} opacity={0.06} top="55%" left="9%" />
-          <PawPrint size={75} opacity={0.05} top="68%" right="7%" />
-          <PawPrint size={90} opacity={0.07} top="78%" left="5%" />
-          <PawPrint size={85} opacity={0.06} top="88%" right="9%" />
+          <PawPrint size={120} opacity={0.15} top="8%" left="6%" />
+          <PawPrint size={85} opacity={0.12} top="15%" right="8%" />
+          <PawPrint size={95} opacity={0.14} top="32%" left="3%" />
+          <PawPrint size={110} opacity={0.11} top="42%" right="5%" />
+          <PawPrint size={100} opacity={0.13} top="55%" left="9%" />
+          <PawPrint size={75} opacity={0.12} top="68%" right="7%" />
+          <PawPrint size={90} opacity={0.14} top="78%" left="5%" />
+          <PawPrint size={85} opacity={0.13} top="88%" right="9%" />
         </div>
 
         {/* MOBILE NAV DRAWER */}
