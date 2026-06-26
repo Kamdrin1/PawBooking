@@ -225,18 +225,6 @@ export default function Home() {
       `}</style>
 
       <div className="page-wrapper" style={{ position: 'relative' }}>
-        {/* PAW PRINTS */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-          <svg width="120" height="120" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '8%', left: '6%', opacity: 0.15 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="85" height="85" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '15%', right: '8%', opacity: 0.12 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="95" height="95" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '32%', left: '3%', opacity: 0.14 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="110" height="110" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '42%', right: '5%', opacity: 0.11 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="100" height="100" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '55%', left: '9%', opacity: 0.13 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="75" height="75" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '68%', right: '7%', opacity: 0.12 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="90" height="90" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '78%', left: '5%', opacity: 0.14 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-          <svg width="85" height="85" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '88%', right: '9%', opacity: 0.13 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
-        </div>
-
         {/* MOBILE NAV DRAWER */}
         <div className={`mobile-nav ${menuOpen ? 'open' : ''}`}>
           <button className="mobile-close" onClick={() => setMenuOpen(false)}>✕</button>
