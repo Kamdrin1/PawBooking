@@ -3,37 +3,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-const PawPrint = ({ size = 80, opacity = 0.1, top, left, right, bottom }: { size?: number; opacity?: number; top?: string | number; left?: string | number; right?: string | number; bottom?: string | number }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 100 100"
-    fill="#1A3329"
-    style={{
-      position: 'absolute',
-      top,
-      left,
-      right,
-      bottom,
-      opacity,
-      pointerEvents: 'none',
-    }}
-  >
-    <ellipse cx="50" cy="70" rx="26" ry="20" />
-    <ellipse cx="20" cy="44" rx="12" ry="15" />
-    <ellipse cx="38" cy="33" rx="12" ry="15" />
-    <ellipse cx="62" cy="33" rx="12" ry="15" />
-    <ellipse cx="80" cy="44" rx="12" ry="15" />
-  </svg>
-)
-
 export default function Home() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
-
-  async function handleEssentialSignup() {
-    router.push('/signup?plan=essential')
-  }
 
   return (
     <>
@@ -253,16 +225,16 @@ export default function Home() {
       `}</style>
 
       <div className="page-wrapper" style={{ position: 'relative' }}>
-        {/* PAW PRINTS - ON ACTUAL LANDING PAGE ONLY */}
+        {/* PAW PRINTS */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-          <PawPrint size={120} opacity={0.15} top="8%" left="6%" />
-          <PawPrint size={85} opacity={0.12} top="15%" right="8%" />
-          <PawPrint size={95} opacity={0.14} top="32%" left="3%" />
-          <PawPrint size={110} opacity={0.11} top="42%" right="5%" />
-          <PawPrint size={100} opacity={0.13} top="55%" left="9%" />
-          <PawPrint size={75} opacity={0.12} top="68%" right="7%" />
-          <PawPrint size={90} opacity={0.14} top="78%" left="5%" />
-          <PawPrint size={85} opacity={0.13} top="88%" right="9%" />
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '8%', left: '6%', opacity: 0.15 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="85" height="85" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '15%', right: '8%', opacity: 0.12 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="95" height="95" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '32%', left: '3%', opacity: 0.14 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="110" height="110" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '42%', right: '5%', opacity: 0.11 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '55%', left: '9%', opacity: 0.13 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="75" height="75" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '68%', right: '7%', opacity: 0.12 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="90" height="90" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '78%', left: '5%', opacity: 0.14 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
+          <svg width="85" height="85" viewBox="0 0 100 100" fill="#1A3329" style={{ position: 'absolute', top: '88%', right: '9%', opacity: 0.13 }}><ellipse cx="50" cy="70" rx="26" ry="20"/><ellipse cx="20" cy="44" rx="12" ry="15"/><ellipse cx="38" cy="33" rx="12" ry="15"/><ellipse cx="62" cy="33" rx="12" ry="15"/><ellipse cx="80" cy="44" rx="12" ry="15"/></svg>
         </div>
 
         {/* MOBILE NAV DRAWER */}
