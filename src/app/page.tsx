@@ -35,10 +35,6 @@ export default function Home() {
     router.push('/signup?plan=essential')
   }
 
-  async function handleProSignup() {
-    router.push('/signup?plan=pro')
-  }
-
   return (
     <>
       <style>{`
@@ -257,65 +253,16 @@ export default function Home() {
       `}</style>
 
       <div className="page-wrapper" style={{ position: 'relative' }}>
-        {/* PAW PRINTS THROUGHOUT PAGE */}
+        {/* PAW PRINTS - ON ACTUAL LANDING PAGE ONLY */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-          {/* Hero section */}
-          <PawPrint size={120} opacity={0.08} top="5%" left="6%" />
-          <PawPrint size={85} opacity={0.06} top="12%" right="8%" />
-          <PawPrint size={95} opacity={0.07} top="25%" left="2%" />
-          <PawPrint size={110} opacity={0.05} top="40%" right="4%" />
-
-          {/* Problem section */}
-          <PawPrint size={100} opacity={0.06} top="52%" left="8%" />
-          <PawPrint size={75} opacity={0.05} top="62%" right="6%" />
-          <PawPrint size={90} opacity={0.07} top="70%" left="4%" />
-          <PawPrint size={80} opacity={0.04} top="80%" right="10%" />
-
-          {/* Features section */}
-          <PawPrint size={105} opacity={0.06} top="90%" left="10%" />
-          <PawPrint size={70} opacity={0.05} top="100%" right="8%" />
-          <PawPrint size={95} opacity={0.07} top="108%" left="2%" />
-          <PawPrint size={85} opacity={0.06} top="118%" right="5%" />
-
-          {/* How it works section */}
-          <PawPrint size={100} opacity={0.08} top="128%" left="6%" />
-          <PawPrint size={80} opacity={0.05} top="138%" right="10%" />
-          <PawPrint size={110} opacity={0.06} top="148%" left="8%" />
-          <PawPrint size={75} opacity={0.04} top="158%" right="4%" />
-
-          {/* Experience section */}
-          <PawPrint size={90} opacity={0.07} top="168%" left="4%" />
-          <PawPrint size={85} opacity={0.06} top="178%" right="8%" />
-          <PawPrint size={100} opacity={0.05} top="188%" left="10%" />
-          <PawPrint size={80} opacity={0.06} top="198%" right="6%" />
-
-          {/* Testimonials section */}
-          <PawPrint size={95} opacity={0.07} top="208%" left="6%" />
-          <PawPrint size={75} opacity={0.05} top="218%" right="10%" />
-          <PawPrint size={110} opacity={0.06} top="228%" left="3%" />
-          <PawPrint size={85} opacity={0.04} top="238%" right="5%" />
-
-          {/* FAQ section */}
-          <PawPrint size={100} opacity={0.08} top="248%" left="8%" />
-          <PawPrint size={80} opacity={0.05} top="258%" right="8%" />
-          <PawPrint size={90} opacity={0.07} top="268%" left="5%" />
-          <PawPrint size={85} opacity={0.06} top="278%" right="10%" />
-
-          {/* Pricing section */}
-          <PawPrint size={105} opacity={0.06} top="288%" left="10%" />
-          <PawPrint size={75} opacity={0.05} top="298%" right="6%" />
-          <PawPrint size={95} opacity={0.07} top="308%" left="4%" />
-          <PawPrint size={100} opacity={0.04} top="318%" right="8%" />
-
-          {/* Final CTA */}
-          <PawPrint size={110} opacity={0.08} top="328%" left="6%" />
-          <PawPrint size={80} opacity={0.06} top="338%" right="10%" />
-          <PawPrint size={90} opacity={0.05} top="348%" left="8%" />
-          <PawPrint size={85} opacity={0.07} top="358%" right="4%" />
-
-          {/* Footer area */}
-          <PawPrint size={95} opacity={0.06} top="368%" left="5%" />
-          <PawPrint size={100} opacity={0.05} top="378%" right="8%" />
+          <PawPrint size={120} opacity={0.08} top="8%" left="6%" />
+          <PawPrint size={85} opacity={0.06} top="15%" right="8%" />
+          <PawPrint size={95} opacity={0.07} top="32%" left="3%" />
+          <PawPrint size={110} opacity={0.05} top="42%" right="5%" />
+          <PawPrint size={100} opacity={0.06} top="55%" left="9%" />
+          <PawPrint size={75} opacity={0.05} top="68%" right="7%" />
+          <PawPrint size={90} opacity={0.07} top="78%" left="5%" />
+          <PawPrint size={85} opacity={0.06} top="88%" right="9%" />
         </div>
 
         {/* MOBILE NAV DRAWER */}
@@ -347,7 +294,6 @@ export default function Home() {
                 <span className="playfair" style={{ fontWeight: 700, fontSize: '17px', color: '#1A3329', letterSpacing: '-0.02em' }}>PawBooking</span>
               </a>
 
-              {/* Desktop nav */}
               <div className="desktop-nav" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '56px' }}>
                 <a href="#features" className="nav-link">Features</a>
                 <a href="#how" className="nav-link">How It Works</a>
@@ -359,7 +305,6 @@ export default function Home() {
                 <Link href="/signup" className="btn-primary" style={{ padding: '10px 24px', fontSize: '13px' }}>Start Free Trial</Link>
               </div>
 
-              {/* Hamburger */}
               <button className="hamburger" onClick={() => setMenuOpen(true)} aria-label="Open menu">
                 <span /><span /><span />
               </button>
@@ -500,7 +445,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* WHAT CLIENTS SEE */}
+          {/* EXPERIENCE */}
           <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '56px' }}>
@@ -522,12 +467,10 @@ export default function Home() {
                     
                     <div style={{ background: '#F5F2EB', borderRadius: '32px', padding: '28px 20px', textAlign: 'center', minHeight: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                       <div style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 600, marginBottom: '20px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Saturday · 2:45 PM</div>
-                      
                       <div style={{ marginBottom: '28px' }}>
                         <div className="playfair" style={{ fontSize: '24px', fontWeight: 700, color: '#1A3329', marginBottom: '4px' }}>Book with Sarah</div>
                         <div style={{ fontSize: '12px', color: '#9CA3AF' }}>Mobile Dog Grooming</div>
                       </div>
-
                       <div style={{ borderTop: '1px solid rgba(237,233,223,0.6)', paddingTop: '20px', marginBottom: '20px' }}>
                         <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginBottom: '12px', textAlign: 'left' }}>Select Service</div>
                         {['Standard Groom — $65', 'Bath & Dry — $45', 'Full Spa Package — $95'].map((service, i) => (
@@ -536,7 +479,6 @@ export default function Home() {
                           </div>
                         ))}
                       </div>
-
                       <div style={{ borderTop: '1px solid rgba(237,233,223,0.6)', paddingTop: '20px' }}>
                         <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginBottom: '12px', textAlign: 'left' }}>Pick a Time</div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -547,7 +489,6 @@ export default function Home() {
                           ))}
                         </div>
                       </div>
-
                       <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(237,233,223,0.6)' }}>
                         <button style={{ width: '100%', padding: '13px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
                           Confirm Booking →
@@ -596,7 +537,7 @@ export default function Home() {
 
           <div className="divider" />
 
-          {/* FAQ SECTION */}
+          {/* FAQ */}
           <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '720px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
@@ -609,13 +550,13 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
                 {[
                   { q: 'How do my clients actually book?', a: 'You get a custom booking link (like pawbooking.net/book/sarah). Share it on Instagram, Facebook, your website, or text it directly. Clients click, pick a service and time, and confirm instantly with their phone number. You get an SMS notification immediately.' },
-                  { q: 'What if a client texts me instead of booking online?', a: 'You can still accept text bookings manually—PawBooking doesn\'t force everyone to book online. But you\'ll be amazed how many prefer the self-service option. Most groomers see 70% of new bookings come through the online link within the first month.' },
-                  { q: 'Can I customize the reminder message?', a: 'On Essential and Professional plans, yes. You can customize the 24-hour reminder text and the auto-review request message. Starter plan uses our default friendly messages, which work great for most groomers.' },
-                  { q: 'Do you integrate with Instagram, Google, or Facebook?', a: 'Your booking link works everywhere—bio links, posts, comments, email, etc. We\'re building direct Instagram & Google integration in Q2 2026. For now, the link-in-bio approach is super clean and gets instant adoption.' },
-                  { q: 'What payment methods do clients use?', a: 'Clients book free through your link. They pay you at the appointment (cash, Venmo, card—however you normally accept payment). PawBooking doesn\'t touch payments, so there\'s no new payment processing for you.' },
-                  { q: 'How long does setup actually take?', a: 'Genuinely 5 minutes. Add your name, services, prices, and availability. We give you a booking link. Share it. Done. You don\'t need to connect anything else unless you want to.' },
-                  { q: 'Can I pause reminders for a week or special occasion?', a: 'Yes. You can block off dates in your availability calendar. Any bookings during blocked time are prevented, and no reminders send for those dates.' },
-                  { q: 'What if I have multiple assistants?', a: 'Right now, PawBooking is built for solo groomers. Multi-user team management is coming in Q3 2026. If you need that sooner, reach out to us.' },
+                  { q: 'What if a client texts me instead of booking online?', a: 'You can still accept text bookings manually—PawBooking doesn\'t force everyone to book online. But you\'ll be amazed how many prefer the self-service option.' },
+                  { q: 'Can I customize the reminder message?', a: 'Yes. On Essential and Professional plans, you can customize the 24-hour reminder text and the auto-review request message.' },
+                  { q: 'Do you integrate with Instagram, Google, or Facebook?', a: 'Your booking link works everywhere. We\'re building direct Instagram & Google integration in Q2 2026.' },
+                  { q: 'What payment methods do clients use?', a: 'Clients book free through your link. They pay you at the appointment (cash, Venmo, card—however you normally accept payment).' },
+                  { q: 'How long does setup actually take?', a: 'Genuinely 5 minutes. Add your name, services, prices, and availability. We give you a booking link. Share it. Done.' },
+                  { q: 'Can I pause reminders for a week or special occasion?', a: 'Yes. You can block off dates in your availability calendar. Any bookings during blocked time are prevented.' },
+                  { q: 'What if I have multiple assistants?', a: 'Right now, PawBooking is built for solo groomers. Multi-user team management is coming in Q3 2026.' },
                 ].map((item, i) => (
                   <details key={i} style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', borderRadius: '16px', padding: '20px 24px', cursor: 'pointer', transition: 'all 0.2s' }}>
                     <summary style={{ fontWeight: 600, color: '#1A3329', fontSize: '15px', outline: 'none', userSelect: 'none', cursor: 'pointer' }}>
@@ -650,136 +591,68 @@ export default function Home() {
                 <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. All plans include 30-day free trial.</p>
               </div>
 
-              {/* ROI CALCULATOR BOX */}
-              <div style={{ background: 'linear-gradient(135deg, #F0F9F2, #E8F5EB)', border: '1px solid rgba(45,106,79,0.1)', borderRadius: '20px', padding: '28px', marginBottom: '48px', maxWidth: '600px', margin: '0 auto 48px' }}>
-                <h3 style={{ fontWeight: 700, color: '#1A3329', marginBottom: '16px', fontSize: '16px' }}>Here's the Math</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500, marginBottom: '4px' }}>2 no-shows/month</div>
-                    <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#E8704A' }}>$170</div>
-                    <div style={{ fontSize: '12px', color: '#6B7280' }}>lost per month</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500, marginBottom: '4px' }}>Our solution costs</div>
-                    <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#2D6A4F' }}>$24–79</div>
-                    <div style={{ fontSize: '12px', color: '#6B7280' }}>per month</div>
-                  </div>
-                </div>
-                <div style={{ borderTop: '1px solid rgba(45,106,79,0.1)', paddingTop: '16px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '13px', color: '#1A3329', fontWeight: 600 }}>You break even in <span style={{ color: '#E8704A', fontWeight: 700 }}>2–5 days</span>. Everything after that is pure profit.</div>
-                </div>
-              </div>
-
-              {/* PRICING GRID - 3 COLUMNS */}
               <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'stretch' }}>
-
                 {/* Starter */}
-                <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.04)' }}>
-                  <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Starter</h3>
+                <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)' }}>
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px' }}>Starter</h3>
                   <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For solo groomers just starting</p>
                   <div style={{ marginBottom: '24px' }}>
                     <span className="playfair price-large">$24</span>
                     <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                   </div>
-                  <div style={{ background: 'rgba(45,106,79,0.05)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px' }}>
-                    <div style={{ fontSize: '12px', color: '#2D6A4F', fontWeight: 600 }}>Best for: 1–3 appointments/week</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
-                    {[
-                      { text: 'Online booking page', included: true },
-                      { text: 'SMS reminders (24hr before)', included: true },
-                      { text: 'Up to 25 appointments/mo', included: true },
-                      { text: 'Instant booking notifications', included: true },
-                      { text: 'Client history', included: true },
-                      { text: 'Unlimited appointments', included: false },
-                      { text: 'Auto review requests', included: false },
-                      { text: 'Monthly reports', included: false },
-                      { text: 'Priority support', included: false },
-                    ].map((f, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: f.included ? '#1A3329' : '#C4BDB0' }}>
-                        <span style={{ marginRight: '8px', color: f.included ? '#2D6A4F' : '#C4BDB0', fontWeight: 700, fontSize: '12px' }}>{f.included ? '✓' : '○'}</span>
-                        {f.text}
+                  <div style={{ flex: 1, marginBottom: '28px' }}>
+                    {['Online booking page', 'SMS reminders', 'Up to 25 appointments/mo', 'Instant notifications'].map((f, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: '#1A3329', marginBottom: '10px' }}>
+                        <span style={{ marginRight: '8px', color: '#2D6A4F', fontWeight: 700 }}>✓</span> {f}
                       </div>
                     ))}
                   </div>
-                  <Link href="/signup?plan=starter" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
+                  <Link href="/signup?plan=starter" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', background: 'transparent' }}>
                     Start Free Trial
                   </Link>
                 </div>
 
-                {/* Essential - MOST POPULAR */}
+                {/* Essential */}
                 <div className="pro-card" style={{ padding: '32px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                  <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg, #E8704A, #d4603a)', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 10px', borderRadius: '50px', boxShadow: '0 4px 12px rgba(232,112,74,0.35)', letterSpacing: '0.02em' }}>
+                  <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'linear-gradient(135deg, #E8704A, #d4603a)', color: 'white', fontSize: '11px', fontWeight: 700, padding: '5px 10px', borderRadius: '50px' }}>
                     ⭐ Most Popular
                   </div>
-                  <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Essential</h3>
+                  <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px' }}>Essential</h3>
                   <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '24px' }}>The sweet spot for growing groomers</p>
                   <div style={{ marginBottom: '24px' }}>
-                    <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>$44</span>
+                    <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white' }}>$44</span>
                     <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '14px' }}>/mo</span>
                   </div>
-                  <div style={{ background: 'rgba(216,243,220,0.1)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px', border: '1px solid rgba(216,243,220,0.2)' }}>
-                    <div style={{ fontSize: '12px', color: '#B3E5D8', fontWeight: 600 }}>Best for: 3–7 appointments/week</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
-                    {[
-                      { text: 'Everything in Starter', included: true },
-                      { text: 'Unlimited appointments', included: true },
-                      { text: 'Auto review requests after jobs', included: true },
-                      { text: 'Smart rebooking reminders', included: true },
-                      { text: 'Monthly revenue & booking reports', included: true },
-                      { text: 'Early access to new features', included: true },
-                      { text: 'Priority email support', included: false },
-                    ].map((f, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: 'rgba(255,255,255,0.75)' }}>
-                        <span style={{ marginRight: '8px', color: '#7DD3A0', fontWeight: 700, fontSize: '12px' }}>✓</span>
-                        {f.text}
+                  <div style={{ flex: 1, marginBottom: '28px' }}>
+                    {['Everything in Starter', 'Unlimited appointments', 'Auto review requests', 'Smart rebooking reminders', 'Monthly reports'].map((f, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: 'rgba(255,255,255,0.75)', marginBottom: '10px' }}>
+                        <span style={{ marginRight: '8px', color: '#7DD3A0', fontWeight: 700 }}>✓</span> {f}
                       </div>
                     ))}
                   </div>
-                  <button onClick={handleEssentialSignup} className="pro-btn">Start Free Trial</button>
+                  <button onClick={() => router.push('/signup?plan=essential')} className="pro-btn">Start Free Trial</button>
                 </div>
 
-                {/* Professional */}
-                <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 4px 20px rgba(26,51,41,0.04)' }}>
-                  <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px', letterSpacing: '-0.01em' }}>Professional</h3>
-                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For high-volume groomers & teams</p>
+                {/* Pro */}
+                <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)' }}>
+                  <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px' }}>Professional</h3>
+                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For high-volume groomers</p>
                   <div style={{ marginBottom: '24px' }}>
                     <span className="playfair price-large">$79</span>
                     <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                   </div>
-                  <div style={{ background: 'rgba(232,112,74,0.05)', padding: '12px 16px', borderRadius: '10px', marginBottom: '24px' }}>
-                    <div style={{ fontSize: '12px', color: '#C25B2E', fontWeight: 600 }}>Best for: 7+ appointments/week</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
-                    {[
-                      { text: 'Everything in Essential', included: true },
-                      { text: 'Priority email & phone support', included: true },
-                      { text: 'Custom branding on booking page', included: true },
-                      { text: 'Advanced analytics & insights', included: true },
-                      { text: 'Team member support (Q3 2026)', included: true },
-                      { text: 'Custom integrations', included: true },
-                    ].map((f, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: '#1A3329' }}>
-                        <span style={{ marginRight: '8px', color: '#E8704A', fontWeight: 700, fontSize: '12px' }}>✓</span>
-                        {f.text}
+                  <div style={{ flex: 1, marginBottom: '28px' }}>
+                    {['Everything in Essential', 'Priority phone support', 'Custom branding', 'Advanced analytics', 'Team support Q3 2026'].map((f, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: '#1A3329', marginBottom: '10px' }}>
+                        <span style={{ marginRight: '8px', color: '#E8704A', fontWeight: 700 }}>✓</span> {f}
                       </div>
                     ))}
                   </div>
-                  <Link href="/signup?plan=pro" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', transition: 'all 0.2s', background: 'transparent' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A3329'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#1A3329'; }}>
+                  <Link href="/signup?plan=pro" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', background: 'transparent' }}>
                     Start Free Trial
                   </Link>
                 </div>
               </div>
-              
-              <p style={{ textAlign: 'center', fontSize: '13px', color: '#9CA3AF', marginTop: '32px' }}>
-                🐾 All plans include a <strong style={{ color: '#1A3329' }}>30-day free trial</strong>. No charge today.
-              </p>
             </div>
           </section>
 
@@ -787,42 +660,25 @@ export default function Home() {
           <section className="section-pad" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden', zIndex: 1 }}>
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
-              <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+              <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px' }}>
                 Your first month is free. See the impact yourself.
               </h2>
-              <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '36px', fontSize: '16px', lineHeight: 1.75 }}>
+              <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '36px', fontSize: '16px' }}>
                 Join PawBooking today. 30 days free, cancel anytime.
               </p>
               <Link href="/signup" className="btn-cta cta-btn-full">Start Your Free Trial →</Link>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '24px', flexWrap: 'wrap' }}>
-                {['✓ 30 days free', '✓ Cancel anytime', '✓ Setup in 5 minutes'].map((t, i) => (
-                  <span key={i} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>{t}</span>
-                ))}
-              </div>
             </div>
           </section>
 
           {/* FOOTER */}
-          <footer className="footer-pad" style={{ background: '#0f2218', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', position: 'relative', zIndex: 1 }}>
-            <div className="footer-inner" style={{ maxWidth: '940px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+          <footer style={{ background: '#0f2218', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', position: 'relative', zIndex: 1 }}>
+            <div style={{ maxWidth: '940px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ background: 'rgba(216,243,220,0.1)', width: '26px', height: '26px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(216,243,220,0.08)' }}>
-                  <svg width="12" height="12" viewBox="0 0 100 100" fill="#D8F3DC">
-                    <ellipse cx="50" cy="70" rx="26" ry="20"/>
-                    <ellipse cx="20" cy="44" rx="12" ry="15"/>
-                    <ellipse cx="38" cy="33" rx="12" ry="15"/>
-                    <ellipse cx="62" cy="33" rx="12" ry="15"/>
-                    <ellipse cx="80" cy="44" rx="12" ry="15"/>
-                  </svg>
-                </div>
-                <span className="playfair" style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: '14px' }}>PawBooking</span>
+                <span className="playfair" style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: '14px' }}>© 2026 PawBooking</span>
               </div>
-              <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>© 2026 PawBooking. Built for dog groomers everywhere.</p>
               <div style={{ display: 'flex', gap: '20px' }}>
                 {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']].map(([label, href], i) => (
-                  <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', textDecoration: 'none', transition: 'color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
-                    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}>
+                  <a key={i} href={href} style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', textDecoration: 'none' }}>
                     {label}
                   </a>
                 ))}
