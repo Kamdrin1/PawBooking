@@ -59,8 +59,9 @@ export async function GET() {
       const [h, m] = appt.appointment_time.split(':')
       const hour = parseInt(h)
       const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+      const businessName = appt.profiles?.business_name || 'your groomer'
 
-      const message = `Hi ${appt.client_name}! 🐾 This is a reminder that ${appt.dog_name} has a grooming appointment tomorrow at ${formattedTime} with ${appt.profiles?.business_name || 'your groomer'}. See you then! Reply STOP to opt out.`
+      const message = `PawBooking reminder: ${appt.dog_name} has a grooming appointment tomorrow at ${formattedTime} with ${businessName}. Reply CONFIRM or CANCEL.`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
@@ -69,7 +70,7 @@ export async function GET() {
       }
     }
 
-    // ─── REBOOKING REMINDERS (Pro only — 28 days after completed) ─────
+    // ─── REBOOKING REMINDERS (Essential+ only — 28 days after completed) ─────
     const twentyEightDaysAgo = new Date()
     twentyEightDaysAgo.setDate(twentyEightDaysAgo.getDate() - 28)
     const windowStart = new Date(twentyEightDaysAgo)
@@ -90,7 +91,7 @@ export async function GET() {
     let rebookSent = 0
 
     for (const appt of completedAppts || []) {
-      if (appt.profiles?.plan !== 'pro') continue
+      if (!['essential', 'pro'].includes(appt.profiles?.plan)) continue
       if (!appt.client_phone) continue
 
       const today = new Date().toISOString().split('T')[0]
@@ -112,7 +113,7 @@ export async function GET() {
       const bookingSlug = businessName.toLowerCase().replace(/\s+/g, '-')
       const bookingLink = `${process.env.NEXT_PUBLIC_SITE_URL}/book/${bookingSlug}`
 
-      const message = `Hi ${appt.client_name}! 🐾 It's been about a month since ${appt.dog_name}'s last groom at ${businessName}. Time to book again? ${bookingLink} Reply STOP to opt out.`
+      const message = `PawBooking: It's been about a month since ${appt.dog_name}'s last groom with ${businessName}. Time for another appointment? Book here: ${bookingLink}`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
@@ -121,8 +122,7 @@ export async function GET() {
       }
     }
 
-    // ─── AUTO REVIEW REQUESTS (Pro only — sent when appointment marked complete) ─────
-    // Find appointments completed in the last hour that haven't had a review request sent
+    // ─── AUTO REVIEW REQUESTS (Essential+ only — sent when appointment marked complete) ─────
     const oneHourAgo = new Date()
     oneHourAgo.setHours(oneHourAgo.getHours() - 1)
 
@@ -138,14 +138,14 @@ export async function GET() {
     let reviewSent = 0
 
     for (const appt of reviewAppts || []) {
-      if (appt.profiles?.plan !== 'pro') continue
+      if (!['essential', 'pro'].includes(appt.profiles?.plan)) continue
       if (!appt.client_phone) continue
       if (!appt.profiles?.google_review_link) continue
 
       const businessName = appt.profiles?.business_name || 'your groomer'
       const reviewLink = appt.profiles.google_review_link
 
-      const message = `Hi ${appt.client_name}! 🐾 Thanks for bringing ${appt.dog_name} in today — it was great to see you! If you have a moment, we'd love a quick Google review: ${reviewLink} It really helps us out. Thanks! Reply STOP to opt out.`
+      const message = `PawBooking: Thanks for visiting ${businessName} today! If you have a moment, please leave a Google review: ${reviewLink} It really helps!`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
