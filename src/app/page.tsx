@@ -3,6 +3,30 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+const PawPrint = ({ size = 80, opacity = 0.1, top, left, right, bottom }: { size?: number; opacity?: number; top?: string | number; left?: string | number; right?: string | number; bottom?: string | number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 100 100"
+    fill="#1A3329"
+    style={{
+      position: 'absolute',
+      top,
+      left,
+      right,
+      bottom,
+      opacity,
+      pointerEvents: 'none',
+    }}
+  >
+    <ellipse cx="50" cy="70" rx="26" ry="20" />
+    <ellipse cx="20" cy="44" rx="12" ry="15" />
+    <ellipse cx="38" cy="33" rx="12" ry="15" />
+    <ellipse cx="62" cy="33" rx="12" ry="15" />
+    <ellipse cx="80" cy="44" rx="12" ry="15" />
+  </svg>
+)
+
 export default function Home() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -233,14 +257,65 @@ export default function Home() {
       `}</style>
 
       <div className="page-wrapper" style={{ position: 'relative' }}>
-        {/* PAW BG */}
+        {/* PAW PRINTS THROUGHOUT PAGE */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '5%', left: '8%', width: '120px', height: '120px', background: '#1A3329', opacity: 0.08, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', top: '12%', right: '10%', width: '85px', height: '85px', background: '#1A3329', opacity: 0.06, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', bottom: '10%', left: '12%', width: '75px', height: '75px', background: '#1A3329', opacity: 0.05, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', top: '35%', right: '5%', width: '100px', height: '100px', background: '#1A3329', opacity: 0.07, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', top: '60%', left: '6%', width: '95px', height: '95px', background: '#1A3329', opacity: 0.06, borderRadius: '50%' }} />
-          <div style={{ position: 'absolute', top: '75%', right: '12%', width: '70px', height: '70px', background: '#1A3329', opacity: 0.05, borderRadius: '50%' }} />
+          {/* Hero section */}
+          <PawPrint size={120} opacity={0.08} top="5%" left="6%" />
+          <PawPrint size={85} opacity={0.06} top="12%" right="8%" />
+          <PawPrint size={95} opacity={0.07} top="25%" left="2%" />
+          <PawPrint size={110} opacity={0.05} top="40%" right="4%" />
+
+          {/* Problem section */}
+          <PawPrint size={100} opacity={0.06} top="52%" left="8%" />
+          <PawPrint size={75} opacity={0.05} top="62%" right="6%" />
+          <PawPrint size={90} opacity={0.07} top="70%" left="4%" />
+          <PawPrint size={80} opacity={0.04} top="80%" right="10%" />
+
+          {/* Features section */}
+          <PawPrint size={105} opacity={0.06} top="90%" left="10%" />
+          <PawPrint size={70} opacity={0.05} top="100%" right="8%" />
+          <PawPrint size={95} opacity={0.07} top="108%" left="2%" />
+          <PawPrint size={85} opacity={0.06} top="118%" right="5%" />
+
+          {/* How it works section */}
+          <PawPrint size={100} opacity={0.08} top="128%" left="6%" />
+          <PawPrint size={80} opacity={0.05} top="138%" right="10%" />
+          <PawPrint size={110} opacity={0.06} top="148%" left="8%" />
+          <PawPrint size={75} opacity={0.04} top="158%" right="4%" />
+
+          {/* Experience section */}
+          <PawPrint size={90} opacity={0.07} top="168%" left="4%" />
+          <PawPrint size={85} opacity={0.06} top="178%" right="8%" />
+          <PawPrint size={100} opacity={0.05} top="188%" left="10%" />
+          <PawPrint size={80} opacity={0.06} top="198%" right="6%" />
+
+          {/* Testimonials section */}
+          <PawPrint size={95} opacity={0.07} top="208%" left="6%" />
+          <PawPrint size={75} opacity={0.05} top="218%" right="10%" />
+          <PawPrint size={110} opacity={0.06} top="228%" left="3%" />
+          <PawPrint size={85} opacity={0.04} top="238%" right="5%" />
+
+          {/* FAQ section */}
+          <PawPrint size={100} opacity={0.08} top="248%" left="8%" />
+          <PawPrint size={80} opacity={0.05} top="258%" right="8%" />
+          <PawPrint size={90} opacity={0.07} top="268%" left="5%" />
+          <PawPrint size={85} opacity={0.06} top="278%" right="10%" />
+
+          {/* Pricing section */}
+          <PawPrint size={105} opacity={0.06} top="288%" left="10%" />
+          <PawPrint size={75} opacity={0.05} top="298%" right="6%" />
+          <PawPrint size={95} opacity={0.07} top="308%" left="4%" />
+          <PawPrint size={100} opacity={0.04} top="318%" right="8%" />
+
+          {/* Final CTA */}
+          <PawPrint size={110} opacity={0.08} top="328%" left="6%" />
+          <PawPrint size={80} opacity={0.06} top="338%" right="10%" />
+          <PawPrint size={90} opacity={0.05} top="348%" left="8%" />
+          <PawPrint size={85} opacity={0.07} top="358%" right="4%" />
+
+          {/* Footer area */}
+          <PawPrint size={95} opacity={0.06} top="368%" left="5%" />
+          <PawPrint size={100} opacity={0.05} top="378%" right="8%" />
         </div>
 
         {/* MOBILE NAV DRAWER */}
@@ -254,7 +329,7 @@ export default function Home() {
           <Link href="/signup" className="btn-primary" onClick={() => setMenuOpen(false)} style={{ fontSize: '15px', padding: '14px 32px' }}>Start Free Trial</Link>
         </div>
 
-        <div style={{ background: '#F5F2EB' }}>
+        <div style={{ background: '#F5F2EB', position: 'relative', zIndex: 1 }}>
 
           {/* NAVBAR */}
           <nav className="sticky-nav">
@@ -330,7 +405,7 @@ export default function Home() {
           </div>
 
           {/* PROBLEM SECTION */}
-          <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px' }}>
+          <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>The Real Cost</div>
@@ -361,7 +436,7 @@ export default function Home() {
           <div className="divider" />
 
           {/* FEATURES */}
-          <section id="features" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <section id="features" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>What You Get</div>
@@ -402,7 +477,7 @@ export default function Home() {
           <div className="divider" />
 
           {/* HOW IT WORKS */}
-          <section id="how" className="section-pad" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+          <section id="how" className="section-pad" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', position: 'relative', overflow: 'hidden', zIndex: 1 }}>
             <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
               <div className="section-label" style={{ marginBottom: '16px', color: 'rgba(216,243,220,0.7)' }}>Simple Setup</div>
@@ -426,7 +501,7 @@ export default function Home() {
           </section>
 
           {/* WHAT CLIENTS SEE */}
-          <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '56px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>The Experience</div>
@@ -492,7 +567,7 @@ export default function Home() {
           <div className="divider" />
 
           {/* TESTIMONIALS */}
-          <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px' }}>
+          <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>Early Feedback</div>
@@ -522,7 +597,7 @@ export default function Home() {
           <div className="divider" />
 
           {/* FAQ SECTION */}
-          <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <section className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '720px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>Questions?</div>
@@ -565,7 +640,7 @@ export default function Home() {
           <div className="divider" />
 
           {/* PRICING */}
-          <section id="pricing" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px' }}>
+          <section id="pricing" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>Simple Pricing</div>
@@ -709,7 +784,7 @@ export default function Home() {
           </section>
 
           {/* FINAL CTA */}
-          <section className="section-pad" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <section className="section-pad" style={{ background: 'linear-gradient(145deg, #1A3329 0%, #0f2218 100%)', padding: '96px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden', zIndex: 1 }}>
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
               <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
@@ -728,7 +803,7 @@ export default function Home() {
           </section>
 
           {/* FOOTER */}
-          <footer className="footer-pad" style={{ background: '#0f2218', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px' }}>
+          <footer className="footer-pad" style={{ background: '#0f2218', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 40px', position: 'relative', zIndex: 1 }}>
             <div className="footer-inner" style={{ maxWidth: '940px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ background: 'rgba(216,243,220,0.1)', width: '26px', height: '26px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(216,243,220,0.08)' }}>
