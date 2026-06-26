@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const hour = parseInt(h)
     const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
 
+    // Send email
     const result = await resend.emails.send({
       from: 'PawBooking <notifications@pawbooking.net>',
       to: 'monchigameing@gmail.com',
@@ -77,12 +78,31 @@ export async function POST(req: Request) {
       `
     })
 
+    // Send SMS confirmation to client
+    const smsMessage = `PawBooking: Your appointment is confirmed! ${dogName} with ${businessName} on ${formattedDate} at ${formattedTime}. See you then!`
+    
+    const smsResponse = await fetch('https://api.telnyx.com/v2/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.TELNYX_API_KEY!}`,
+      },
+      body: JSON.stringify({
+        from: process.env.TELNYX_PHONE_NUMBER!,
+        to: clientPhone,
+        text: smsMessage,
+      }),
+    })
+
+    const smsData = await smsResponse.json()
+    console.log('SMS sent:', smsData)
+
     console.log('Resend result:', JSON.stringify(result))
-    return NextResponse.json({ success: true, result })
+    return NextResponse.json({ success: true, result, sms: smsData })
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('Email notification error:', message)
+    console.error('Notification error:', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
