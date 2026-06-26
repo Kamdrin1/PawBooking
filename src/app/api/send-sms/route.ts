@@ -1,10 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import twilio from 'twilio'
-
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
-)
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,15 +8,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing phone or message' }, { status: 400 })
     }
 
-    const msg = await client.messages.create({
-      body: message,
-      from: process.env.TWILIO_PHONE_NUMBER!,
-      to,
+    const response = await fetch('https://api.telnyx.com/v2/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.TELNYX_API_KEY!}`,
+      },
+      body: JSON.stringify({
+        from: process.env.TELNYX_PHONE_NUMBER!,
+        to: to,
+        text: message,
+      }),
     })
 
-    return NextResponse.json({ success: true, sid: msg.sid })
+    if (!response.ok) {
+      const error = await response.json()
+      console.error('Telnyx error:', error)
+      return NextResponse.json({ error: 'Failed to send SMS' }, { status: 500 })
+    }
+
+    const data = await response.json()
+    return NextResponse.json({ success: true, id: data.data.id })
   } catch (error: unknown) {
-    console.error('Twilio error:', error)
+    console.error('SMS error:', error)
     return NextResponse.json({ error: 'Failed to send SMS' }, { status: 500 })
   }
 }
