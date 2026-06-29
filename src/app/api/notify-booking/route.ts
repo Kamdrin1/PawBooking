@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     })
 
     // Send SMS confirmation to client
-    const smsMessage = `PawBooking: Your appointment is confirmed! ${dogName} with ${businessName} on ${formattedDate} at ${formattedTime}. See you then!`
+    const smsMessage = `PawBooking: Your appointment is confirmed! ${dogName} on ${formattedDate} at ${formattedTime}. See you then!`
     
     const smsResponse = await fetch('https://api.telnyx.com/v2/messages', {
       method: 'POST',

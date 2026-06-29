@@ -59,9 +59,8 @@ export async function GET() {
       const [h, m] = appt.appointment_time.split(':')
       const hour = parseInt(h)
       const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
-      const businessName = appt.profiles?.business_name || 'your groomer'
 
-      const message = `PawBooking reminder: ${appt.dog_name} has a grooming appointment tomorrow at ${formattedTime} with ${businessName}. Reply CONFIRM or CANCEL.`
+      const message = `PawBooking reminder: ${appt.dog_name} has a grooming appointment tomorrow at ${formattedTime}. Reply CONFIRM or CANCEL.`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
@@ -109,11 +108,10 @@ export async function GET() {
         continue
       }
 
-      const businessName = appt.profiles?.business_name || 'your groomer'
-      const bookingSlug = businessName.toLowerCase().replace(/\s+/g, '-')
+      const bookingSlug = appt.profiles?.business_name.toLowerCase().replace(/\s+/g, '-') || 'book'
       const bookingLink = `${process.env.NEXT_PUBLIC_SITE_URL}/book/${bookingSlug}`
 
-      const message = `PawBooking: It's been about a month since ${appt.dog_name}'s last groom with ${businessName}. Time for another appointment? Book here: ${bookingLink}`
+      const message = `PawBooking: It's been about a month since ${appt.dog_name}'s last groom. Time for another appointment? Book here: ${bookingLink}`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
@@ -142,10 +140,9 @@ export async function GET() {
       if (!appt.client_phone) continue
       if (!appt.profiles?.google_review_link) continue
 
-      const businessName = appt.profiles?.business_name || 'your groomer'
       const reviewLink = appt.profiles.google_review_link
 
-      const message = `PawBooking: Thanks for visiting ${businessName} today! If you have a moment, please leave a Google review: ${reviewLink} It really helps!`
+      const message = `PawBooking: Thanks for your visit today! If you have a moment, please leave a Google review: ${reviewLink} It really helps!`
 
       const ok = await sendSMS(appt.client_phone, message)
       if (ok) {
