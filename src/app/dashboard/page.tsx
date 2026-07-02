@@ -294,7 +294,6 @@ function CalendarPage({ profile, supabase }: {
                       color: '#1A3329',
                       resize: 'none',
                       fontFamily: 'inherit',
-                      rows: 2,
                     }}
                     rows={2}
                   />
