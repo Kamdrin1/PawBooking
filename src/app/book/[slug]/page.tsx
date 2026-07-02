@@ -538,7 +538,7 @@ export default function BookingPage() {
             )}
 
             {/* SUBMIT */}
-            <button type="submit" disabled={loading || !smsConsent || (date && isDateDisabled(date))} className="submit-btn"
+            disabled={loading || !smsConsent || (date ? isDateDisabled(date) : false)}
               style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent || (date && isDateDisabled(date)) ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
