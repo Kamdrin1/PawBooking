@@ -17,6 +17,11 @@ interface Profile {
   business_name: string
   service_area: string
   payment_methods: string[]
+  availability: { days: Record<string, boolean>; startTime: string; endTime: string }
+}
+
+interface UnavailableDate {
+  date: string
 }
 
 function formatPhone(raw: string): string {
@@ -25,6 +30,24 @@ function formatPhone(raw: string): string {
   if (digits.length <= 3) return `+1 (${digits}`
   if (digits.length <= 6) return `+1 (${digits.slice(0, 3)}) ${digits.slice(3)}`
   return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+}
+
+function generateTimeSlots(startTime: string, endTime: string): string[] {
+  const slots: string[] = []
+  const [startH, startM] = startTime.split(':').map(Number)
+  const [endH, endM] = endTime.split(':').map(Number)
+  
+  let current = new Date(2000, 0, 1, startH, startM)
+  const end = new Date(2000, 0, 1, endH, endM)
+  
+  while (current < end) {
+    const h = String(current.getHours()).padStart(2, '0')
+    const m = String(current.getMinutes()).padStart(2, '0')
+    slots.push(`${h}:${m}`)
+    current.setMinutes(current.getMinutes() + 30)
+  }
+  
+  return slots
 }
 
 export default function BookingPage() {
@@ -36,8 +59,9 @@ export default function BookingPage() {
   const [services, setServices] = useState<Service[]>([])
   const [notFound, setNotFound] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [unavailableDates, setUnavailableDates] = useState<Set<string>>(new Set())
 
   const [clientName, setClientName] = useState('')
   const [clientPhone, setClientPhone] = useState('')
@@ -54,7 +78,7 @@ export default function BookingPage() {
     async function load() {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, business_name, service_area, payment_methods')
+        .select('id, business_name, service_area, payment_methods, availability')
         .eq('slug', slug)
         .single()
 
@@ -66,20 +90,91 @@ export default function BookingPage() {
 
       setServices(serviceData || [])
       if (serviceData && serviceData.length > 0) setServiceId(serviceData[0].id)
+
+      // Load unavailable dates
+      const { data: unavailData } = await supabase
+        .from('unavailable_dates')
+        .select('date')
+        .eq('profile_id', profiles.id)
+      
+      if (unavailData) {
+        setUnavailableDates(new Set(unavailData.map(d => d.date)))
+      }
+
+      // Subscribe to real-time unavailable dates updates
+      const subscription = supabase
+        .channel(`unavailable_dates:profile_id=eq.${profiles.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'unavailable_dates',
+            filter: `profile_id=eq.${profiles.id}`
+          },
+          (payload) => {
+            if (payload.eventType === 'INSERT') {
+              setUnavailableDates(prev => new Set([...prev, payload.new.date]))
+            } else if (payload.eventType === 'DELETE') {
+              setUnavailableDates(prev => {
+                const updated = new Set(prev)
+                updated.delete(payload.old.date)
+                return updated
+              })
+            }
+          }
+        )
+        .subscribe()
+
+      setLoading(false)
+
+      return () => {
+        subscription.unsubscribe()
+      }
     }
     load()
   }, [slug])
 
   const selectedService = services.find(s => s.id === serviceId)
+  const availability = profile?.availability || { days: {}, startTime: '09:00', endTime: '17:00' }
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const timeSlots = generateTimeSlots(availability.startTime, availability.endTime)
 
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     const digits = e.target.value.replace(/\D/g, '').replace(/^1/, '').slice(0, 10)
     setClientPhone(formatPhone(digits))
   }
 
+  function isDateDisabled(dateStr: string): boolean {
+    // Check if date is in unavailable dates
+    if (unavailableDates.has(dateStr)) return true
+    
+    // Check if day of week is available
+    const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay()
+    const dayName = dayNames[dayOfWeek]
+    if (!availability.days[dayName]) return true
+    
+    // Check if date is in the past
+    const today = new Date().toISOString().split('T')[0]
+    if (dateStr < today) return true
+    
+    return false
+  }
+
+  function getDateStatus(dateStr: string): string {
+    if (dateStr < new Date().toISOString().split('T')[0]) return 'past'
+    if (unavailableDates.has(dateStr)) return 'unavailable'
+    const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay()
+    const dayName = dayNames[dayOfWeek]
+    if (!availability.days[dayName]) return 'closed'
+    return 'available'
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!smsConsent) { setError('Please agree to receive SMS reminders to complete your booking.'); return }
+    if (isDateDisabled(date)) { setError('This date is not available. Please select another.'); return }
+    
     setLoading(true); setError('')
 
     const { error } = await supabase.from('appointments').insert({
@@ -221,6 +316,9 @@ export default function BookingPage() {
           outline: none; border-color: #2D6A4F !important;
           box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
         }
+        input:disabled, select:disabled {
+          opacity: 0.5; cursor: not-allowed !important;
+        }
         .service-card {
           border: 2px solid rgba(237,233,223,0.8); border-radius: 18px; padding: 16px;
           cursor: pointer; transition: all 0.2s ease;
@@ -243,8 +341,8 @@ export default function BookingPage() {
           color: white; transition: all 0.25s ease;
           box-shadow: 0 4px 15px rgba(26,51,41,0.25);
         }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,51,41,0.35); }
-        .submit-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(26,51,41,0.35); }
+        .submit-btn:disabled { opacity: 0.5; transform: none; box-shadow: none; cursor: not-allowed; }
         label { color: #6B7280; font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
         .two-col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         @media (max-width: 480px) {
@@ -320,12 +418,25 @@ export default function BookingPage() {
                   <input type="date" value={date} onChange={e => setDate(e.target.value)}
                     required min={new Date().toISOString().split('T')[0]}
                     style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
+                  {date && isDateDisabled(date) && (
+                    <div style={{ fontSize: '11px', color: '#DC2626', marginTop: '4px' }}>
+                      ⚠️ {getDateStatus(date) === 'unavailable' ? 'Groomer unavailable' : 'Not available'}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label>Preferred Time *</label>
-                  <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                    required
-                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
+                  <select value={time} onChange={e => setTime(e.target.value)}
+                    required disabled={!date}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }}>
+                    <option value="">{!date ? 'Select date first' : 'Select time'}</option>
+                    {timeSlots.map(slot => (
+                      <option key={slot} value={slot}>{(() => { const [h, m] = slot.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()} ({slot})</option>
+                    ))}
+                  </select>
+                  <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
+                    {availability.startTime} - {availability.endTime}
+                  </div>
                 </div>
               </div>
             </div>
@@ -387,7 +498,7 @@ export default function BookingPage() {
             </div>
 
             {/* BOOKING SUMMARY */}
-            {selectedService && date && time && (
+            {selectedService && date && time && !isDateDisabled(date) && (
               <div style={{ borderRadius: '20px', padding: '20px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.15)', boxShadow: '0 4px 16px rgba(45,106,79,0.1)' }}>
                 <h2 style={{ fontWeight: 700, marginBottom: '12px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1A5C36' }}>Booking Summary</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -427,8 +538,8 @@ export default function BookingPage() {
             )}
 
             {/* SUBMIT */}
-            <button type="submit" disabled={loading || !smsConsent} className="submit-btn"
-              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent ? 'not-allowed' : 'pointer' }}>
+            <button type="submit" disabled={loading || !smsConsent || (date && isDateDisabled(date))} className="submit-btn"
+              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent || (date && isDateDisabled(date)) ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
 
