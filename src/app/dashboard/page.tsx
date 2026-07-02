@@ -71,6 +71,15 @@ function CalendarPage({ profile, supabase }: {
     </div>
   )
 
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const availability = profile.availability || { days: {}, startTime: '09:00', endTime: '17:00' }
+
+  // Get available days of week
+  const availableDaysOfWeek = availability.days ? Object.entries(availability.days)
+    .filter(([_, isAvailable]) => isAvailable)
+    .map(([day, _]) => dayNames.indexOf(day)) : []
+
   useEffect(() => {
     async function loadUnavailableDates() {
       const { data: { user } } = await supabase.auth.getUser()
@@ -117,15 +126,6 @@ function CalendarPage({ profile, supabase }: {
     }
     setSavingReason(false)
   }
-
-  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const availability = profile.availability
-
-  // Get available days of week
-  const availableDaysOfWeek = Object.entries(availability.days)
-    .filter(([_, isAvailable]) => isAvailable)
-    .map(([day, _]) => dayNames.indexOf(day))
 
   // Generate calendar days
   const year = currentMonth.getFullYear()
@@ -204,7 +204,6 @@ function CalendarPage({ profile, supabase }: {
               const isAvailable = isDayAvailable(day)
               const isPast = isPastDate(day)
               const isToday = dateStr === today
-              const existingDate = unavailableDates.find(d => d.date === dateStr)
 
               return (
                 <button
