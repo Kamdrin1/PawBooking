@@ -173,7 +173,7 @@ export default function BookingPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!smsConsent) { setError('Please agree to receive SMS reminders to complete your booking.'); return }
-    if (isDateDisabled(date)) { setError('This date is not available. Please select another.'); return }
+    if (date && isDateDisabled(date)) { setError('This date is not available. Please select another.'); return }
     
     setLoading(true); setError('')
 
@@ -538,8 +538,8 @@ export default function BookingPage() {
             )}
 
             {/* SUBMIT */}
-            disabled={loading || !smsConsent || (date ? isDateDisabled(date) : false)}
-              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: loading || !smsConsent || (date && isDateDisabled(date)) ? 'not-allowed' : 'pointer' }}>
+            <button type="submit" disabled={(loading || !smsConsent || (date ? isDateDisabled(date) : false))} className="submit-btn"
+              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: (loading || !smsConsent || (date ? isDateDisabled(date) : false)) ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
 
