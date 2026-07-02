@@ -65,6 +65,12 @@ function CalendarPage({ profile, supabase }: {
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
 
+  if (!profile?.availability) return (
+    <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+      <div style={{ fontSize: '14px', color: '#9CA3AF' }}>Loading calendar...</div>
+    </div>
+  )
+
   useEffect(() => {
     async function loadUnavailableDates() {
       const { data: { user } } = await supabase.auth.getUser()
@@ -114,7 +120,7 @@ function CalendarPage({ profile, supabase }: {
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const availability = profile?.availability || { days: {}, startTime: '09:00', endTime: '17:00' }
+  const availability = profile.availability
 
   // Get available days of week
   const availableDaysOfWeek = Object.entries(availability.days)
@@ -791,12 +797,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming'>('today')
   const [activePage, setActivePage] = useState<'dashboard' | 'appointments' | 'clients' | 'services' | 'calendar' | 'reports' | 'settings'>('dashboard')
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
-  const [newServiceName, setNewServiceName] = useState('')
-  const [newServicePrice, setNewServicePrice] = useState('')
-  const [editingService, setEditingService] = useState<Service | null>(null)
-  const [serviceError, setServiceError] = useState('')
   const [monthlyApptCount, setMonthlyApptCount] = useState(0)
-  const [newPaymentTypes, setNewPaymentTypes] = useState<string[]>([])
   const [completingAppt, setCompletingAppt] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
@@ -837,44 +838,6 @@ export default function DashboardPage() {
     }
     setCompletingAppt(null)
   }
-  async function handleAddService() {
-    setServiceError('')
-    if (!newServiceName.trim()) { setServiceError('Service name is required'); return }
-    if (newPaymentTypes.length === 0) { setServiceError('Select at least one payment type'); return }
-    const duplicate = services.find(s => s.name.toLowerCase() === newServiceName.toLowerCase().trim())
-    if (duplicate) { setServiceError(`"${newServiceName}" already exists`); return }
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { data, error } = await supabase.from('services').insert({
-      profile_id: user.id, name: newServiceName.trim(), price: parseFloat(newServicePrice) || 0, duration_minutes: 60,
-      payment_type: newPaymentTypes.includes('online') && newPaymentTypes.includes('in_person') ? 'full' : newPaymentTypes.includes('online') ? 'full' : 'none', deposit_amount: 0,
-    }).select().single()
-    if (error) { setServiceError(error.message); return }
-    setServices(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
-    setNewServiceName(''); setNewServicePrice(''); setNewPaymentTypes([])
-  }
-  async function handleUpdateService() {
-    if (!editingService) return; setServiceError('')
-    const duplicate = services.find(s => s.name.toLowerCase() === editingService.name.toLowerCase().trim() && s.id !== editingService.id)
-    if (duplicate) { setServiceError(`"${editingService.name}" already exists`); return }
-    const { error } = await supabase.from('services').update({ name: editingService.name.trim(), price: editingService.price }).eq('id', editingService.id)
-    if (error) { setServiceError(error.message); return }
-    setServices(prev => prev.map(s => s.id === editingService.id ? editingService : s).sort((a, b) => a.name.localeCompare(b.name)))
-    setEditingService(null)
-  }
-  async function handleDeleteService(id: string) {
-    if (!confirm('Delete this service?')) return
-    await supabase.from('services').delete().eq('id', id)
-    setServices(prev => prev.filter(s => s.id !== id))
-  }
-
-  function getServicePaymentLabel(service: Service) {
-    const hasInPerson = service.payment_type === 'none' || (service.payment_type === 'full' && profile?.payment_methods?.includes('in_person'))
-    const hasOnline = service.payment_type === 'full'
-    if (hasOnline && hasInPerson) return '💵 Pay in Person · 💳 Pay Online'
-    if (hasOnline) return '💳 Pay Online'
-    return '💵 Pay in Person'
-  }
 
   const today = new Date().toISOString().split('T')[0]
   const todayAppts = appointments.filter(a => a.appointment_date === today)
@@ -896,7 +859,6 @@ export default function DashboardPage() {
     return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   }
   function getInitials(name: string) { return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) }
-  function getPaymentLabel(method: string) { return method === 'online' ? '💳 Online' : '💵 In Person' }
 
   const avatarColors = [
     { bg: '#D8F3DC', text: '#1A3329' }, { bg: '#FDE8D8', text: '#7C2D12' },
@@ -946,10 +908,6 @@ export default function DashboardPage() {
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .tab-btn { transition: all 0.15s ease; border-bottom: 2px solid transparent; background: none; border-left: none; border-right: none; border-top: none; cursor: pointer; }
         .tab-active-style { border-bottom: 2px solid #1A3329 !important; color: #1A3329 !important; font-weight: 600; }
-        .service-row { border-bottom: 1px solid rgba(237,233,223,0.7); transition: background 0.15s; }
-        .service-row:hover { background: #F5F2EB; }
-        .service-row:last-child { border-bottom: none; }
-        input:focus, textarea:focus { outline: none; border-color: #2D6A4F !important; box-shadow: 0 0 0 3px rgba(45,106,79,0.1); }
 
         /* LAYOUT */
         .dash-layout { display: flex; min-height: 100vh; }
@@ -1020,8 +978,6 @@ export default function DashboardPage() {
           .appt-meta { display: none !important; }
           .modal-inner { padding: 16px !important; }
           .modal-actions { padding: 0 16px 16px !important; }
-          .service-edit-row { flex-wrap: wrap; gap: 8px; }
-          .service-price-input { width: 100% !important; }
         }
 
         @media (max-width: 480px) {
@@ -1162,7 +1118,6 @@ export default function DashboardPage() {
                       <div style={{ fontSize: '36px', marginBottom: '12px' }}>🐾</div>
                       <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>No appointments {activeTab === 'today' ? 'today' : 'coming up'}</div>
                       <div style={{ fontSize: '13px', color: '#9CA3AF', marginBottom: '20px' }}>Add one to fill your schedule</div>
-                      <button onClick={() => router.push('/appointments/new')} className="btn-new" style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 600 }}>Add Appointment</button>
                     </div>
                   ) : displayAppts.map(appt => {
                     const color = getAvatarColor(appt.client_name)
@@ -1209,9 +1164,6 @@ export default function DashboardPage() {
               router={router}
             />
           )}
-
-          {/* ... rest of pages (appointments, clients, services) stay the same as original ... */}
-          {/* I'll keep those pages but they're large, so just note they remain unchanged */}
 
         </main>
       </div>
@@ -1279,12 +1231,6 @@ export default function DashboardPage() {
                 <button onClick={() => handleMarkComplete(selectedAppt.id)} disabled={completingAppt === selectedAppt.id}
                   style={{ flex: 1, padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#1A5C36', border: '1px solid rgba(45,106,79,0.15)', cursor: 'pointer', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', opacity: completingAppt === selectedAppt.id ? 0.5 : 1 }}>
                   {completingAppt === selectedAppt.id ? 'Saving...' : '✓ Mark Complete'}
-                </button>
-              )}
-              {selectedAppt.status !== 'completed' && (
-                <button onClick={() => router.push(`/appointments/new?edit=${selectedAppt.id}`)}
-                  style={{ padding: '14px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
-                  Edit
                 </button>
               )}
               <button onClick={() => { if (confirm('Delete this appointment?')) handleDelete(selectedAppt.id) }}
