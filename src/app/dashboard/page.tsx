@@ -65,7 +65,7 @@ function CalendarPage({ profile, supabase }: {
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
 
-  if (!profile?.availability) return (
+  if (!profile) return (
     <div style={{ padding: '60px 20px', textAlign: 'center' }}>
       <div style={{ fontSize: '14px', color: '#9CA3AF' }}>Loading calendar...</div>
     </div>
