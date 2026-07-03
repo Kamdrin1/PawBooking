@@ -243,7 +243,6 @@ function CalendarPage({ profile, supabase }: {
               )
             })}
           </div>
-        </div>
           </div>
 
           {/* NOTES COLUMN */}
