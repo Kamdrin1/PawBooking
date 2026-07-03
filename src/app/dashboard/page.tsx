@@ -66,8 +66,6 @@ function CalendarPage({ profile, supabase }: {
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
   const [togglingDate, setTogglingDate] = useState(false)
-  const [showUnavailable, setShowUnavailable] = useState(true)
-  const [showNonWorking, setShowNonWorking] = useState(true)
 
   if (!profile) return (
     <div style={{ padding: '60px 20px', textAlign: 'center' }}>
@@ -182,8 +180,10 @@ function CalendarPage({ profile, supabase }: {
         <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Calendar</h1>
         <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Mark dates when you're unavailable</p>
       </header>
-      <div className="page-content" style={{ maxWidth: '900px' }}>
-        <div className="dash-card rounded-2xl" style={{ padding: '32px', marginBottom: '16px' }}>
+      <div className="page-content" style={{ maxWidth: '1400px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '24px' }}>
+          {/* CALENDAR COLUMN */}
+          <div className="dash-card rounded-2xl" style={{ padding: '32px', marginBottom: '16px' }}>
           {/* MONTH NAVIGATION */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
             <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
@@ -244,87 +244,97 @@ function CalendarPage({ profile, supabase }: {
             })}
           </div>
         </div>
-
-        {/* DETAILS PANEL */}
-        {selectedDate && (
-          <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>
-                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </div>
-                <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
-                  {isDateUnavailable ? 'Marked as unavailable' : 'Available for bookings'}
-                </div>
-              </div>
-              <button onClick={() => { setSelectedDate(null); setReason('') }}
-                style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', color: '#6B7280', border: 'none', cursor: 'pointer' }}>
-                ✕
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* UNAVAILABLE CHECKBOX */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
-                <input 
-                  type="checkbox"
-                  checked={isDateUnavailable}
-                  onChange={(e) => handleToggleDate(selectedDate, e.target.checked)}
-                  disabled={togglingDate}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#DC2626' }}
-                />
-                <label style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329', cursor: 'pointer', flex: 1 }}>
-                  Mark as unavailable
-                </label>
-              </div>
-
-              {/* REASON (only show if unavailable) */}
-              {isDateUnavailable && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
-                    Reason (optional)
-                  </label>
-                  <textarea
-                    value={reason}
-                    onChange={e => setReason(e.target.value)}
-                    placeholder="e.g., Holiday, Personal day, Training, etc."
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      background: '#F5F2EB',
-                      border: '1px solid #EDE9DF',
-                      color: '#1A3329',
-                      resize: 'none',
-                      fontFamily: 'inherit',
-                    }}
-                    rows={2}
-                  />
-                  <button onClick={handleSaveReason} disabled={savingReason}
-                    style={{
-                      marginTop: '8px',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      color: '#1A5C36',
-                      border: '1px solid rgba(45,106,79,0.15)',
-                      background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)',
-                      cursor: 'pointer',
-                      opacity: savingReason ? 0.5 : 1,
-                    }}>
-                    {savingReason ? 'Saving...' : 'Save Reason'}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '12px' }}>
-              💡 Click any date to mark it available or unavailable
-            </p>
           </div>
-        )}
+
+          {/* NOTES COLUMN */}
+          <div className="dash-card rounded-2xl" style={{ padding: '20px', height: 'fit-content', position: 'sticky', top: '100px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Notes</h3>
+            
+            {selectedDate ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>
+                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </div>
+
+                {/* CHECKBOX */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
+                  <input 
+                    type="checkbox"
+                    checked={isDateUnavailable}
+                    onChange={(e) => handleToggleDate(selectedDate, e.target.checked)}
+                    disabled={togglingDate}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#DC2626' }}
+                  />
+                  <label style={{ fontSize: '12px', fontWeight: 500, color: '#1A3329', cursor: 'pointer', flex: 1 }}>
+                    Unavailable
+                  </label>
+                </div>
+                
+                {isDateUnavailable && (
+                  <div style={{ padding: '12px', borderRadius: '8px', background: '#FEE2E2', border: '1px solid #FECACA' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: '#DC2626', marginBottom: '4px' }}>Status</div>
+                    <div style={{ fontSize: '13px', color: '#991B1B' }}>
+                      {reason || 'No reason provided'}
+                    </div>
+                  </div>
+                )}
+
+                {isDateUnavailable && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
+                      Add note
+                    </label>
+                    <textarea
+                      value={reason}
+                      onChange={e => setReason(e.target.value)}
+                      placeholder="Holiday, personal day, training..."
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        background: '#F5F2EB',
+                        border: '1px solid #EDE9DF',
+                        color: '#1A3329',
+                        resize: 'none',
+                        fontFamily: 'inherit',
+                      }}
+                      rows={3}
+                    />
+                    <button onClick={handleSaveReason} disabled={savingReason}
+                      style={{
+                        marginTop: '8px',
+                        width: '100%',
+                        padding: '6px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: '#1A5C36',
+                        border: '1px solid rgba(45,106,79,0.15)',
+                        background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)',
+                        cursor: 'pointer',
+                        opacity: savingReason ? 0.5 : 1,
+                      }}>
+                      {savingReason ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                )}
+
+                {!isDateUnavailable && (
+                  <div style={{ padding: '16px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF', textAlign: 'center' }}>
+                    <div style={{ fontSize: '24px', marginBottom: '6px' }}>📅</div>
+                    <div style={{ fontSize: '12px', color: '#6B7280' }}>Available for bookings</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ padding: '24px', textAlign: 'center', color: '#9CA3AF' }}>
+                <div style={{ fontSize: '28px', marginBottom: '8px' }}>📝</div>
+                <div style={{ fontSize: '12px' }}>Select a date to add notes</div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </>
   )
