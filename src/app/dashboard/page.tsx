@@ -61,7 +61,7 @@ function CalendarPage({ profile, supabase }: {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [isDateUnavailable, setIsDateUnavailable] = useState(false)
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
@@ -93,37 +93,50 @@ function CalendarPage({ profile, supabase }: {
     loadUnavailableDates()
   }, [])
 
-  async function handleToggleDate(dateStr: string, newUnavailableState: boolean) {
+  async function handleToggleDates(newUnavailableState: boolean) {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user || selectedDates.length === 0) return
     setTogglingDate(true)
 
-    const existing = unavailableDates.find(d => d.date === dateStr)
-    
-    if (newUnavailableState && !existing) {
-      // Mark as unavailable
-      const { data, error } = await supabase.from('unavailable_dates').insert({
-        profile_id: user.id,
-        date: dateStr,
-        reason: null,
-      }).select().single()
-      if (!error && data) {
-        setUnavailableDates(prev => [...prev, data])
-        setIsDateUnavailable(true)
+    let updatedUnavailable = [...unavailableDates]
+
+    for (const dateStr of selectedDates) {
+      const existing = updatedUnavailable.find(d => d.date === dateStr)
+      
+      if (newUnavailableState && !existing) {
+        // Mark as unavailable
+        const { data, error } = await supabase.from('unavailable_dates').insert({
+          profile_id: user.id,
+          date: dateStr,
+          reason: null,
+        }).select().single()
+        if (!error && data) {
+          updatedUnavailable = [...updatedUnavailable, data]
+        }
+      } else if (!newUnavailableState && existing) {
+        // Mark as available
+        await supabase.from('unavailable_dates').delete().eq('id', existing.id)
+        updatedUnavailable = updatedUnavailable.filter(d => d.id !== existing.id)
       }
-    } else if (!newUnavailableState && existing) {
-      // Mark as available
-      await supabase.from('unavailable_dates').delete().eq('id', existing.id)
-      setUnavailableDates(prev => prev.filter(d => d.id !== existing.id))
-      setIsDateUnavailable(false)
     }
+    
+    setUnavailableDates(updatedUnavailable)
+    
+    // Update isDateUnavailable for first selected date
+    if (selectedDates.length > 0) {
+      const firstDate = selectedDates[0]
+      const existing = updatedUnavailable.find(d => d.date === firstDate)
+      setIsDateUnavailable(!!existing)
+    }
+    
     setTogglingDate(false)
   }
 
   async function handleSaveReason() {
-    if (!selectedDate) return
+    if (selectedDates.length === 0) return
     setSavingReason(true)
-    const existing = unavailableDates.find(d => d.date === selectedDate)
+    const firstDate = selectedDates[0]
+    const existing = unavailableDates.find(d => d.date === firstDate)
     if (existing) {
       const { error } = await supabase.from('unavailable_dates').update({ reason: reason.trim() || null }).eq('id', existing.id)
       if (!error) {
@@ -133,12 +146,31 @@ function CalendarPage({ profile, supabase }: {
     setSavingReason(false)
   }
 
-  function handleDateClick(day: number) {
+  function handleDateClick(day: number, e: React.MouseEvent) {
     const dateStr = getDateString(day)
-    setSelectedDate(dateStr)
-    const existing = unavailableDates.find(d => d.date === dateStr)
-    setIsDateUnavailable(!!existing)
-    setReason(existing?.reason || '')
+    const isCtrlOrCmd = e.ctrlKey || e.metaKey
+    
+    let newSelectedDates: string[]
+    if (isCtrlOrCmd) {
+      // Multi-select with Ctrl/Cmd
+      newSelectedDates = selectedDates.includes(dateStr) 
+        ? selectedDates.filter(d => d !== dateStr)
+        : [...selectedDates, dateStr]
+    } else {
+      // Single select
+      newSelectedDates = [dateStr]
+      const existing = unavailableDates.find(d => d.date === dateStr)
+      setReason(existing?.reason || '')
+    }
+    
+    setSelectedDates(newSelectedDates)
+    
+    // Update isDateUnavailable based on first selected date
+    if (newSelectedDates.length > 0) {
+      const firstDate = newSelectedDates[0]
+      const existing = unavailableDates.find(d => d.date === firstDate)
+      setIsDateUnavailable(!!existing)
+    }
   }
 
   // Generate calendar days
@@ -220,12 +252,13 @@ function CalendarPage({ profile, supabase }: {
               const isAvailable = isDayAvailable(day)
               const isPast = isPastDate(day)
               const isToday = dateStr === today
-              const isSelected = selectedDate === dateStr
+              const isSelected = selectedDates.includes(dateStr)
 
               return (
                 <button
                   key={day}
-                  onClick={() => handleDateClick(day)}
+                  onClick={(e) => handleDateClick(day, e)}
+                  title="Click to select, Ctrl+Click to multi-select"
                   style={{
                     padding: '16px 8px',
                     borderRadius: '12px',
@@ -249,27 +282,42 @@ function CalendarPage({ profile, supabase }: {
           <div className="dash-card rounded-2xl" style={{ padding: '20px', height: 'fit-content', position: 'sticky', top: '100px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Notes</h3>
             
-            {selectedDate ? (
+            {selectedDates.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>
-                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                  {selectedDates.length === 1 
+                    ? new Date(selectedDates[0] + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+                    : `${selectedDates.length} dates selected`}
                 </div>
+
+                {selectedDates.length > 1 && (
+                  <div style={{ padding: '12px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>Selected:</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {selectedDates.sort().map(date => (
+                        <span key={date} style={{ background: '#D8F3DC', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', color: '#1A5C36' }}>
+                          {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* CHECKBOX */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
                   <input 
                     type="checkbox"
                     checked={isDateUnavailable}
-                    onChange={(e) => handleToggleDate(selectedDate, e.target.checked)}
+                    onChange={(e) => handleToggleDates(e.target.checked)}
                     disabled={togglingDate}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#DC2626' }}
                   />
                   <label style={{ fontSize: '12px', fontWeight: 500, color: '#1A3329', cursor: 'pointer', flex: 1 }}>
-                    Unavailable
+                    {selectedDates.length === 1 ? 'Unavailable' : `Mark all unavailable`}
                   </label>
                 </div>
                 
-                {isDateUnavailable && (
+                {isDateUnavailable && selectedDates.length === 1 && (
                   <div style={{ padding: '12px', borderRadius: '8px', background: '#FEE2E2', border: '1px solid #FECACA' }}>
                     <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: '#DC2626', marginBottom: '4px' }}>Status</div>
                     <div style={{ fontSize: '13px', color: '#991B1B' }}>
@@ -278,7 +326,7 @@ function CalendarPage({ profile, supabase }: {
                   </div>
                 )}
 
-                {isDateUnavailable && (
+                {isDateUnavailable && selectedDates.length === 1 && (
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
                       Add note
@@ -319,7 +367,7 @@ function CalendarPage({ profile, supabase }: {
                   </div>
                 )}
 
-                {!isDateUnavailable && (
+                {!isDateUnavailable && selectedDates.length === 1 && (
                   <div style={{ padding: '16px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF', textAlign: 'center' }}>
                     <div style={{ fontSize: '24px', marginBottom: '6px' }}>📅</div>
                     <div style={{ fontSize: '12px', color: '#6B7280' }}>Available for bookings</div>
@@ -329,7 +377,7 @@ function CalendarPage({ profile, supabase }: {
             ) : (
               <div style={{ padding: '24px', textAlign: 'center', color: '#9CA3AF' }}>
                 <div style={{ fontSize: '28px', marginBottom: '8px' }}>📝</div>
-                <div style={{ fontSize: '12px' }}>Select a date to add notes</div>
+                <div style={{ fontSize: '12px' }}>Click dates to select<br/><span style={{ fontSize: '11px', fontWeight: 500 }}>Ctrl+Click for multi-select</span></div>
               </div>
             )}
           </div>
