@@ -226,17 +226,16 @@ function CalendarPage({ profile, supabase }: {
                 <button
                   key={day}
                   onClick={() => handleDateClick(day)}
-                  disabled={isPast || !isAvailable}
                   style={{
                     padding: '16px 8px',
                     borderRadius: '12px',
                     fontSize: '18px',
                     fontWeight: 700,
                     border: isSelected ? '3px solid #1A3329' : isMarkedUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
-                    background: isPast ? '#EDE9DF' : isMarkedUnavailable ? '#DC2626' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
-                    color: isPast ? '#9CA3AF' : isMarkedUnavailable ? 'white' : isToday ? '#1A3329' : !isAvailable ? '#9CA3AF' : '#1A3329',
-                    cursor: isPast || !isAvailable ? 'not-allowed' : 'pointer',
-                    opacity: isPast || !isAvailable ? 0.5 : 1,
+                    background: isMarkedUnavailable ? '#DC2626' : isPast ? '#EDE9DF' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
+                    color: isMarkedUnavailable ? 'white' : isPast ? '#9CA3AF' : isToday ? '#1A3329' : !isAvailable ? '#9CA3AF' : '#1A3329',
+                    cursor: 'pointer',
+                    opacity: 1,
                     transition: 'all 0.15s',
                   }}>
                   {day}
@@ -288,7 +287,7 @@ function CalendarPage({ profile, supabase }: {
                   checked={isDateUnavailable}
                   onChange={(e) => handleToggleDate(selectedDate, e.target.checked)}
                   disabled={togglingDate}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#DC2626' }}
                 />
                 <label style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329', cursor: 'pointer', flex: 1 }}>
                   Mark as unavailable
