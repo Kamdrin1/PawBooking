@@ -61,9 +61,13 @@ function CalendarPage({ profile, supabase }: {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDates, setSelectedDates] = useState<string[]>([])
+  const [selectedDateForReason, setSelectedDateForReason] = useState<string | null>(null)
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
+  const [showAvailable, setShowAvailable] = useState(true)
+  const [showUnavailable, setShowUnavailable] = useState(true)
+  const [showNonWorking, setShowNonWorking] = useState(true)
 
   if (!profile) return (
     <div style={{ padding: '60px 20px', textAlign: 'center' }}>
@@ -91,33 +95,33 @@ function CalendarPage({ profile, supabase }: {
     loadUnavailableDates()
   }, [])
 
-  async function handleToggleDate(dateStr: string) {
+  async function handleToggleDates(datesToToggle: string[]) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const existing = unavailableDates.find(d => d.date === dateStr)
-    if (existing) {
-      await supabase.from('unavailable_dates').delete().eq('id', existing.id)
-      setUnavailableDates(prev => prev.filter(d => d.id !== existing.id))
-      setSelectedDate(null)
-      setReason('')
-    } else {
-      const { data, error } = await supabase.from('unavailable_dates').insert({
-        profile_id: user.id,
-        date: dateStr,
-        reason: null,
-      }).select().single()
-      if (!error && data) {
-        setUnavailableDates(prev => [...prev, data])
-        setSelectedDate(dateStr)
+    for (const dateStr of datesToToggle) {
+      const existing = unavailableDates.find(d => d.date === dateStr)
+      if (existing) {
+        await supabase.from('unavailable_dates').delete().eq('id', existing.id)
+        setUnavailableDates(prev => prev.filter(d => d.id !== existing.id))
+      } else {
+        const { data, error } = await supabase.from('unavailable_dates').insert({
+          profile_id: user.id,
+          date: dateStr,
+          reason: null,
+        }).select().single()
+        if (!error && data) {
+          setUnavailableDates(prev => [...prev, data])
+        }
       }
     }
+    setSelectedDates([])
   }
 
   async function handleSaveReason() {
-    if (!selectedDate) return
+    if (!selectedDateForReason) return
     setSavingReason(true)
-    const existing = unavailableDates.find(d => d.date === selectedDate)
+    const existing = unavailableDates.find(d => d.date === selectedDateForReason)
     if (existing) {
       const { error } = await supabase.from('unavailable_dates').update({ reason: reason.trim() || null }).eq('id', existing.id)
       if (!error) {
@@ -125,6 +129,23 @@ function CalendarPage({ profile, supabase }: {
       }
     }
     setSavingReason(false)
+  }
+
+  function handleDateClick(day: number, e: React.MouseEvent) {
+    const dateStr = getDateString(day)
+    const isCtrlOrCmd = e.ctrlKey || e.metaKey
+    
+    if (isCtrlOrCmd) {
+      setSelectedDates(prev => 
+        prev.includes(dateStr) 
+          ? prev.filter(d => d !== dateStr)
+          : [...prev, dateStr]
+      )
+    } else {
+      setSelectedDates([dateStr])
+      setSelectedDateForReason(dateStr)
+      setReason(unavailableDates.find(d => d.date === dateStr)?.reason || '')
+    }
   }
 
   // Generate calendar days
@@ -166,34 +187,34 @@ function CalendarPage({ profile, supabase }: {
         <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Calendar</h1>
         <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Mark dates when you're unavailable</p>
       </header>
-      <div className="page-content" style={{ maxWidth: '600px' }}>
-        <div className="dash-card rounded-2xl" style={{ padding: '20px', marginBottom: '16px' }}>
+      <div className="page-content" style={{ maxWidth: '900px' }}>
+        <div className="dash-card rounded-2xl" style={{ padding: '32px', marginBottom: '16px' }}>
           {/* MONTH NAVIGATION */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
             <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
-              style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>
+              style={{ width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>
               ‹
             </button>
-            <h2 className="playfair" style={{ fontSize: '18px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.01em' }}>
+            <h2 className="playfair" style={{ fontSize: '28px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>
               {new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </h2>
             <button onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
-              style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>
+              style={{ width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>
               ›
             </button>
           </div>
 
           {/* DAYS OF WEEK */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', marginBottom: '16px' }}>
             {daysOfWeek.map(day => (
-              <div key={day} style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700, color: '#9CA3AF', paddingBottom: '8px' }}>
+              <div key={day} style={{ textAlign: 'center', fontSize: '14px', fontWeight: 700, color: '#9CA3AF', paddingBottom: '8px' }}>
                 {day}
               </div>
             ))}
           </div>
 
           {/* CALENDAR GRID */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
             {calendarDays.map((day, i) => {
               if (day === null) {
                 return <div key={`empty-${i}`} />
@@ -204,19 +225,21 @@ function CalendarPage({ profile, supabase }: {
               const isAvailable = isDayAvailable(day)
               const isPast = isPastDate(day)
               const isToday = dateStr === today
+              const isSelected = selectedDates.includes(dateStr)
 
               return (
                 <button
                   key={day}
-                  onClick={() => setSelectedDate(dateStr)}
+                  onClick={(e) => handleDateClick(day, e)}
                   disabled={isPast || !isAvailable}
+                  title={isPast || !isAvailable ? '' : 'Ctrl+Click to multi-select'}
                   style={{
-                    padding: '12px 8px',
-                    borderRadius: '10px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    border: selectedDate === dateStr ? '2px solid #1A3329' : isUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
-                    background: isPast ? '#EDE9DF' : isUnavailable ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : selectedDate === dateStr ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
+                    padding: '16px 8px',
+                    borderRadius: '12px',
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    border: isSelected ? '3px solid #1A3329' : isUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
+                    background: isPast ? '#EDE9DF' : isUnavailable ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
                     color: isPast ? '#9CA3AF' : isUnavailable ? '#DC2626' : isToday ? '#1A3329' : !isAvailable ? '#9CA3AF' : '#1A3329',
                     cursor: isPast || !isAvailable ? 'not-allowed' : 'pointer',
                     opacity: isPast || !isAvailable ? 0.5 : 1,
@@ -230,42 +253,65 @@ function CalendarPage({ profile, supabase }: {
 
           {/* LEGEND */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '20px', padding: '16px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid #2D6A4F' }} />
+            <button onClick={() => setShowAvailable(!showAvailable)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '2px solid #2D6A4F', opacity: showAvailable ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: '#1A5C36' }}>
+                {showAvailable ? '✓' : ''}
+              </div>
               <span style={{ color: '#6B7280' }}>Available working days</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #FEE2E2, #FEF2F2)', border: '2px solid #DC2626' }} />
+            </button>
+            <button onClick={() => setShowUnavailable(!showUnavailable)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #FEE2E2, #FEF2F2)', border: '2px solid #DC2626', opacity: showUnavailable ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: '#DC2626' }}>
+                {showUnavailable ? '✓' : ''}
+              </div>
               <span style={{ color: '#6B7280' }}>Marked unavailable</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: '#F5F2EB', opacity: 0.5 }} />
+            </button>
+            <button onClick={() => setShowNonWorking(!showNonWorking)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: '#F5F2EB', border: '1px solid #D1D5DB', opacity: showNonWorking ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+                {showNonWorking ? '✓' : ''}
+              </div>
               <span style={{ color: '#9CA3AF' }}>Non-working days or past dates</span>
-            </div>
+            </button>
           </div>
         </div>
 
         {/* DETAILS PANEL */}
-        {selectedDate && (
+        {selectedDates.length > 0 && (
           <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div>
                 <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>
-                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  {selectedDates.length === 1 
+                    ? new Date(selectedDates[0] + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+                    : `${selectedDates.length} dates selected`}
                 </div>
                 <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
-                  {unavailableDates.find(d => d.date === selectedDate) ? 'Currently unavailable' : 'Currently available'}
+                  {selectedDates.length === 1 
+                    ? (unavailableDates.find(d => d.date === selectedDates[0]) ? 'Currently unavailable' : 'Currently available')
+                    : 'Bulk actions available'}
                 </div>
               </div>
-              <button onClick={() => setSelectedDate(null)}
+              <button onClick={() => { setSelectedDates([]); setSelectedDateForReason(null); setReason('') }}
                 style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', color: '#6B7280', border: 'none', cursor: 'pointer' }}>
                 ✕
               </button>
             </div>
 
+            {selectedDates.length > 1 && (
+              <div style={{ marginBottom: '12px', padding: '12px', borderRadius: '8px', background: 'linear-gradient(135deg, rgba(216,243,220,0.2), rgba(216,243,220,0.1))', border: '1px solid rgba(45,106,79,0.1)' }}>
+                <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500 }}>Selected dates:</div>
+                <div style={{ fontSize: '12px', color: '#1A3329', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {selectedDates.sort().map(date => (
+                    <span key={date} style={{ background: '#D8F3DC', padding: '2px 8px', borderRadius: '4px' }}>
+                      {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* TOGGLE */}
-              <button onClick={() => handleToggleDate(selectedDate)}
+              {/* TOGGLE MULTIPLE */}
+              <button onClick={() => handleToggleDates(selectedDates)}
                 style={{
                   padding: '12px 16px',
                   borderRadius: '10px',
@@ -274,13 +320,17 @@ function CalendarPage({ profile, supabase }: {
                   color: 'white',
                   border: 'none',
                   cursor: 'pointer',
-                  background: unavailableDates.find(d => d.date === selectedDate) ? '#DC2626' : 'linear-gradient(135deg, #1A3329, #2D6A4F)',
+                  background: selectedDates.some(d => unavailableDates.find(ud => ud.date === d)) 
+                    ? '#DC2626' 
+                    : 'linear-gradient(135deg, #1A3329, #2D6A4F)',
                 }}>
-                {unavailableDates.find(d => d.date === selectedDate) ? '✓ Mark as Available' : '✕ Mark as Unavailable'}
+                {selectedDates.length === 1 
+                  ? (unavailableDates.find(d => d.date === selectedDates[0]) ? '✓ Mark as Available' : '✕ Mark as Unavailable')
+                  : (selectedDates.some(d => unavailableDates.find(ud => ud.date === d)) ? '✓ Mark All as Available' : '✕ Mark All as Unavailable')}
               </button>
 
-              {/* REASON (only show if unavailable) */}
-              {unavailableDates.find(d => d.date === selectedDate) && (
+              {/* REASON (only show if single date selected and unavailable) */}
+              {selectedDates.length === 1 && unavailableDates.find(d => d.date === selectedDates[0]) && (
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
                     Reason (optional)
@@ -322,7 +372,7 @@ function CalendarPage({ profile, supabase }: {
             </div>
 
             <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '12px' }}>
-              💡 Clients won't be able to book on dates you mark as unavailable.
+              💡 Ctrl+Click (or Cmd+Click on Mac) to select multiple dates
             </p>
           </div>
         )}
