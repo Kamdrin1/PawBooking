@@ -135,12 +135,14 @@ function CalendarPage({ profile, supabase }: {
   async function handleSaveReason() {
     if (selectedDates.length === 0) return
     setSavingReason(true)
-    const firstDate = selectedDates[0]
-    const existing = unavailableDates.find(d => d.date === firstDate)
-    if (existing) {
-      const { error } = await supabase.from('unavailable_dates').update({ reason: reason.trim() || null }).eq('id', existing.id)
-      if (!error) {
-        setUnavailableDates(prev => prev.map(d => d.id === existing.id ? { ...d, reason: reason.trim() || null } : d))
+    
+    for (const dateStr of selectedDates) {
+      const existing = unavailableDates.find(d => d.date === dateStr)
+      if (existing) {
+        const { error } = await supabase.from('unavailable_dates').update({ reason: reason.trim() || null }).eq('id', existing.id)
+        if (!error) {
+          setUnavailableDates(prev => prev.map(d => d.id === existing.id ? { ...d, reason: reason.trim() || null } : d))
+        }
       }
     }
     setSavingReason(false)
@@ -326,10 +328,16 @@ function CalendarPage({ profile, supabase }: {
                   </div>
                 )}
 
-                {isDateUnavailable && selectedDates.length === 1 && (
+                {isDateUnavailable && selectedDates.length > 1 && (
+                  <div style={{ padding: '12px', borderRadius: '8px', background: '#FEE2E2', border: '1px solid #FECACA' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: '#DC2626', marginBottom: '4px' }}>{selectedDates.length} dates will be marked unavailable</div>
+                  </div>
+                )}
+
+                {isDateUnavailable && (
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
-                      Add note
+                      {selectedDates.length === 1 ? 'Add note' : 'Add note (for first date)'}
                     </label>
                     <textarea
                       value={reason}
@@ -367,10 +375,12 @@ function CalendarPage({ profile, supabase }: {
                   </div>
                 )}
 
-                {!isDateUnavailable && selectedDates.length === 1 && (
+                {!isDateUnavailable && (
                   <div style={{ padding: '16px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF', textAlign: 'center' }}>
                     <div style={{ fontSize: '24px', marginBottom: '6px' }}>📅</div>
-                    <div style={{ fontSize: '12px', color: '#6B7280' }}>Available for bookings</div>
+                    <div style={{ fontSize: '12px', color: '#6B7280' }}>
+                      {selectedDates.length === 1 ? 'Available for bookings' : `All ${selectedDates.length} dates available`}
+                    </div>
                   </div>
                 )}
               </div>
