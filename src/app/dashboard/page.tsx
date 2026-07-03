@@ -161,7 +161,7 @@ function CalendarPage({ profile, supabase }: {
     return new Date(year, month, day).toISOString().split('T')[0]
   }
 
-  function isDateUnavailable(day: number) {
+  function isDateMarkedUnavailable(day: number) {
     const dateStr = getDateString(day)
     return unavailableDates.some(d => d.date === dateStr)
   }
@@ -216,7 +216,7 @@ function CalendarPage({ profile, supabase }: {
               }
 
               const dateStr = getDateString(day)
-              const isMarkedUnavailable = unavailableDates.some(d => d.date === dateStr)
+              const isMarkedUnavailable = isDateMarkedUnavailable(day)
               const isAvailable = isDayAvailable(day)
               const isPast = isPastDate(day)
               const isToday = dateStr === today
