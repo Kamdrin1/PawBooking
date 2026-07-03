@@ -65,7 +65,6 @@ function CalendarPage({ profile, supabase }: {
   const [selectedDateForReason, setSelectedDateForReason] = useState<string | null>(null)
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
-  const [showAvailable, setShowAvailable] = useState(true)
   const [showUnavailable, setShowUnavailable] = useState(true)
   const [showNonWorking, setShowNonWorking] = useState(true)
 
@@ -253,20 +252,14 @@ function CalendarPage({ profile, supabase }: {
 
           {/* LEGEND */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '20px', padding: '16px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
-            <button onClick={() => setShowAvailable(!showAvailable)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '2px solid #2D6A4F', opacity: showAvailable ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: '#1A5C36' }}>
-                {showAvailable ? '✓' : ''}
-              </div>
-              <span style={{ color: '#6B7280' }}>Available working days</span>
-            </button>
             <button onClick={() => setShowUnavailable(!showUnavailable)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #FEE2E2, #FEF2F2)', border: '2px solid #DC2626', opacity: showUnavailable ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: '#DC2626' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: showUnavailable ? '#DC2626' : 'linear-gradient(135deg, #FEE2E2, #FEF2F2)', border: '2px solid #DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', color: 'white' }}>
                 {showUnavailable ? '✓' : ''}
               </div>
               <span style={{ color: '#6B7280' }}>Marked unavailable</span>
             </button>
             <button onClick={() => setShowNonWorking(!showNonWorking)} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: '0' }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: '#F5F2EB', border: '1px solid #D1D5DB', opacity: showNonWorking ? 1 : 0.4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: '#F5F2EB', border: '1px solid #D1D5DB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold', opacity: showNonWorking ? 1 : 0.4 }}>
                 {showNonWorking ? '✓' : ''}
               </div>
               <span style={{ color: '#9CA3AF' }}>Non-working days or past dates</span>
