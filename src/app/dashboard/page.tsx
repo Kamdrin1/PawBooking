@@ -61,10 +61,11 @@ function CalendarPage({ profile, supabase }: {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedDates, setSelectedDates] = useState<string[]>([])
-  const [selectedDateForReason, setSelectedDateForReason] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [isDateUnavailable, setIsDateUnavailable] = useState(false)
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
+  const [togglingDate, setTogglingDate] = useState(false)
   const [showUnavailable, setShowUnavailable] = useState(true)
   const [showNonWorking, setShowNonWorking] = useState(true)
 
@@ -94,33 +95,37 @@ function CalendarPage({ profile, supabase }: {
     loadUnavailableDates()
   }, [])
 
-  async function handleToggleDates(datesToToggle: string[]) {
+  async function handleToggleDate(dateStr: string, newUnavailableState: boolean) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+    setTogglingDate(true)
 
-    for (const dateStr of datesToToggle) {
-      const existing = unavailableDates.find(d => d.date === dateStr)
-      if (existing) {
-        await supabase.from('unavailable_dates').delete().eq('id', existing.id)
-        setUnavailableDates(prev => prev.filter(d => d.id !== existing.id))
-      } else {
-        const { data, error } = await supabase.from('unavailable_dates').insert({
-          profile_id: user.id,
-          date: dateStr,
-          reason: null,
-        }).select().single()
-        if (!error && data) {
-          setUnavailableDates(prev => [...prev, data])
-        }
+    const existing = unavailableDates.find(d => d.date === dateStr)
+    
+    if (newUnavailableState && !existing) {
+      // Mark as unavailable
+      const { data, error } = await supabase.from('unavailable_dates').insert({
+        profile_id: user.id,
+        date: dateStr,
+        reason: null,
+      }).select().single()
+      if (!error && data) {
+        setUnavailableDates(prev => [...prev, data])
+        setIsDateUnavailable(true)
       }
+    } else if (!newUnavailableState && existing) {
+      // Mark as available
+      await supabase.from('unavailable_dates').delete().eq('id', existing.id)
+      setUnavailableDates(prev => prev.filter(d => d.id !== existing.id))
+      setIsDateUnavailable(false)
     }
-    setSelectedDates([])
+    setTogglingDate(false)
   }
 
   async function handleSaveReason() {
-    if (!selectedDateForReason) return
+    if (!selectedDate) return
     setSavingReason(true)
-    const existing = unavailableDates.find(d => d.date === selectedDateForReason)
+    const existing = unavailableDates.find(d => d.date === selectedDate)
     if (existing) {
       const { error } = await supabase.from('unavailable_dates').update({ reason: reason.trim() || null }).eq('id', existing.id)
       if (!error) {
@@ -130,21 +135,12 @@ function CalendarPage({ profile, supabase }: {
     setSavingReason(false)
   }
 
-  function handleDateClick(day: number, e: React.MouseEvent) {
+  function handleDateClick(day: number) {
     const dateStr = getDateString(day)
-    const isCtrlOrCmd = e.ctrlKey || e.metaKey
-    
-    if (isCtrlOrCmd) {
-      setSelectedDates(prev => 
-        prev.includes(dateStr) 
-          ? prev.filter(d => d !== dateStr)
-          : [...prev, dateStr]
-      )
-    } else {
-      setSelectedDates([dateStr])
-      setSelectedDateForReason(dateStr)
-      setReason(unavailableDates.find(d => d.date === dateStr)?.reason || '')
-    }
+    setSelectedDate(dateStr)
+    const existing = unavailableDates.find(d => d.date === dateStr)
+    setIsDateUnavailable(!!existing)
+    setReason(existing?.reason || '')
   }
 
   // Generate calendar days
@@ -220,26 +216,25 @@ function CalendarPage({ profile, supabase }: {
               }
 
               const dateStr = getDateString(day)
-              const isUnavailable = isDateUnavailable(day)
+              const isMarkedUnavailable = unavailableDates.some(d => d.date === dateStr)
               const isAvailable = isDayAvailable(day)
               const isPast = isPastDate(day)
               const isToday = dateStr === today
-              const isSelected = selectedDates.includes(dateStr)
+              const isSelected = selectedDate === dateStr
 
               return (
                 <button
                   key={day}
-                  onClick={(e) => handleDateClick(day, e)}
+                  onClick={() => handleDateClick(day)}
                   disabled={isPast || !isAvailable}
-                  title={isPast || !isAvailable ? '' : 'Ctrl+Click to multi-select'}
                   style={{
                     padding: '16px 8px',
                     borderRadius: '12px',
                     fontSize: '18px',
                     fontWeight: 700,
-                    border: isSelected ? '3px solid #1A3329' : isUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
-                    background: isPast ? '#EDE9DF' : isUnavailable ? 'linear-gradient(135deg, #FEE2E2, #FEF2F2)' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
-                    color: isPast ? '#9CA3AF' : isUnavailable ? '#DC2626' : isToday ? '#1A3329' : !isAvailable ? '#9CA3AF' : '#1A3329',
+                    border: isSelected ? '3px solid #1A3329' : isMarkedUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
+                    background: isPast ? '#EDE9DF' : isMarkedUnavailable ? '#DC2626' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
+                    color: isPast ? '#9CA3AF' : isMarkedUnavailable ? 'white' : isToday ? '#1A3329' : !isAvailable ? '#9CA3AF' : '#1A3329',
                     cursor: isPast || !isAvailable ? 'not-allowed' : 'pointer',
                     opacity: isPast || !isAvailable ? 0.5 : 1,
                     transition: 'all 0.15s',
@@ -268,62 +263,40 @@ function CalendarPage({ profile, supabase }: {
         </div>
 
         {/* DETAILS PANEL */}
-        {selectedDates.length > 0 && (
+        {selectedDate && (
           <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div>
                 <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>
-                  {selectedDates.length === 1 
-                    ? new Date(selectedDates[0] + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-                    : `${selectedDates.length} dates selected`}
+                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </div>
                 <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
-                  {selectedDates.length === 1 
-                    ? (unavailableDates.find(d => d.date === selectedDates[0]) ? 'Currently unavailable' : 'Currently available')
-                    : 'Bulk actions available'}
+                  {isDateUnavailable ? 'Marked as unavailable' : 'Available for bookings'}
                 </div>
               </div>
-              <button onClick={() => { setSelectedDates([]); setSelectedDateForReason(null); setReason('') }}
+              <button onClick={() => { setSelectedDate(null); setReason('') }}
                 style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', color: '#6B7280', border: 'none', cursor: 'pointer' }}>
                 ✕
               </button>
             </div>
 
-            {selectedDates.length > 1 && (
-              <div style={{ marginBottom: '12px', padding: '12px', borderRadius: '8px', background: 'linear-gradient(135deg, rgba(216,243,220,0.2), rgba(216,243,220,0.1))', border: '1px solid rgba(45,106,79,0.1)' }}>
-                <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500 }}>Selected dates:</div>
-                <div style={{ fontSize: '12px', color: '#1A3329', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                  {selectedDates.sort().map(date => (
-                    <span key={date} style={{ background: '#D8F3DC', padding: '2px 8px', borderRadius: '4px' }}>
-                      {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* TOGGLE MULTIPLE */}
-              <button onClick={() => handleToggleDates(selectedDates)}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: 'white',
-                  border: 'none',
-                  cursor: 'pointer',
-                  background: selectedDates.some(d => unavailableDates.find(ud => ud.date === d)) 
-                    ? '#DC2626' 
-                    : 'linear-gradient(135deg, #1A3329, #2D6A4F)',
-                }}>
-                {selectedDates.length === 1 
-                  ? (unavailableDates.find(d => d.date === selectedDates[0]) ? '✓ Mark as Available' : '✕ Mark as Unavailable')
-                  : (selectedDates.some(d => unavailableDates.find(ud => ud.date === d)) ? '✓ Mark All as Available' : '✕ Mark All as Unavailable')}
-              </button>
+              {/* UNAVAILABLE CHECKBOX */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>
+                <input 
+                  type="checkbox"
+                  checked={isDateUnavailable}
+                  onChange={(e) => handleToggleDate(selectedDate, e.target.checked)}
+                  disabled={togglingDate}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329', cursor: 'pointer', flex: 1 }}>
+                  Mark as unavailable
+                </label>
+              </div>
 
-              {/* REASON (only show if single date selected and unavailable) */}
-              {selectedDates.length === 1 && unavailableDates.find(d => d.date === selectedDates[0]) && (
+              {/* REASON (only show if unavailable) */}
+              {isDateUnavailable && (
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6B7280', marginBottom: '6px' }}>
                     Reason (optional)
@@ -365,7 +338,7 @@ function CalendarPage({ profile, supabase }: {
             </div>
 
             <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '12px' }}>
-              💡 Ctrl+Click (or Cmd+Click on Mac) to select multiple dates
+              💡 Click any date to mark it available or unavailable
             </p>
           </div>
         )}
