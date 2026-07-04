@@ -816,9 +816,11 @@ export default function DashboardPage() {
     ? `${window.location.origin}/book/${profile?.slug}`
     : `https://pawbooking.net/book/${profile?.slug}`
 
-  function formatTime(time: string) {
-    const [h, m] = time.split(':'); const hour = parseInt(h)
-    return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+ function formatTime(time: string | null | undefined) {
+  if (!time) return ''
+  const [h, m] = time.split(':'); const hour = parseInt(h)
+  return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+}
   }
   function formatDate(date: string) {
     return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
