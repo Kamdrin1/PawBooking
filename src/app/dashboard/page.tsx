@@ -380,7 +380,7 @@ function ServicesPage({ supabase, router }: {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ name: '', price: 0, duration_minutes: 30, payment_type: 'full' as const, deposit_amount: 0 })
+  const [formData, setFormData] = useState<{ name: string; price: number; duration_minutes: number; payment_type: 'none' | 'deposit' | 'full'; deposit_amount: number }>({ name: '', price: 0, duration_minutes: 30, payment_type: 'full', deposit_amount: 0 })
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -408,7 +408,7 @@ function ServicesPage({ supabase, router }: {
       if (data) setServices(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
     }
     setEditingId(null)
-    setFormData({ name: '', price: 0, duration_minutes: 30, payment_type: 'full', deposit_amount: 0 })
+    setFormData({ name: '', price: 0, duration_minutes: 30, payment_type: 'full' as const, deposit_amount: 0 })
     setSaving(false)
   }
 
@@ -432,7 +432,7 @@ function ServicesPage({ supabase, router }: {
             <input type="text" placeholder="Service name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
             <input type="number" placeholder="Price" value={formData.price} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })} style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
             <input type="number" placeholder="Duration (minutes)" value={formData.duration_minutes} onChange={e => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })} style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} />
-            <select value={formData.payment_type} onChange={e => setFormData({ ...formData, payment_type: e.target.value as any })} style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}>
+            <select value={formData.payment_type} onChange={e => setFormData({ ...formData, payment_type: e.target.value as 'none' | 'deposit' | 'full' })} style={{ padding: '12px', borderRadius: '10px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }}>
               <option value="none">No payment required</option>
               <option value="deposit">Deposit required</option>
               <option value="full">Full payment required</option>
@@ -445,7 +445,7 @@ function ServicesPage({ supabase, router }: {
                 {saving ? 'Saving...' : editingId ? 'Update' : 'Add Service'}
               </button>
               {editingId && (
-                <button onClick={() => { setEditingId(null); setFormData({ name: '', price: 0, duration_minutes: 30, payment_type: 'full', deposit_amount: 0 }) }} style={{ padding: '12px 16px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>
+                <button onClick={() => { setEditingId(null); setFormData({ name: '', price: 0, duration_minutes: 30, payment_type: 'full' as const, deposit_amount: 0 }) }} style={{ padding: '12px 16px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>
                   Cancel
                 </button>
               )}
