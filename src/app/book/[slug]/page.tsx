@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 
 interface Service {
   id: string
@@ -24,7 +24,6 @@ interface Profile {
 
 export default function BookingPage() {
   const params = useParams()
-  const router = useRouter()
   const slug = params?.slug as string
   const supabase = createClient()
 
@@ -149,7 +148,7 @@ export default function BookingPage() {
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #D8F3DC 0%, #E8F5E9 100%)' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '14px', color: '#9CA3AF', marginBottom: '8px' }}>Loading booking form...</div>
+        <div style={{ fontSize: '14px', color: '#9CA3AF' }}>Loading your booking form...</div>
       </div>
     </div>
   )
@@ -177,7 +176,7 @@ export default function BookingPage() {
         <div style={{ width: '100%', maxWidth: '500px', background: 'white', borderRadius: '20px', padding: '48px 32px', textAlign: 'center', boxShadow: '0 16px 48px rgba(26, 51, 41, 0.15)' }}>
           <div style={{ fontSize: '80px', lineHeight: 1, marginBottom: '20px' }}>✓</div>
           <h1 style={{ fontSize: '32px', fontWeight: 700, color: '#1A3329', margin: '0 0 12px', fontFamily: "'Playfair Display', serif", letterSpacing: '-0.02em' }}>Booking Confirmed!</h1>
-          <p style={{ fontSize: '15px', color: '#6B7280', margin: '0 0 32px', lineHeight: 1.5 }}>We'll send a confirmation SMS to {formData.clientPhone}</p>
+          <p style={{ fontSize: '15px', color: '#6B7280', margin: '0 0 32px' }}>We'll send a confirmation SMS to {formData.clientPhone}</p>
 
           <div style={{ background: 'linear-gradient(135deg, #F5F2EB 0%, #FAF7F2 100%)', borderRadius: '16px', padding: '24px', marginBottom: '32px', textAlign: 'left' }}>
             {details.map(({ label, value }) => (
@@ -188,13 +187,8 @@ export default function BookingPage() {
             ))}
           </div>
 
-          <a href="/" style={{ display: 'inline-block', padding: '14px 32px', background: 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', marginBottom: '12px', boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)', cursor: 'pointer' }}>
-            Home
-          </a>
-          <br />
-          <a href={`/book/${slug}`} style={{ display: 'inline-block', padding: '14px 32px', background: 'white', color: '#1A3329', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', border: '2px solid #2D6A4F', cursor: 'pointer' }}>
-            Book Another
-          </a>
+          <a href="/" style={{ display: 'inline-block', padding: '14px 32px', background: 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', marginBottom: '12px', boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)', cursor: 'pointer' }}>Home</a><br />
+          <a href={`/book/${slug}`} style={{ display: 'inline-block', padding: '14px 32px', background: 'white', color: '#1A3329', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', border: '2px solid #2D6A4F', cursor: 'pointer' }}>Book Another</a>
         </div>
       </div>
     )
@@ -207,11 +201,10 @@ export default function BookingPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
         input, select, textarea { font-family: 'DM Sans', sans-serif; }
-        .playfair { font-family: 'Playfair Display', serif; }
       `}</style>
       <div style={{ width: '100%', maxWidth: '520px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h1 className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: '#1A3329', margin: 0, letterSpacing: '-0.02em' }}>Book a Grooming</h1>
+          <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#1A3329', margin: 0, fontFamily: "'Playfair Display', serif", letterSpacing: '-0.02em' }}>Book a Grooming</h1>
           <p style={{ fontSize: '15px', color: '#6B7280', margin: '8px 0 0', fontWeight: 500 }}>{profile.business_name}</p>
         </div>
 
@@ -228,7 +221,7 @@ export default function BookingPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service</label>
-              <select value={formData.serviceId} onChange={e => setFormData({ ...formData, serviceId: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%226B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '20px', paddingRight: '32px' }} required>
+              <select value={formData.serviceId} onChange={e => setFormData({ ...formData, serviceId: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%236B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '20px', paddingRight: '32px' }} required>
                 <option value="">Select a service</option>
                 {services.map(s => <option key={s.id} value={s.id}>{s.name} - ${s.price}</option>)}
               </select>
