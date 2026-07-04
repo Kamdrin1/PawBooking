@@ -219,7 +219,7 @@ export default function BookingPage() {
       `}</style>
       <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F5F2EB' }}>
         <div className="text-center">
-          <div className="text-5xl mb-4">🐾</div>
+          <div className="text-5xl mb-4">≡ƒÉ╛</div>
           <h1 className="playfair text-2xl font-bold mb-2" style={{ color: '#1A3329' }}>Groomer not found</h1>
           <p style={{ color: '#9CA3AF' }}>This booking link doesn&apos;t exist or has been removed.</p>
         </div>
@@ -285,7 +285,7 @@ export default function BookingPage() {
               { label: 'Dog', value: dogName },
               { label: 'Service', value: selectedService?.name },
               { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) },
-              { label: 'Time', value: time ? (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() : '' },
+              { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
             ].map((row, i) => (
               <div key={i} className="flex justify-between text-sm" style={{ borderBottom: '1px solid rgba(237,233,223,0.8)', paddingBottom: '10px' }}>
                 <span style={{ color: '#9CA3AF' }}>{row.label}</span>
@@ -399,7 +399,7 @@ export default function BookingPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span className="font-bold text-sm" style={{ color: '#2D6A4F' }}>${s.price}</span>
                           <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${serviceId === s.id ? '#1A3329' : '#D1C9B8'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: serviceId === s.id ? 'linear-gradient(135deg, #1A3329, #2D6A4F)' : 'transparent' }}>
-                            {serviceId === s.id && <span style={{ color: 'white', fontSize: '11px' }}>✓</span>}
+                            {serviceId === s.id && <span style={{ color: 'white', fontSize: '11px' }}>Γ£ô</span>}
                           </div>
                         </div>
                       </div>
@@ -420,7 +420,7 @@ export default function BookingPage() {
                     style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
                   {date && isDateDisabled(date) && (
                     <div style={{ fontSize: '11px', color: '#DC2626', marginTop: '4px' }}>
-                      ⚠️ {getDateStatus(date) === 'unavailable' ? 'Groomer unavailable' : 'Not available'}
+                      ΓÜá∩╕Å {getDateStatus(date) === 'unavailable' ? 'Groomer unavailable' : 'Not available'}
                     </div>
                   )}
                 </div>
@@ -460,7 +460,7 @@ export default function BookingPage() {
                   </div>
                 </div>
                 <div>
-                  <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional — for confirmation)</span></label>
+                  <label>Email <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(optional ΓÇö for confirmation)</span></label>
                   <input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)}
                     placeholder="jane@email.com"
                     style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
@@ -505,7 +505,7 @@ export default function BookingPage() {
                   {[
                     { label: 'Service', value: selectedService.name },
                     { label: 'Date', value: new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) },
-                    { label: 'Time', value: time ? (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() : '' },
+                    { label: 'Time', value: (() => { const [h, m] = time.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })() },
                   ].map((row, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                       <span style={{ color: '#2D6A4F' }}>{row.label}</span>
@@ -538,9 +538,9 @@ export default function BookingPage() {
             )}
 
             {/* SUBMIT */}
-            <button type="submit" disabled={loading || !smsConsent || (date ? isDateDisabled(date) : false)} className="submit-btn"
+            <button type="submit" disabled={(loading || !smsConsent || (date ? isDateDisabled(date) : false))} className="submit-btn"
               style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: (loading || !smsConsent || (date ? isDateDisabled(date) : false)) ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
+              {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` ΓÇö $${selectedService.price}` : ''}`}
             </button>
 
             <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', lineHeight: 1.7 }}>
