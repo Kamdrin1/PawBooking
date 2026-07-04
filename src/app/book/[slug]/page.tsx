@@ -264,7 +264,7 @@ export default function BookingPage() {
 
             {error && <div style={{ padding: '12px', borderRadius: '10px', background: '#FEE2E2', border: '1px solid #FECACA', color: '#DC2626', fontSize: '13px' }}>{error}</div>}
 
-            <button type="submit" disabled={submitting || (formData.date && !formData.time)} style={{ padding: '14px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white', fontWeight: 600, fontSize: '14px', border: 'none', cursor: 'pointer', opacity: submitting || (formData.date && !formData.time) ? 0.6 : 1, boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
+            <button type="submit" disabled={submitting || (!!formData.date && !formData.time)} style={{ padding: '14px', borderRadius: '10px', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', color: 'white', fontWeight: 600, fontSize: '14px', border: 'none', cursor: 'pointer', opacity: submitting || (!!formData.date && !formData.time) ? 0.6 : 1, boxShadow: '0 4px 12px rgba(26,51,41,0.2)' }}>
               {submitting ? 'Booking...' : 'Confirm Booking'}
             </button>
           </div>
