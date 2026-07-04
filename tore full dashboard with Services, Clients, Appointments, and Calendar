@@ -1,0 +1,45 @@
+[33m6b23079[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m Show add note textarea for multiple selected dates and save to all
+[33mdca9d9f[m Add multi-select dates with Ctrl+Click and bulk unavailable marking
+[33m47d1bf7[m Fix JSX closing tag structure for calendar and notes layout
+[33mf2eb8ff[m Add notes panel on right side with date selection and updates
+[33m9f29502[m Remove legend checkbox section
+[33m108ca07[m Make all dates clickable and fix checkbox toggle functionality
+[33m6197b32[m Fix duplicate isDateUnavailable naming conflict
+[33mbd22e6c[m Simplify calendar to single-select with checkbox toggle and solid red unavailable dates
+[33m8182c30[m Remove available working days filter and make unavailable checkbox turn red when checked
+[33m0a2e931[m Add multi-select dates, clickable legend filters, and bigger calendar
+[33m7c6528b[m Fix CalendarPage availability.days guard check
+[33maaa8d9a[m Fix Calendar loading check - verify profile exists before accessing
+[33m36a4f78[m Fix Calendar component null check for availability
+[33m4b7972b[m Fix TypeScript error: remove rows from style object in dashboard
+[33me4b4f41[m Add calendar feature to manage unavailable dates
+[33m5fe3ace[m fix: use slug field for booking link instead of generating from business name
+[33m883328c[m refactor: responsive plan card grid layout for better spacing and mobile experience
+[33m222612f[m feat: update dashboard to Starter/Essential/Professional plans with Supabase integration
+[33m3746a35[m feat: mobile responsive dashboard with bottom tab nav
+[33ma9df962[m feat: full-width booking link bar, remove SMS status card
+[33m552f9a2[m feat: premium dashboard redesign — gradients, glow cards, polished UI
+[33mbd3ea4a[m feat: auto review requests — Google review link in Settings + SMS after mark complete
+[33m904319f[m feat: Stripe portal for manage plan + Most Popular badge always on Pro
+[33mfeea70f[m feat: add Reports tab with blur upsell for Basic users
+[33m0d92301[m fix: remove smart personalized messages from basic locked features
+[33ma919c1e[m feat: rebooking reminders — mark complete button + 28-day cron logic
+[33m0014fed[m feat: show locked Pro features on Basic card with strikethrough
+[33m4c79a0d[m feat: Basic/Pro plan cards with full feature lists in settings
+[33m01da403[m fix service payment type to support multi-select checkboxes
+[33ma78bb73[m remove header new appointment button, add basic plan appointment counter to sidebar
+[33me23fba1[m set Pro upgrade to coming soon in settings
+[33m5909e04[m build out settings page with editable business name and plan card
+[33mdde3675[m show payment method inline on appointment rows
+[33m35de8d2[m show payment method in appointment modal
+[33m910d789[m show both payment methods on services when groomer accepts both
+[33m18ba1d0[m update services payment to reflect groomer payment methods
+[33m16a0bf9[m add email to clients page
+[33m9d364bf[m fix: all nav tabs working
+[33mfb6bba1[m add payment type UI to edit services
+[33mafb3c38[m add payment type state and service updates
+[33m066b2e9[m add edit services tab, fix duplicate services
+[33m4878600[m premium warm editorial dashboard redesign
+[33m00b4d4d[m premium dark dashboard redesign
+[33m024c215[m add appointment detail modal
+[33mca2dcc3[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m initial commit
