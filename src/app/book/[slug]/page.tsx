@@ -57,13 +57,22 @@ export default function BookingPage() {
     async function load() {
       if (!slug) return
       const { data: profileData } = await supabase.from('profiles').select('*').eq('slug', slug).single()
-      if (!profileData) { setError('Business not found'); setLoading(false); return }
+      if (!profileData) {
+        setError('Business not found')
+        setLoading(false)
+        return
+      }
       setProfile(profileData)
 
       const { data: serviceData } = await supabase.from('services').select('*').eq('profile_id', profileData.id).order('name')
       setServices(serviceData || [])
 
-      const { data: apptData } = await supabase.from('appointments').select('appointment_date, appointment_time').eq('profile_id', profileData.id).neq('status', 'cancelled')
+      const { data: apptData } = await supabase
+        .from('appointments')
+        .select('appointment_date, appointment_time')
+        .eq('profile_id', profileData.id)
+        .neq('status', 'cancelled')
+
       const booked = new Map<string, Set<string>>()
       apptData?.forEach(a => {
         if (!booked.has(a.appointment_date)) booked.set(a.appointment_date, new Set())
@@ -81,7 +90,11 @@ export default function BookingPage() {
 
   const availability = profile?.availability || { days: {}, startTime: '09:00', endTime: '17:00' }
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const availableDays = availability.days ? Object.entries(availability.days).filter(([_, available]) => available).map(([day]) => dayNames.indexOf(day)) : []
+  const availableDays = availability.days
+    ? Object.entries(availability.days)
+        .filter(([_, available]) => available)
+        .map(([day]) => dayNames.indexOf(day))
+    : []
 
   function isDateAvailable(dateStr: string) {
     if (unavailableDates.has(dateStr)) return false
@@ -93,8 +106,8 @@ export default function BookingPage() {
     if (!isDateAvailable(dateStr)) return []
     const booked = bookedTimes.get(dateStr) || new Set()
     const times: string[] = []
-    const [startH] = availability.startTime.split(':').map(Number)
-    const [endH] = availability.endTime.split(':').map(Number)
+    const [startH, startM] = availability.startTime.split(':').map(Number)
+    const [endH, endM] = availability.endTime.split(':').map(Number)
     let current = new Date(dateStr + 'T' + availability.startTime)
     const end = new Date(dateStr + 'T' + availability.endTime)
     while (current < end) {
@@ -109,18 +122,28 @@ export default function BookingPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
     if (!formData.clientName || !formData.clientPhone || !formData.dogName || !formData.date || !formData.time || !formData.serviceId) {
       setError('Please fill all required fields')
       return
     }
-    if (!formData.smsConsent) { setError('Please consent to SMS communications'); return }
+
+    if (!formData.smsConsent) {
+      setError('Please consent to SMS communications')
+      return
+    }
 
     setSubmitting(true)
     setError('')
 
     const { data: { user } } = await supabase.auth.getUser()
     const profileId = profile?.id || user?.id
-    if (!profileId) { setError('Unable to process booking'); setSubmitting(false); return }
+
+    if (!profileId) {
+      setError('Unable to process booking')
+      setSubmitting(false)
+      return
+    }
 
     const { error: insertError } = await supabase.from('appointments').insert({
       profile_id: profileId,
@@ -137,7 +160,11 @@ export default function BookingPage() {
       status: 'confirmed',
     })
 
-    if (insertError) { setError('Booking failed: ' + insertError.message); setSubmitting(false); return }
+    if (insertError) {
+      setError('Booking failed: ' + insertError.message)
+      setSubmitting(false)
+      return
+    }
 
     setDate(formData.date)
     setTime(formData.time)
@@ -145,21 +172,23 @@ export default function BookingPage() {
     setSubmitting(false)
   }
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #D8F3DC 0%, #E8F5E9 100%)' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '14px', color: '#9CA3AF' }}>Loading your booking form...</div>
+  if (loading)
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #D8F3DC 0%, #E8F5E9 100%)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '14px', color: '#9CA3AF' }}>Loading your booking form...</div>
+        </div>
       </div>
-    </div>
-  )
+    )
 
-  if (!profile) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #D8F3DC 0%, #E8F5E9 100%)' }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '18px', fontWeight: 700, color: '#1A3329' }}>Business not found</div>
+  if (!profile)
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #D8F3DC 0%, #E8F5E9 100%)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '18px', fontWeight: 700, color: '#1A3329' }}>Business not found</div>
+        </div>
       </div>
-    </div>
-  )
+    )
 
   if (submitted) {
     const details = [
@@ -187,8 +216,13 @@ export default function BookingPage() {
             ))}
           </div>
 
-          <a href="/" style={{ display: 'inline-block', padding: '14px 32px', background: 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', marginBottom: '12px', boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)', cursor: 'pointer' }}>Home</a><br />
-          <a href={`/book/${slug}`} style={{ display: 'inline-block', padding: '14px 32px', background: 'white', color: '#1A3329', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', border: '2px solid #2D6A4F', cursor: 'pointer' }}>Book Another</a>
+          <a href="/" style={{ display: 'inline-block', padding: '14px 32px', background: 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', marginBottom: '12px', boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)', cursor: 'pointer' }}>
+            Home
+          </a>
+          <br />
+          <a href={`/book/${slug}`} style={{ display: 'inline-block', padding: '14px 32px', background: 'white', color: '#1A3329', borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px', border: '2px solid #2D6A4F', cursor: 'pointer' }}>
+            Book Another
+          </a>
         </div>
       </div>
     )
@@ -210,50 +244,171 @@ export default function BookingPage() {
 
         <form onSubmit={handleSubmit} style={{ background: 'white', borderRadius: '20px', padding: '32px', boxShadow: '0 16px 48px rgba(26, 51, 41, 0.1)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <input type="text" placeholder="Your name" value={formData.clientName} onChange={e => setFormData({ ...formData, clientName: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }} required />
-            <input type="tel" placeholder="Phone number" value={formData.clientPhone} onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }} required />
-            <input type="email" placeholder="Email (optional)" value={formData.clientEmail} onChange={e => setFormData({ ...formData, clientEmail: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }} />
+            <input
+              type="text"
+              placeholder="Your name"
+              value={formData.clientName}
+              onChange={e => setFormData({ ...formData, clientName: e.target.value })}
+              style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }}
+              required
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone number"
+              value={formData.clientPhone}
+              onChange={e => setFormData({ ...formData, clientPhone: e.target.value })}
+              style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }}
+              required
+            />
+
+            <input
+              type="email"
+              placeholder="Email (optional)"
+              value={formData.clientEmail}
+              onChange={e => setFormData({ ...formData, clientEmail: e.target.value })}
+              style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329' }}
+            />
+
             <div style={{ paddingTop: '8px' }}>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Dog</label>
-              <input type="text" placeholder="Dog's name" value={formData.dogName} onChange={e => setFormData({ ...formData, dogName: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', marginBottom: '10px', boxSizing: 'border-box' }} required />
-              <input type="text" placeholder="Breed (optional)" value={formData.dogBreed} onChange={e => setFormData({ ...formData, dogBreed: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box' }} />
+              <input
+                type="text"
+                placeholder="Dog's name"
+                value={formData.dogName}
+                onChange={e => setFormData({ ...formData, dogName: e.target.value })}
+                style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', marginBottom: '10px', boxSizing: 'border-box' }}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Breed (optional)"
+                value={formData.dogBreed}
+                onChange={e => setFormData({ ...formData, dogBreed: e.target.value })}
+                style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box' }}
+              />
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service</label>
-              <select value={formData.serviceId} onChange={e => setFormData({ ...formData, serviceId: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%236B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '20px', paddingRight: '32px' }} required>
+              <select
+                value={formData.serviceId}
+                onChange={e => setFormData({ ...formData, serviceId: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '1px solid #EDE9DF',
+                  fontSize: '15px',
+                  color: '#1A3329',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  appearance: 'none',
+                  backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%236B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 8px center',
+                  backgroundSize: '20px',
+                  paddingRight: '32px',
+                }}
+                required
+              >
                 <option value="">Select a service</option>
-                {services.map(s => <option key={s.id} value={s.id}>{s.name} - ${s.price}</option>)}
+                {services.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} - ${s.price}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</label>
-              <input type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value, time: '' })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box' }} required />
+              <input
+                type="date"
+                value={formData.date}
+                onChange={e => setFormData({ ...formData, date: e.target.value, time: '' })}
+                style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box' }}
+                required
+              />
             </div>
 
             {formData.date && (
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Time</label>
-                <select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', width: '100%', boxSizing: 'border-box', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%236B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '20px', paddingRight: '32px' }} required>
+                <select
+                  value={formData.time}
+                  onChange={e => setFormData({ ...formData, time: e.target.value })}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '10px',
+                    border: '1px solid #EDE9DF',
+                    fontSize: '15px',
+                    color: '#1A3329',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    appearance: 'none',
+                    backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%236B7280%22 stroke-width=%222%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e")',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
+                    backgroundSize: '20px',
+                    paddingRight: '32px',
+                  }}
+                  required
+                >
                   <option value="">Select a time</option>
-                  {availableTimes.map(t => <option key={t} value={t}>{(() => { const [h, m] = t.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()} </option>)}
+                  {availableTimes.map(t => (
+                    <option key={t} value={t}>
+                      {(() => {
+                        const [h, m] = t.split(':')
+                        const hour = parseInt(h)
+                        return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+                      })()}{' '}
+                    </option>
+                  ))}
                 </select>
               </div>
             )}
 
-            <textarea placeholder="Notes (optional)" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', minHeight: '100px', resize: 'none' }} />
+            <textarea
+              placeholder="Notes (optional)"
+              value={formData.notes}
+              onChange={e => setFormData({ ...formData, notes: e.target.value })}
+              style={{ padding: '14px 16px', borderRadius: '10px', border: '1px solid #EDE9DF', fontSize: '15px', color: '#1A3329', minHeight: '100px', resize: 'none' }}
+            />
 
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 16px', borderRadius: '10px', background: '#FEF9E7', border: '1px solid #FDF4D1', cursor: 'pointer' }}>
-              <input type="checkbox" checked={formData.smsConsent} onChange={e => setFormData({ ...formData, smsConsent: e.target.checked })} style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#92400E' }} required />
+              <input
+                type="checkbox"
+                checked={formData.smsConsent}
+                onChange={e => setFormData({ ...formData, smsConsent: e.target.checked })}
+                style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#92400E' }}
+                required
+              />
               <span style={{ fontSize: '13px', color: '#78350F', lineHeight: 1.5, fontWeight: 500 }}>
-                I'd like to receive SMS reminders for my appointment to <strong>{formData.clientPhone || '(your number)'}</strong>. Message & data rates apply. <a href="/privacy" style={{ color: '#92400E', textDecoration: 'underline' }}>See our privacy policy.</a>
+                I'd like to receive SMS reminders for my appointment to <strong>{formData.clientPhone || '(your number)'}</strong>. Message & data rates apply.{' '}
+                <a href="/privacy" style={{ color: '#92400E', textDecoration: 'underline' }}>
+                  See our privacy policy.
+                </a>
               </span>
             </label>
 
             {error && <div style={{ padding: '14px 16px', borderRadius: '10px', background: '#FEE2E2', border: '1px solid #FECACA', color: '#991B1B', fontSize: '13px', fontWeight: 500 }}>{error}</div>}
 
-            <button type="submit" disabled={submitting || (!!formData.date && !formData.time)} style={{ padding: '16px', borderRadius: '12px', background: submitting ? '#C6E9DD' : 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)', color: submitting ? '#6B7280' : 'white', fontWeight: 700, fontSize: '15px', border: 'none', cursor: submitting || (!!formData.date && !formData.time) ? 'not-allowed' : 'pointer', boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)', transition: 'all 0.2s ease' }}>
+            <button
+              type="submit"
+              disabled={submitting || (!!formData.date && !formData.time)}
+              style={{
+                padding: '16px',
+                borderRadius: '12px',
+                background: submitting ? '#C6E9DD' : 'linear-gradient(135deg, #1A3329 0%, #2D6A4F 100%)',
+                color: submitting ? '#6B7280' : 'white',
+                fontWeight: 700,
+                fontSize: '15px',
+                border: 'none',
+                cursor: submitting || (!!formData.date && !formData.time) ? 'not-allowed' : 'pointer',
+                boxShadow: '0 8px 20px rgba(26, 51, 41, 0.25)',
+                transition: 'all 0.2s ease',
+              }}
+            >
               {submitting ? 'Confirming...' : 'Confirm Booking'}
             </button>
           </div>
