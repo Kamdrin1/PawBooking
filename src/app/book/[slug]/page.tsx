@@ -114,11 +114,11 @@ export default function BookingPage() {
           },
           (payload) => {
             if (payload.eventType === 'INSERT') {
-              setUnavailableDates(prev => new Set([...prev, payload.new.date]))
+              setUnavailableDates(prev => new Set([...prev, (payload.new as { date: string }).date]))
             } else if (payload.eventType === 'DELETE') {
               setUnavailableDates(prev => {
                 const updated = new Set(prev)
-                updated.delete(payload.old.date)
+                updated.delete((payload.old as { date: string }).date)
                 return updated
               })
             }
