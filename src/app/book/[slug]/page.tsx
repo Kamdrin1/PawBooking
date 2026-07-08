@@ -34,8 +34,8 @@ function formatPhone(raw: string): string {
 
 function generateTimeSlots(startTime: string, endTime: string): string[] {
   const slots: string[] = []
-  const [startH, startM] = startTime.split(':').map(Number)
-  const [endH, endM] = endTime.split(':').map(Number)
+  const [startH, startM] = (startTime || '09:00').split(':').map(Number)
+  const [endH, endM] = (endTime || '17:00').split(':').map(Number)
   
   let current = new Date(2000, 0, 1, startH, startM)
   const end = new Date(2000, 0, 1, endH, endM)
@@ -136,7 +136,7 @@ export default function BookingPage() {
   }, [slug])
 
   const selectedService = services.find(s => s.id === serviceId)
-  const availability = profile?.availability || { days: {}, startTime: '09:00', endTime: '17:00' }
+  const availability = { days: {}, startTime: '09:00', endTime: '17:00', ...(profile?.availability || {}) }
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const timeSlots = generateTimeSlots(availability.startTime, availability.endTime)
 
