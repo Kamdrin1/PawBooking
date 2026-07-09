@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const hour = parseInt(h)
     const formattedTime = `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
 
-    // Send email
+    // ── GROOMER NOTIFICATION (goes to you — has View Dashboard) ────────────────
     const result = await resend.emails.send({
       from: 'PawBooking <notifications@pawbooking.net>',
       to: 'monchigameing@gmail.com',
@@ -78,9 +78,58 @@ export async function POST(req: Request) {
       `
     })
 
-    // Send SMS confirmation to client
+    // ── CLIENT CONFIRMATION (goes to the client — no dashboard button) ─────────
+    let clientResult = null
+    if (clientEmail) {
+      clientResult = await resend.emails.send({
+        from: `${businessName} <notifications@pawbooking.net>`,
+        to: clientEmail,
+        subject: `Your booking request with ${businessName} 🐾`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; background: #F5F2EB; padding: 32px; border-radius: 16px;">
+            <div style="background: #1A3329; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+              <h1 style="color: white; margin: 0; font-size: 22px;">🐾 Booking Request Received</h1>
+              <p style="color: rgba(255,255,255,0.6); margin: 8px 0 0; font-size: 14px;">${businessName}</p>
+            </div>
+            <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+              <p style="color: #1A3329; font-size: 15px; margin: 0 0 20px; line-height: 1.6;">
+                Hi ${clientName}, thanks for booking with <strong>${businessName}</strong>! Your request has been received and will be confirmed shortly. Here are your details:
+              </p>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #EDE9DF;">
+                  <td style="padding: 10px 0; color: #9CA3AF; font-size: 13px;">Dog</td>
+                  <td style="padding: 10px 0; color: #1A3329; font-size: 13px; font-weight: 600; text-align: right;">${dogName}${dogBreed ? ` (${dogBreed})` : ''}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDE9DF;">
+                  <td style="padding: 10px 0; color: #9CA3AF; font-size: 13px;">Service</td>
+                  <td style="padding: 10px 0; color: #1A3329; font-size: 13px; font-weight: 600; text-align: right;">${serviceName} — $${servicePrice}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDE9DF;">
+                  <td style="padding: 10px 0; color: #9CA3AF; font-size: 13px;">Date</td>
+                  <td style="padding: 10px 0; color: #1A3329; font-size: 13px; font-weight: 600; text-align: right;">${formattedDate}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EDE9DF;">
+                  <td style="padding: 10px 0; color: #9CA3AF; font-size: 13px;">Time</td>
+                  <td style="padding: 10px 0; color: #1A3329; font-size: 13px; font-weight: 600; text-align: right;">${formattedTime}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0; color: #9CA3AF; font-size: 13px;">Payment</td>
+                  <td style="padding: 10px 0; color: #1A3329; font-size: 13px; font-weight: 600; text-align: right;">${paymentMethod === 'online' ? '💳 Pay Online' : '💵 Pay in Person'}</td>
+                </tr>
+              </table>
+            </div>
+            <p style="text-align: center; color: #6B7280; font-size: 13px; line-height: 1.6; margin: 0 0 8px;">
+              This is a request — <strong>${businessName}</strong> will confirm your appointment shortly. You'll get an SMS reminder before your visit.
+            </p>
+            <p style="text-align: center; color: #9CA3AF; font-size: 11px; margin-top: 20px;">Sent via PawBooking on behalf of ${businessName}</p>
+          </div>
+        `
+      })
+    }
+
+    // ── SMS confirmation to client ────────────────────────────────────────────
     const smsMessage = `PawBooking: Your appointment is confirmed! ${dogName} on ${formattedDate} at ${formattedTime}. See you then!`
-    
+
     const smsResponse = await fetch('https://api.telnyx.com/v2/messages', {
       method: 'POST',
       headers: {
@@ -98,7 +147,7 @@ export async function POST(req: Request) {
     console.log('SMS sent:', smsData)
 
     console.log('Resend result:', JSON.stringify(result))
-    return NextResponse.json({ success: true, result, sms: smsData })
+    return NextResponse.json({ success: true, result, clientResult, sms: smsData })
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
