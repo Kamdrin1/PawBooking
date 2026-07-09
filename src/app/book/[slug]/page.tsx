@@ -136,7 +136,12 @@ export default function BookingPage() {
   }, [slug])
 
   const selectedService = services.find(s => s.id === serviceId)
-  const availability = { days: {}, startTime: '09:00', endTime: '17:00', ...(profile?.availability || {}) }
+  let parsedAvailability: Partial<Profile['availability']> = {}
+  try {
+    const raw = profile?.availability as unknown
+    parsedAvailability = typeof raw === 'string' ? JSON.parse(raw) : (raw as Profile['availability']) || {}
+  } catch { parsedAvailability = {} }
+  const availability = { days: {}, startTime: '09:00', endTime: '17:00', ...parsedAvailability }
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const timeSlots = generateTimeSlots(availability.startTime, availability.endTime)
 
