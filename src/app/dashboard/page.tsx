@@ -15,6 +15,7 @@ interface Appointment {
   status: string
   notes: string
   payment_method: string
+  products_used: string | null
   services: { name: string; price: number } | null
 }
 
@@ -92,7 +93,7 @@ function formatLongDate(date: string) {
 }
 
 // ─── DOG PROFILE PAGE ─────────────────────────────────────────────────────────
-type DogTab = 'overview' | 'appointments' | 'photos' | 'care' | 'timeline' | 'documents'
+type DogTab = 'overview' | 'appointments' | 'photos' | 'care'
 
 function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient> }) {
   const [dogs, setDogs] = useState<Dog[]>([])
@@ -112,6 +113,25 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   const [notes, setNotes] = useState('')
   const [notesStatus, setNotesStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const notesTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // expandable appointment rows + products used (autosave)
+  const [expandedAppt, setExpandedAppt] = useState<string | null>(null)
+  const [products, setProducts] = useState<Record<string, string>>({})
+  const [productStatus, setProductStatus] = useState<Record<string, 'idle' | 'saving' | 'saved'>>({})
+  const productTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+
+  function handleProductsChange(apptId: string, value: string) {
+    setProducts(prev => ({ ...prev, [apptId]: value }))
+    setProductStatus(prev => ({ ...prev, [apptId]: 'saving' }))
+    if (productTimers.current[apptId]) clearTimeout(productTimers.current[apptId])
+    productTimers.current[apptId] = setTimeout(async () => {
+      const { error } = await supabase.from('appointments').update({ products_used: value }).eq('id', apptId)
+      if (!error) {
+        setProductStatus(prev => ({ ...prev, [apptId]: 'saved' }))
+        setTimeout(() => setProductStatus(prev => ({ ...prev, [apptId]: 'idle' })), 1600)
+      }
+    }, 800)
+  }
 
   useEffect(() => {
     async function loadDogs() {
@@ -136,6 +156,10 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
       .eq('dog_id', dog.id)
       .order('appointment_date', { ascending: false })
     setDogAppts(data || [])
+    const seeded: Record<string, string> = {}
+    ;(data || []).forEach((a: Appointment) => { seeded[a.id] = a.products_used || '' })
+    setProducts(seeded)
+    setExpandedAppt(null)
     setApptsLoading(false)
   }
 
@@ -225,8 +249,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
     { id: 'appointments', label: 'Appointments' },
     { id: 'photos', label: 'Photos' },
     { id: 'care', label: 'Care Notes' },
-    { id: 'timeline', label: 'Timeline' },
-    { id: 'documents', label: 'Documents' },
   ]
 
   return (
@@ -410,6 +432,7 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
                       const isCancelled = a.status === 'cancelled'
                       const isCompleted = a.status === 'completed'
                       const isUpcoming = !isCancelled && !isCompleted && a.appointment_date > today
+                      const isOpen = expandedAppt === a.id
                       const badge = isCancelled
                         ? { text: 'Cancelled', bg: '#FEE2E2', color: '#DC2626', border: '#FECACA' }
                         : isCompleted
@@ -418,19 +441,52 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
                             ? { text: 'Upcoming', bg: '#F5F2EB', color: '#6B7280', border: '#EDE9DF' }
                             : { text: 'Pending', bg: '#FEF3C7', color: '#92400E', border: '#FDE68A' }
                       return (
-                        <div key={a.id} className="dash-card rounded-2xl" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>{formatLongDate(a.appointment_date)}</div>
-                            <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
-                              {formatTime(a.appointment_time)}{a.services?.name ? ` · ${a.services.name}` : ''}
+                        <div key={a.id} className="dash-card rounded-2xl" style={{ overflow: 'hidden' }}>
+                          <div onClick={() => setExpandedAppt(isOpen ? null : a.id)}
+                            style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer' }}>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>{formatLongDate(a.appointment_date)}</div>
+                              <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
+                                {formatTime(a.appointment_time)}{a.services?.name ? ` · ${a.services.name}` : ''}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                              {a.services?.price ? <div style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>${a.services.price}</div> : null}
+                              <span style={{ padding: '4px 10px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, whiteSpace: 'nowrap' }}>
+                                {badge.text}
+                              </span>
+                              <span style={{ color: '#D1D5DB', fontSize: '14px', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>›</span>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                            {a.services?.price ? <div style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>${a.services.price}</div> : null}
-                            <span style={{ padding: '4px 10px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, whiteSpace: 'nowrap' }}>
-                              {badge.text}
-                            </span>
-                          </div>
+
+                          {isOpen && (
+                            <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(237,233,223,0.7)' }}>
+                              {/* BOX 1 — PRODUCTS USED */}
+                              <div style={{ marginTop: '14px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>Products Used</div>
+                                  <div style={{ fontSize: '10px', fontWeight: 600, color: productStatus[a.id] === 'saved' ? '#2D6A4F' : '#9CA3AF' }}>
+                                    {productStatus[a.id] === 'saving' ? 'Saving...' : productStatus[a.id] === 'saved' ? '✓ Saved' : 'Saves automatically'}
+                                  </div>
+                                </div>
+                                <textarea
+                                  value={products[a.id] ?? ''}
+                                  onChange={e => handleProductsChange(a.id, e.target.value)}
+                                  placeholder="Shampoo, conditioner, cologne, tools used..."
+                                  rows={3}
+                                  style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', fontSize: '13px', lineHeight: 1.6, background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329', resize: 'vertical', fontFamily: 'inherit' }}
+                                />
+                              </div>
+
+                              {/* BOX 2 — BOOKING NOTES (read-only) */}
+                              <div>
+                                <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '6px' }}>Notes From Booking</div>
+                                <div style={{ padding: '12px 14px', borderRadius: '10px', fontSize: '13px', lineHeight: 1.6, background: '#F5F2EB', border: '1px solid #EDE9DF', color: a.notes ? '#1A3329' : '#9CA3AF', minHeight: '60px' }}>
+                                  {a.notes || 'No notes were left with this booking.'}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )
                     })}
@@ -462,15 +518,11 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
                 </div>
               )}
 
-              {/* PLACEHOLDER TABS */}
-              {(tab === 'photos' || tab === 'timeline' || tab === 'documents') && (
+              {/* PHOTOS */}
+              {tab === 'photos' && (
                 <div style={{ padding: '50px 20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '10px' }}>
-                    {tab === 'photos' ? '📸' : tab === 'timeline' ? '🕓' : '📄'}
-                  </div>
-                  <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', marginBottom: '4px' }}>
-                    {tab === 'photos' ? 'Photos' : tab === 'timeline' ? 'Timeline' : 'Documents'}
-                  </div>
+                  <div style={{ fontSize: '32px', marginBottom: '10px' }}>📸</div>
+                  <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', marginBottom: '4px' }}>Photos</div>
                   <div style={{ fontSize: '13px', color: '#9CA3AF' }}>Coming soon</div>
                 </div>
               )}
@@ -1673,9 +1725,9 @@ export default function DashboardPage() {
       </div>
 
       {selectedAppt && (
-        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '0', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
+        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
           onClick={() => setSelectedAppt(null)}>
-          <div className="modal-box" style={{ width: '100%', maxWidth: '480px', borderRadius: '24px 24px 0 0', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 -8px 40px rgba(15,34,24,0.2)', maxHeight: '90vh', overflowY: 'auto' }}
+          <div className="modal-box" style={{ width: '100%', maxWidth: '480px', borderRadius: '24px', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 20px 60px rgba(15,34,24,0.25)', maxHeight: '85vh', overflowY: 'auto' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

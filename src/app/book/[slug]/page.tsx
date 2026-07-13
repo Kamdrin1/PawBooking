@@ -68,6 +68,8 @@ export default function BookingPage() {
   const [clientEmail, setClientEmail] = useState('')
   const [dogName, setDogName] = useState('')
   const [dogBreed, setDogBreed] = useState('')
+  const [rabies, setRabies] = useState<'yes' | 'no' | ''>('')
+  const [rabiesExp, setRabiesExp] = useState('')
   const [serviceId, setServiceId] = useState('')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
@@ -178,6 +180,8 @@ export default function BookingPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!smsConsent) { setError('Please agree to receive SMS reminders to complete your booking.'); return }
+    if (!rabies) { setError('Please tell us whether your dog is up to date on rabies vaccination.'); return }
+    if (rabies === 'yes' && !rabiesExp) { setError('Please enter the rabies vaccination expiration date.'); return }
     if (date && isDateDisabled(date)) { setError('This date is not available. Please select another.'); return }
     
     setLoading(true); setError('')
@@ -189,6 +193,8 @@ export default function BookingPage() {
       client_email: clientEmail,
       dog_name: dogName,
       dog_breed: dogBreed,
+      rabies_vaccinated: rabies === 'yes',
+      rabies_expiration: rabies === 'yes' && rabiesExp ? rabiesExp : null,
       service_id: serviceId || null,
       appointment_date: date,
       appointment_time: time,
@@ -490,6 +496,40 @@ export default function BookingPage() {
                     style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)' }} />
                 </div>
               </div>
+
+              {/* RABIES */}
+              <div style={{ marginTop: '12px' }}>
+                <label>Is your dog up to date on rabies vaccination? *</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(['yes', 'no'] as const).map(opt => (
+                    <button key={opt} type="button" onClick={() => { setRabies(opt); if (opt === 'no') setRabiesExp('') }}
+                      style={{
+                        flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        border: `2px solid ${rabies === opt ? '#1A3329' : 'rgba(237,233,223,0.8)'}`,
+                        background: rabies === opt ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#F5F2EB',
+                        color: rabies === opt ? '#1A3329' : '#9CA3AF',
+                      }}>
+                      {opt === 'yes' ? 'Yes' : 'No'}
+                    </button>
+                  ))}
+                </div>
+
+                {rabies === 'yes' && (
+                  <div style={{ marginTop: '12px' }}>
+                    <label>Vaccination Expiration Date *</label>
+                    <input type="date" value={rabiesExp} onChange={e => setRabiesExp(e.target.value)}
+                      required
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }} />
+                  </div>
+                )}
+
+                {rabies === 'no' && (
+                  <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '10px', background: '#FEF3C7', border: '1px solid #FDE68A', fontSize: '12px', color: '#92400E', lineHeight: 1.6 }}>
+                    Please note: {profile.business_name} may require proof of rabies vaccination before your appointment.
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* NOTES */}
@@ -543,8 +583,8 @@ export default function BookingPage() {
             )}
 
             {/* SUBMIT */}
-            <button type="submit" disabled={(loading || !smsConsent || (date ? isDateDisabled(date) : false))} className="submit-btn"
-              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: (loading || !smsConsent || (date ? isDateDisabled(date) : false)) ? 'not-allowed' : 'pointer' }}>
+            <button type="submit" disabled={(loading || !smsConsent || !rabies || (rabies === 'yes' && !rabiesExp) || (date ? isDateDisabled(date) : false))} className="submit-btn"
+              style={{ width: '100%', padding: '16px', borderRadius: '14px', fontWeight: 700, fontSize: '15px', border: 'none', cursor: (loading || !smsConsent || !rabies || (rabies === 'yes' && !rabiesExp) || (date ? isDateDisabled(date) : false)) ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending request...' : `Request Appointment${selectedService ? ` — $${selectedService.price}` : ''}`}
             </button>
 
