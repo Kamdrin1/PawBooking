@@ -548,8 +548,6 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   }
 
   const today = new Date().toISOString().split('T')[0]
-  const completed = appts.filter(a => a.status === 'completed')
-  const totalSpend = completed.reduce((sum, a) => sum + (a.services?.price || 0), 0)
 
   const filtered = customers.filter(c => {
     const q = search.toLowerCase().trim()
@@ -674,18 +672,6 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
                       🐾 {d.name}{d.breed ? ` · ${d.breed}` : ''}
                     </span>
                   ))}
-                </div>
-              </div>
-
-              {/* STATS */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-                <div className="dash-card rounded-2xl" style={{ padding: '14px 16px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '6px' }}>Completed Visits</div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#1A3329' }}>{completed.length}</div>
-                </div>
-                <div className="dash-card rounded-2xl" style={{ padding: '14px 16px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '6px' }}>Total Spend</div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#2D6A4F' }}>{totalSpend > 0 ? `$${totalSpend}` : '—'}</div>
                 </div>
               </div>
 
