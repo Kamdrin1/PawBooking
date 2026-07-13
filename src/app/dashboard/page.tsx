@@ -197,16 +197,16 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   // ── derived stats for Overview ──
   const today = new Date().toISOString().split('T')[0]
   const activeAppts = dogAppts.filter(a => a.status !== 'cancelled')
-  const pastAppts = activeAppts.filter(a => a.appointment_date <= today)
+  const completedAppts = dogAppts.filter(a => a.status === 'completed')
   const futureAppts = activeAppts.filter(a => a.appointment_date > today)
-  const lastGroom = pastAppts.length > 0 ? pastAppts[0] : null
+  const lastGroom = completedAppts.length > 0 ? completedAppts[0] : null
   const nextAppt = futureAppts.length > 0 ? futureAppts[futureAppts.length - 1] : null
-  const lifetimeVisits = activeAppts.length
-  const totalSpend = activeAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
+  const lifetimeVisits = completedAppts.length
+  const totalSpend = completedAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
   const avgSpend = lifetimeVisits > 0 ? Math.round(totalSpend / lifetimeVisits) : 0
 
   const serviceCounts: Record<string, number> = {}
-  activeAppts.forEach(a => {
+  completedAppts.forEach(a => {
     const n = a.services?.name
     if (n) serviceCounts[n] = (serviceCounts[n] || 0) + 1
   })
@@ -292,9 +292,9 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
 
       {/* ── DOG DETAIL MODAL ── */}
       {selectedDog && (
-        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
+        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
           onClick={closeDog}>
-          <div className="modal-box" style={{ width: '100%', maxWidth: '560px', borderRadius: '24px 24px 0 0', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 -8px 40px rgba(15,34,24,0.2)', maxHeight: '92vh', overflowY: 'auto' }}
+          <div className="modal-box" style={{ width: '100%', maxWidth: '560px', borderRadius: '24px', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 20px 60px rgba(15,34,24,0.25)', maxHeight: '85vh', overflowY: 'auto' }}
             onClick={e => e.stopPropagation()}>
 
             {/* HEADER */}
