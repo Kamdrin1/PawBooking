@@ -482,6 +482,261 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   )
 }
 
+// ─── CUSTOMER PROFILE PAGE ────────────────────────────────────────────────────
+interface Customer {
+  key: string
+  name: string
+  phone: string
+  email: string
+  dogs: Dog[]
+}
+
+function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Customer | null>(null)
+  const [appts, setAppts] = useState<Appointment[]>([])
+  const [apptsLoading, setApptsLoading] = useState(false)
+
+  useEffect(() => {
+    async function loadCustomers() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase.from('dogs').select('*').eq('profile_id', user.id).order('owner_name')
+
+      const map = new Map<string, Customer>()
+      ;(data || []).forEach((d: Dog) => {
+        const digits = (d.owner_phone || '').replace(/\D/g, '')
+        const key = `${d.owner_name.toLowerCase().trim()}|${digits}`
+        const existing = map.get(key)
+        if (existing) {
+          existing.dogs.push(d)
+          if (!existing.email && d.owner_email) existing.email = d.owner_email
+          if (!existing.phone && d.owner_phone) existing.phone = d.owner_phone
+        } else {
+          map.set(key, {
+            key,
+            name: d.owner_name,
+            phone: d.owner_phone || '',
+            email: d.owner_email || '',
+            dogs: [d],
+          })
+        }
+      })
+      setCustomers(Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name)))
+      setLoading(false)
+    }
+    loadCustomers()
+  }, [])
+
+  async function openCustomer(c: Customer) {
+    setSelected(c)
+    setApptsLoading(true)
+    const dogIds = c.dogs.map(d => d.id)
+    const { data } = await supabase
+      .from('appointments').select('*, services(name, price)')
+      .in('dog_id', dogIds)
+      .order('appointment_date', { ascending: false })
+    setAppts(data || [])
+    setApptsLoading(false)
+  }
+
+  function closeCustomer() {
+    setSelected(null)
+    setAppts([])
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+  const completed = appts.filter(a => a.status === 'completed')
+  const totalSpend = completed.reduce((sum, a) => sum + (a.services?.price || 0), 0)
+
+  const filtered = customers.filter(c => {
+    const q = search.toLowerCase().trim()
+    if (!q) return true
+    return c.name.toLowerCase().includes(q)
+      || c.phone.toLowerCase().includes(q)
+      || c.email.toLowerCase().includes(q)
+      || c.dogs.some(d => d.name.toLowerCase().includes(q))
+  })
+
+  return (
+    <>
+      <header className="page-header">
+        <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Customer Profile</h1>
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your clients and their booking history</p>
+      </header>
+
+      <div className="page-content" style={{ maxWidth: '900px' }}>
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search by owner, phone, email, or dog..."
+          style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', marginBottom: '16px', background: '#FDFBF7', border: '1px solid #EDE9DF', color: '#1A3329' }}
+        />
+
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+            <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: '60px 20px', textAlign: 'center', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '16px', border: '1px solid rgba(237,233,223,0.7)' }}>
+            <div style={{ fontSize: '36px', marginBottom: '12px' }}>👥</div>
+            <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>
+              {customers.length === 0 ? 'No customers yet' : 'No matches'}
+            </div>
+            <div style={{ fontSize: '13px', color: '#9CA3AF' }}>
+              {customers.length === 0 ? 'Profiles are created automatically when a booking comes in' : 'Try a different search'}
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl" style={{ overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.7)' }}>
+            {filtered.map(c => {
+              const color = getAvatarColor(c.name)
+              return (
+                <div key={c.key} onClick={() => openCustomer(c)} className="appt-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                    <div style={{ width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0, background: color.bg, color: color.text }}>
+                      {getInitials(c.name)}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: '14px', color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {c.name}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {c.dogs.map(d => d.name).join(', ')}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                    {c.phone && <div style={{ fontSize: '13px', color: '#6B7280' }}>{c.phone}</div>}
+                    <div style={{ color: '#D1D5DB', fontSize: '16px' }}>›</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── CUSTOMER DETAIL MODAL ── */}
+      {selected && (
+        <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
+          onClick={closeCustomer}>
+          <div className="modal-box" style={{ width: '100%', maxWidth: '560px', borderRadius: '24px', overflow: 'hidden', background: 'linear-gradient(145deg, #FDFBF7, #FAF7F2)', border: '1px solid rgba(237,233,223,0.8)', boxShadow: '0 20px 60px rgba(15,34,24,0.25)', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* HEADER */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid rgba(237,233,223,0.7)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 700, flexShrink: 0, background: getAvatarColor(selected.name).bg, color: getAvatarColor(selected.name).text }}>
+                  {getInitials(selected.name)}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: '18px', color: '#1A3329' }}>{selected.name}</div>
+                  <div style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>
+                    {selected.dogs.length} {selected.dogs.length === 1 ? 'dog' : 'dogs'}
+                  </div>
+                </div>
+              </div>
+              <button onClick={closeCustomer} style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', background: '#F5F2EB', color: '#6B7280', border: 'none', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+            </div>
+
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+
+              {/* CONTACT */}
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Contact</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {selected.phone && (
+                    <a href={`tel:${selected.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)', textDecoration: 'none' }}>
+                      <span>📞</span><span style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329' }}>{selected.phone}</span>
+                    </a>
+                  )}
+                  {selected.email && (
+                    <a href={`mailto:${selected.email}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.7)', textDecoration: 'none' }}>
+                      <span>✉️</span><span style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329', wordBreak: 'break-all' }}>{selected.email}</span>
+                    </a>
+                  )}
+                  {!selected.phone && !selected.email && (
+                    <div style={{ fontSize: '13px', color: '#9CA3AF' }}>No contact info on file</div>
+                  )}
+                </div>
+              </div>
+
+              {/* DOGS */}
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Dogs</div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {selected.dogs.map(d => (
+                    <span key={d.id} style={{ padding: '6px 12px', borderRadius: '50px', fontSize: '14px', fontWeight: 500, background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36' }}>
+                      🐾 {d.name}{d.breed ? ` · ${d.breed}` : ''}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* STATS */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                <div className="dash-card rounded-2xl" style={{ padding: '14px 16px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '6px' }}>Completed Visits</div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#1A3329' }}>{completed.length}</div>
+                </div>
+                <div className="dash-card rounded-2xl" style={{ padding: '14px 16px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '6px' }}>Total Spend</div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#2D6A4F' }}>{totalSpend > 0 ? `$${totalSpend}` : '—'}</div>
+                </div>
+              </div>
+
+              {/* BOOKING HISTORY */}
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Booking History</div>
+                {apptsLoading ? (
+                  <div style={{ padding: '24px', textAlign: 'center', fontSize: '13px', color: '#9CA3AF' }}>Loading...</div>
+                ) : appts.length === 0 ? (
+                  <div style={{ padding: '24px', textAlign: 'center', fontSize: '13px', color: '#9CA3AF' }}>No appointments yet</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {appts.map(a => {
+                      const isCancelled = a.status === 'cancelled'
+                      const isCompleted = a.status === 'completed'
+                      const isUpcoming = !isCancelled && !isCompleted && a.appointment_date > today
+                      const badge = isCancelled
+                        ? { text: 'Cancelled', bg: '#FEE2E2', color: '#DC2626', border: '#FECACA' }
+                        : isCompleted
+                          ? { text: 'Completed', bg: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', color: '#1A5C36', border: 'rgba(45,106,79,0.15)' }
+                          : isUpcoming
+                            ? { text: 'Upcoming', bg: '#F5F2EB', color: '#6B7280', border: '#EDE9DF' }
+                            : { text: 'Pending', bg: '#FEF3C7', color: '#92400E', border: '#FDE68A' }
+                      return (
+                        <div key={a.id} className="dash-card rounded-2xl" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>{formatLongDate(a.appointment_date)}</div>
+                            <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>
+                              {a.dog_name}{a.services?.name ? ` · ${a.services.name}` : ''}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                            {a.services?.price ? <div style={{ fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>${a.services.price}</div> : null}
+                            <span style={{ padding: '4px 10px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, whiteSpace: 'nowrap' }}>
+                              {badge.text}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 // ─── CALENDAR PAGE ────────────────────────────────────────────────────────────
 function CalendarPage({ profile, supabase }: {
   profile: Profile | null
@@ -1415,21 +1670,7 @@ export default function DashboardPage() {
 
           {activePage === 'dogs' && <DogProfilePage supabase={supabase} />}
 
-          {activePage === 'customers' && (
-            <>
-              <header className="page-header">
-                <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Customer Profile</h1>
-                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your clients and their booking history</p>
-              </header>
-              <div className="page-content">
-                <div style={{ padding: '60px 20px', textAlign: 'center', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '16px', border: '1px solid rgba(237,233,223,0.7)' }}>
-                  <div style={{ fontSize: '36px', marginBottom: '12px' }}>👥</div>
-                  <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>Customer Profile</div>
-                  <div style={{ fontSize: '13px', color: '#9CA3AF' }}>Coming next — building Dog Profile first</div>
-                </div>
-              </div>
-            </>
-          )}
+          {activePage === 'customers' && <CustomerProfilePage supabase={supabase} />}
 
           {activePage === 'calendar' && <CalendarPage profile={profile} supabase={supabase} />}
           {activePage === 'services' && <ServicesPage supabase={supabase} />}
