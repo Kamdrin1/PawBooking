@@ -108,6 +108,7 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ name: '', breed: '', owner_name: '', owner_phone: '', owner_email: '' })
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // care notes (autosave)
   const [notes, setNotes] = useState('')
@@ -206,6 +207,23 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
         setTimeout(() => setNotesStatus('idle'), 1600)
       }
     }, 800)
+  }
+
+  async function handleDeleteDog() {
+    if (!selectedDog) return
+    const ok = confirm(
+      `Delete ${selectedDog.name}'s profile?\n\n` +
+      `This permanently removes their care notes, products-used history, and profile details.\n\n` +
+      `Their past appointments will NOT be deleted — they'll stay on your dashboard, just unlinked from this dog.`
+    )
+    if (!ok) return
+    setDeleting(true)
+    const { error } = await supabase.from('dogs').delete().eq('id', selectedDog.id)
+    if (!error) {
+      setDogs(prev => prev.filter(d => d.id !== selectedDog.id))
+      closeDog()
+    }
+    setDeleting(false)
   }
 
   async function toggleReminder() {
@@ -528,6 +546,14 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
                 </div>
               )}
             </div>
+
+            {/* DELETE */}
+            <div style={{ padding: '0 20px 20px' }}>
+              <button onClick={handleDeleteDog} disabled={deleting}
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#DC2626', border: '1px solid #FECACA', cursor: deleting ? 'not-allowed' : 'pointer', background: '#FEE2E2', opacity: deleting ? 0.5 : 1 }}>
+                {deleting ? 'Deleting...' : `Delete ${selectedDog.name}'s Profile`}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -551,6 +577,7 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   const [selected, setSelected] = useState<Customer | null>(null)
   const [appts, setAppts] = useState<Appointment[]>([])
   const [apptsLoading, setApptsLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function loadCustomers() {
@@ -598,6 +625,25 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   function closeCustomer() {
     setSelected(null)
     setAppts([])
+  }
+
+  async function handleDeleteCustomer() {
+    if (!selected) return
+    const dogNames = selected.dogs.map(d => d.name).join(', ')
+    const ok = confirm(
+      `Delete ${selected.name}'s profile?\n\n` +
+      `This also deletes their dog profile${selected.dogs.length === 1 ? '' : 's'} (${dogNames}), including care notes and products-used history.\n\n` +
+      `Their past appointments will NOT be deleted — they'll stay on your dashboard, just unlinked.`
+    )
+    if (!ok) return
+    setDeleting(true)
+    const dogIds = selected.dogs.map(d => d.id)
+    const { error } = await supabase.from('dogs').delete().in('id', dogIds)
+    if (!error) {
+      setCustomers(prev => prev.filter(c => c.key !== selected.key))
+      closeCustomer()
+    }
+    setDeleting(false)
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -768,6 +814,12 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
                   </div>
                 )}
               </div>
+
+              {/* DELETE */}
+              <button onClick={handleDeleteCustomer} disabled={deleting}
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#DC2626', border: '1px solid #FECACA', cursor: deleting ? 'not-allowed' : 'pointer', background: '#FEE2E2', opacity: deleting ? 0.5 : 1 }}>
+                {deleting ? 'Deleting...' : `Delete ${selected.name}'s Profile`}
+              </button>
             </div>
           </div>
         </div>
@@ -789,6 +841,7 @@ function CalendarPage({ profile, supabase }: {
   const [reason, setReason] = useState('')
   const [savingReason, setSavingReason] = useState(false)
   const [togglingDate, setTogglingDate] = useState(false)
+  const [apptsByDate, setApptsByDate] = useState<Record<string, Appointment[]>>({})
 
   useEffect(() => {
     async function loadUnavailableDates() {
@@ -796,6 +849,19 @@ function CalendarPage({ profile, supabase }: {
       if (!user) return
       const { data } = await supabase.from('unavailable_dates').select('*').eq('profile_id', user.id)
       setUnavailableDates(data || [])
+
+      const { data: appts } = await supabase
+        .from('appointments').select('*, services(name, price)')
+        .eq('profile_id', user.id)
+        .neq('status', 'cancelled')
+        .order('appointment_time', { ascending: true })
+
+      const grouped: Record<string, Appointment[]> = {}
+      ;(appts || []).forEach((a: Appointment) => {
+        if (!grouped[a.appointment_date]) grouped[a.appointment_date] = []
+        grouped[a.appointment_date].push(a)
+      })
+      setApptsByDate(grouped)
       setLoading(false)
     }
     loadUnavailableDates()
@@ -956,12 +1022,15 @@ function CalendarPage({ profile, supabase }: {
                 const isToday = dateStr === today
                 const isSelected = selectedDates.includes(dateStr)
 
+                const dayAppts = apptsByDate[dateStr] || []
+
                 return (
                   <button
                     key={day}
                     onClick={(e) => handleDateClick(day, e)}
-                    title="Click to select, Ctrl+Click to multi-select"
+                    title={dayAppts.length > 0 ? `${dayAppts.length} booking${dayAppts.length === 1 ? '' : 's'}` : 'Click to select, Ctrl+Click to multi-select'}
                     style={{
+                      position: 'relative',
                       padding: '16px 8px',
                       borderRadius: '12px',
                       fontSize: '18px',
@@ -974,6 +1043,19 @@ function CalendarPage({ profile, supabase }: {
                       transition: 'all 0.15s',
                     }}>
                     {day}
+                    {dayAppts.length > 0 && (
+                      <span style={{
+                        position: 'absolute', top: '4px', right: '4px',
+                        minWidth: '18px', height: '18px', padding: '0 4px',
+                        borderRadius: '50px', fontSize: '10px', fontWeight: 700,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: isMarkedUnavailable ? 'white' : 'linear-gradient(135deg, #1A3329, #2D6A4F)',
+                        color: isMarkedUnavailable ? '#DC2626' : 'white',
+                        boxShadow: '0 2px 6px rgba(26,51,41,0.25)',
+                      }}>
+                        {dayAppts.length}
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -990,6 +1072,30 @@ function CalendarPage({ profile, supabase }: {
                     ? new Date(selectedDates[0] + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
                     : `${selectedDates.length} dates selected`}
                 </div>
+
+                {/* BOOKINGS ON THIS DAY */}
+                {selectedDates.length === 1 && (apptsByDate[selectedDates[0]] || []).length > 0 && (
+                  <div style={{ padding: '12px', borderRadius: '8px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.15)' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#1A5C36', marginBottom: '8px' }}>
+                      {(apptsByDate[selectedDates[0]] || []).length} Booking{(apptsByDate[selectedDates[0]] || []).length === 1 ? '' : 's'}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {(apptsByDate[selectedDates[0]] || []).map(a => (
+                        <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, color: '#1A3329', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {formatTime(a.appointment_time)} · {a.dog_name}
+                            </div>
+                            <div style={{ color: '#2D6A4F', fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {a.client_name}{a.services?.name ? ` · ${a.services.name}` : ''}
+                            </div>
+                          </div>
+                          {a.services?.price ? <div style={{ fontWeight: 700, color: '#1A5C36', flexShrink: 0 }}>${a.services.price}</div> : null}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {selectedDates.length > 1 && (
                   <div style={{ padding: '12px', borderRadius: '8px', background: '#F5F2EB', border: '1px solid #EDE9DF' }}>

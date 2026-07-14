@@ -32,6 +32,11 @@ function formatPhone(raw: string): string {
   return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
 }
 
+function toMinutes(t: string): number {
+  const [h, m] = (t || '00:00').split(':').map(Number)
+  return h * 60 + m
+}
+
 function generateTimeSlots(startTime: string, endTime: string): string[] {
   const slots: string[] = []
   const [startH, startM] = (startTime || '09:00').split(':').map(Number)
@@ -62,6 +67,8 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [unavailableDates, setUnavailableDates] = useState<Set<string>>(new Set())
+  const [bookedIntervals, setBookedIntervals] = useState<[number, number][]>([])
+  const [slotsLoading, setSlotsLoading] = useState(false)
 
   const [clientName, setClientName] = useState('')
   const [clientPhone, setClientPhone] = useState('')
@@ -145,6 +152,45 @@ export default function BookingPage() {
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const timeSlots = generateTimeSlots(availability.startTime, availability.endTime)
 
+  // Load existing bookings for the chosen date so we can block overlapping slots
+  useEffect(() => {
+    async function loadBooked() {
+      if (!date || !profile?.id) { setBookedIntervals([]); return }
+      setSlotsLoading(true)
+      const { data } = await supabase
+        .from('appointments')
+        .select('appointment_time, services(duration_minutes)')
+        .eq('profile_id', profile.id)
+        .eq('appointment_date', date)
+        .neq('status', 'cancelled')
+
+      const intervals: [number, number][] = (data || []).map((a) => {
+        const raw = a as unknown as { appointment_time: string; services: { duration_minutes: number } | { duration_minutes: number }[] | null }
+        const svc = Array.isArray(raw.services) ? raw.services[0] : raw.services
+        const start = toMinutes(raw.appointment_time)
+        const dur = svc?.duration_minutes || 30
+        return [start, start + dur]
+      })
+      setBookedIntervals(intervals)
+      setSlotsLoading(false)
+    }
+    loadBooked()
+  }, [date, profile?.id])
+
+  // A slot works only if the whole service fits, and nothing overlaps it
+  function isSlotAvailable(slot: string): boolean {
+    const start = toMinutes(slot)
+    const duration = selectedService?.duration_minutes || 30
+    const end = start + duration
+    if (end > toMinutes(availability.endTime)) return false
+    return !bookedIntervals.some(([bStart, bEnd]) => start < bEnd && end > bStart)
+  }
+
+  // If the chosen time stops working (service changed, someone booked it), clear it
+  useEffect(() => {
+    if (time && !isSlotAvailable(time)) setTime('')
+  }, [bookedIntervals, serviceId])
+
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     const digits = e.target.value.replace(/\D/g, '').replace(/^1/, '').slice(0, 10)
     setClientPhone(formatPhone(digits))
@@ -179,6 +225,7 @@ export default function BookingPage() {
     e.preventDefault()
     if (!smsConsent) { setError('Please agree to receive SMS reminders to complete your booking.'); return }
     if (date && isDateDisabled(date)) { setError('This date is not available. Please select another.'); return }
+    if (time && !isSlotAvailable(time)) { setError('Sorry, that time was just booked. Please pick another.'); return }
     
     setLoading(true); setError('')
 
@@ -432,15 +479,23 @@ export default function BookingPage() {
                 <div>
                   <label>Preferred Time *</label>
                   <select value={time} onChange={e => setTime(e.target.value)}
-                    required disabled={!date}
+                    required disabled={!date || slotsLoading}
                     style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid rgba(237,233,223,0.8)', color: '#1A3329' }}>
-                    <option value="">{!date ? 'Select date first' : 'Select time'}</option>
-                    {timeSlots.map(slot => (
-                      <option key={slot} value={slot}>{(() => { const [h, m] = slot.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()} ({slot})</option>
-                    ))}
+                    <option value="">{!date ? 'Select date first' : slotsLoading ? 'Checking availability...' : 'Select time'}</option>
+                    {timeSlots.map(slot => {
+                      const open = isSlotAvailable(slot)
+                      const label = (() => { const [h, m] = slot.split(':'); const hour = parseInt(h); return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}` })()
+                      return (
+                        <option key={slot} value={slot} disabled={!open}>
+                          {label}{open ? '' : ' — Booked'}
+                        </option>
+                      )
+                    })}
                   </select>
                   <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
-                    {availability.startTime} - {availability.endTime}
+                    {date && !slotsLoading && timeSlots.filter(isSlotAvailable).length === 0
+                      ? <span style={{ color: '#DC2626' }}>No times left on this date — please pick another day.</span>
+                      : `${availability.startTime} - ${availability.endTime}`}
                   </div>
                 </div>
               </div>
