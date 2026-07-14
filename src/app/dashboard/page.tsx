@@ -108,7 +108,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ name: '', breed: '', owner_name: '', owner_phone: '', owner_email: '' })
   const [saving, setSaving] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   // care notes (autosave)
   const [notes, setNotes] = useState('')
@@ -207,23 +206,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
         setTimeout(() => setNotesStatus('idle'), 1600)
       }
     }, 800)
-  }
-
-  async function handleDeleteDog() {
-    if (!selectedDog) return
-    const ok = confirm(
-      `Delete ${selectedDog.name}'s profile?\n\n` +
-      `This permanently removes their care notes, products-used history, and profile details.\n\n` +
-      `Their past appointments will NOT be deleted — they'll stay on your dashboard, just unlinked from this dog.`
-    )
-    if (!ok) return
-    setDeleting(true)
-    const { error } = await supabase.from('dogs').delete().eq('id', selectedDog.id)
-    if (!error) {
-      setDogs(prev => prev.filter(d => d.id !== selectedDog.id))
-      closeDog()
-    }
-    setDeleting(false)
   }
 
   async function toggleReminder() {
@@ -547,13 +529,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
               )}
             </div>
 
-            {/* DELETE */}
-            <div style={{ padding: '0 20px 20px' }}>
-              <button onClick={handleDeleteDog} disabled={deleting}
-                style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#DC2626', border: '1px solid #FECACA', cursor: deleting ? 'not-allowed' : 'pointer', background: '#FEE2E2', opacity: deleting ? 0.5 : 1 }}>
-                {deleting ? 'Deleting...' : `Delete ${selectedDog.name}'s Profile`}
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -577,7 +552,6 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   const [selected, setSelected] = useState<Customer | null>(null)
   const [appts, setAppts] = useState<Appointment[]>([])
   const [apptsLoading, setApptsLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function loadCustomers() {
@@ -625,25 +599,6 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   function closeCustomer() {
     setSelected(null)
     setAppts([])
-  }
-
-  async function handleDeleteCustomer() {
-    if (!selected) return
-    const dogNames = selected.dogs.map(d => d.name).join(', ')
-    const ok = confirm(
-      `Delete ${selected.name}'s profile?\n\n` +
-      `This also deletes their dog profile${selected.dogs.length === 1 ? '' : 's'} (${dogNames}), including care notes and products-used history.\n\n` +
-      `Their past appointments will NOT be deleted — they'll stay on your dashboard, just unlinked.`
-    )
-    if (!ok) return
-    setDeleting(true)
-    const dogIds = selected.dogs.map(d => d.id)
-    const { error } = await supabase.from('dogs').delete().in('id', dogIds)
-    if (!error) {
-      setCustomers(prev => prev.filter(c => c.key !== selected.key))
-      closeCustomer()
-    }
-    setDeleting(false)
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -815,11 +770,6 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
                 )}
               </div>
 
-              {/* DELETE */}
-              <button onClick={handleDeleteCustomer} disabled={deleting}
-                style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#DC2626', border: '1px solid #FECACA', cursor: deleting ? 'not-allowed' : 'pointer', background: '#FEE2E2', opacity: deleting ? 0.5 : 1 }}>
-                {deleting ? 'Deleting...' : `Delete ${selected.name}'s Profile`}
-              </button>
             </div>
           </div>
         </div>
