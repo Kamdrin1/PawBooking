@@ -16,8 +16,6 @@ interface Appointment {
   notes: string
   payment_method: string
   products_used: string | null
-  rabies_vaccinated: boolean | null
-  rabies_expiration: string | null
   services: { name: string; price: number } | null
 }
 
@@ -238,9 +236,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
   })
   const favoriteService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'
 
-  // latest rabies info reported on a booking (dogAppts is newest-first)
-  const rabiesAppt = dogAppts.find(a => a.rabies_vaccinated !== null && a.rabies_vaccinated !== undefined)
-  const rabiesExpired = !!(rabiesAppt?.rabies_expiration && rabiesAppt.rabies_expiration < today)
 
   const filteredDogs = dogs.filter(d => {
     const q = search.toLowerCase().trim()
@@ -503,38 +498,6 @@ function DogProfilePage({ supabase }: { supabase: ReturnType<typeof createClient
               {/* CARE NOTES */}
               {tab === 'care' && (
                 <div>
-                  {/* RABIES — pinned, pulled from latest booking */}
-                  {rabiesAppt && (
-                    <div style={{
-                      padding: '12px 14px', borderRadius: '12px', marginBottom: '16px',
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      background: !rabiesAppt.rabies_vaccinated ? '#FEE2E2' : rabiesExpired ? '#FEF3C7' : 'linear-gradient(135deg, #D8F3DC, #c8eacd)',
-                      border: `1px solid ${!rabiesAppt.rabies_vaccinated ? '#FECACA' : rabiesExpired ? '#FDE68A' : 'rgba(45,106,79,0.15)'}`,
-                    }}>
-                      <span style={{ fontSize: '18px', flexShrink: 0 }}>
-                        {!rabiesAppt.rabies_vaccinated ? '⚠️' : rabiesExpired ? '⏰' : '💉'}
-                      </span>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{
-                          fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px',
-                          color: !rabiesAppt.rabies_vaccinated ? '#DC2626' : rabiesExpired ? '#92400E' : '#1A5C36',
-                        }}>
-                          Rabies Vaccination
-                        </div>
-                        <div style={{
-                          fontSize: '13px', fontWeight: 600,
-                          color: !rabiesAppt.rabies_vaccinated ? '#991B1B' : rabiesExpired ? '#92400E' : '#1A3329',
-                        }}>
-                          {!rabiesAppt.rabies_vaccinated
-                            ? 'Not vaccinated — owner reported no'
-                            : rabiesAppt.rabies_expiration
-                              ? `${rabiesExpired ? 'EXPIRED' : 'Expires'} ${formatLongDate(rabiesAppt.rabies_expiration)}`
-                              : 'Vaccinated — no expiration date given'}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>
                       ✏️ Care Notes
