@@ -1402,7 +1402,7 @@ function InsightsPage({ profile, supabase, router, onViewOverdue }: {
       // ── repeat customer rate (based on completed visits, by phone) ──
       function repeatRateUpTo(cutoffKey: string): number {
         const counts: Record<string, number> = {}
-        appts.forEach(a => {
+        ;(appts || []).forEach(a => {
           if (a.status !== 'completed' || !a.client_phone) return
           if (a.appointment_date.slice(0, 7) > cutoffKey) return
           const p = a.client_phone.replace(/\D/g, '')
