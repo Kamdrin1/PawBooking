@@ -56,15 +56,24 @@ interface UnavailableDate {
   reason: string | null
 }
 
-interface ReportData {
+interface InsightsData {
+  // business health
+  revenueThisMonth: number
+  revenueLastMonth: number
+  revenueGrowthPct: number | null
+  apptsThisMonth: number
+  apptsLastMonth: number
+  repeatRate: number            // % of clients with >1 completed visit
+  repeatRateLastMonth: number
+  // trends
   monthlyRevenue: { month: string; revenue: number }[]
-  topServices: { name: string; count: number; revenue: number }[]
-  newVsReturning: { new: number; returning: number }
-  avgRevenuePerAppt: number
-  totalRevenue: number
-  totalAppointments: number
-  noShowRate: number
-  reviewsGenerated: number
+  // intelligence
+  topService: { name: string; revenue: number; sharePct: number } | null
+  busiestDay: { day: string; count: number } | null
+  avgDaysBetween: number | null
+  overdueCount: number
+  // feed
+  suggestions: { icon: string; text: string; tone: 'good' | 'watch' | 'info' }[]
 }
 
 // ─── SHARED HELPERS ───────────────────────────────────────────────────────────
@@ -543,12 +552,18 @@ interface Customer {
   phone: string
   email: string
   dogs: Dog[]
+  status: 'upcoming' | 'overdue' | 'none'
 }
 
-function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+function CustomerProfilePage({ supabase, initialFilter, onFilterConsumed }: {
+  supabase: ReturnType<typeof createClient>
+  initialFilter: 'all' | 'upcoming' | 'overdue'
+  onFilterConsumed: () => void
+}) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'overdue'>(initialFilter)
   const [selected, setSelected] = useState<Customer | null>(null)
   const [appts, setAppts] = useState<Appointment[]>([])
   const [apptsLoading, setApptsLoading] = useState(false)
@@ -558,6 +573,25 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       const { data } = await supabase.from('dogs').select('*').eq('profile_id', user.id).order('owner_name')
+
+      // Pull appointments to derive per-customer status (upcoming / overdue)
+      const { data: appts } = await supabase
+        .from('appointments')
+        .select('dog_id, appointment_date, status')
+        .eq('profile_id', user.id)
+
+      const todayStr = new Date().toISOString().split('T')[0]
+      const nextByDog: Record<string, boolean> = {}
+      const lastCompletedByDog: Record<string, string> = {}
+      ;(appts || []).forEach(a => {
+        if (!a.dog_id) return
+        if (a.status !== 'cancelled' && a.appointment_date >= todayStr) nextByDog[a.dog_id] = true
+        if (a.status === 'completed') {
+          if (!lastCompletedByDog[a.dog_id] || a.appointment_date > lastCompletedByDog[a.dog_id]) {
+            lastCompletedByDog[a.dog_id] = a.appointment_date
+          }
+        }
+      })
 
       const map = new Map<string, Customer>()
       ;(data || []).forEach((d: Dog) => {
@@ -575,13 +609,40 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
             phone: d.owner_phone || '',
             email: d.owner_email || '',
             dogs: [d],
+            status: 'none',
           })
         }
       })
+
+      // Derive status per customer across all their dogs
+      const now = Date.now()
+      map.forEach(c => {
+        const dogIds = c.dogs.map(d => d.id)
+        const hasUpcoming = dogIds.some(id => nextByDog[id])
+        if (hasUpcoming) { c.status = 'upcoming'; return }
+        // overdue = a completed groom >6 weeks ago and nothing upcoming
+        const lastDates = dogIds.map(id => lastCompletedByDog[id]).filter(Boolean) as string[]
+        if (lastDates.length > 0) {
+          const mostRecent = lastDates.sort().slice(-1)[0]
+          const days = (now - new Date(mostRecent + 'T00:00:00').getTime()) / 86400000
+          if (days > 42) c.status = 'overdue'
+        }
+      })
+
       setCustomers(Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name)))
       setLoading(false)
     }
     loadCustomers()
+  }, [])
+
+  // Apply an incoming filter intent from Insights, then clear it so a later
+  // manual visit to this page doesn't reopen with a stale filter.
+  useEffect(() => {
+    if (initialFilter !== 'all') {
+      setFilter(initialFilter)
+      onFilterConsumed()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function openCustomer(c: Customer) {
@@ -604,6 +665,8 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
   const today = new Date().toISOString().split('T')[0]
 
   const filtered = customers.filter(c => {
+    if (filter === 'upcoming' && c.status !== 'upcoming') return false
+    if (filter === 'overdue' && c.status !== 'overdue') return false
     const q = search.toLowerCase().trim()
     if (!q) return true
     return c.name.toLowerCase().includes(q)
@@ -611,6 +674,12 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
       || c.email.toLowerCase().includes(q)
       || c.dogs.some(d => d.name.toLowerCase().includes(q))
   })
+
+  const filterCounts = {
+    all: customers.length,
+    upcoming: customers.filter(c => c.status === 'upcoming').length,
+    overdue: customers.filter(c => c.status === 'overdue').length,
+  }
 
   return (
     <>
@@ -625,8 +694,30 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by owner, phone, email, or dog..."
-          style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', marginBottom: '16px', background: '#FDFBF7', border: '1px solid #EDE9DF', color: '#1A3329' }}
+          style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', marginBottom: '12px', background: '#FDFBF7', border: '1px solid #EDE9DF', color: '#1A3329' }}
         />
+
+        {/* FILTER */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          {([
+            { id: 'all', label: 'All' },
+            { id: 'upcoming', label: 'Upcoming' },
+            { id: 'overdue', label: 'Overdue' },
+          ] as const).map(f => {
+            const active = filter === f.id
+            return (
+              <button key={f.id} onClick={() => setFilter(f.id)}
+                style={{
+                  padding: '7px 14px', borderRadius: '50px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                  border: active ? '1px solid rgba(45,106,79,0.15)' : '1px solid #EDE9DF',
+                  background: active ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : 'transparent',
+                  color: active ? '#1A5C36' : '#9CA3AF',
+                }}>
+                {f.label}{f.id !== 'all' ? ` · ${filterCounts[f.id]}` : ''}
+              </button>
+            )
+          })}
+        </div>
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
@@ -636,10 +727,10 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
           <div style={{ padding: '60px 20px', textAlign: 'center', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '16px', border: '1px solid rgba(237,233,223,0.7)' }}>
             <div style={{ fontSize: '36px', marginBottom: '12px' }}>👥</div>
             <div style={{ fontWeight: 500, color: '#6B7280', marginBottom: '4px' }}>
-              {customers.length === 0 ? 'No customers yet' : 'No matches'}
+              {customers.length === 0 ? 'No customers yet' : filter === 'overdue' ? 'No overdue clients' : filter === 'upcoming' ? 'No upcoming appointments' : 'No matches'}
             </div>
             <div style={{ fontSize: '13px', color: '#9CA3AF' }}>
-              {customers.length === 0 ? 'Profiles are created automatically when a booking comes in' : 'Try a different search'}
+              {customers.length === 0 ? 'Profiles are created automatically when a booking comes in' : filter === 'overdue' ? "You're all caught up — nobody's overdue." : filter === 'upcoming' ? 'No clients have a booking coming up.' : 'Try a different search'}
             </div>
           </div>
         ) : (
@@ -662,6 +753,11 @@ function CustomerProfilePage({ supabase }: { supabase: ReturnType<typeof createC
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                    {c.status === 'overdue' && (
+                      <span style={{ padding: '3px 10px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A', whiteSpace: 'nowrap' }}>
+                        Overdue
+                      </span>
+                    )}
                     {c.phone && <div style={{ fontSize: '13px', color: '#6B7280' }}>{c.phone}</div>}
                     <div style={{ color: '#D1D5DB', fontSize: '16px' }}>›</div>
                   </div>
@@ -1263,76 +1359,205 @@ function ServicesPage({ supabase }: {
   )
 }
 
-// ─── REPORTS PAGE ─────────────────────────────────────────────────────────────
-function ReportsPage({ profile, supabase, router }: {
+// ─── INSIGHTS PAGE ────────────────────────────────────────────────────────────
+function InsightsPage({ profile, supabase, router, onViewOverdue }: {
   profile: Profile | null
   supabase: ReturnType<typeof createClient>
   router: ReturnType<typeof useRouter>
+  onViewOverdue: () => void
 }) {
-  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [data, setData] = useState<InsightsData | null>(null)
   const [loading, setLoading] = useState(true)
-  const canAccessReports = ['essential', 'professional'].includes(profile?.plan || '')
+  const canAccess = ['essential', 'professional'].includes(profile?.plan || '')
 
   useEffect(() => {
-    if (!canAccessReports) { setLoading(false); return }
-    async function loadReports() {
+    if (!canAccess) { setLoading(false); return }
+    async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data: allAppts } = await supabase
+      const { data: appts } = await supabase
         .from('appointments').select('*, services(name, price)').eq('profile_id', user.id)
         .order('appointment_date', { ascending: true })
-      if (!allAppts) { setLoading(false); return }
+      if (!appts) { setLoading(false); return }
 
-      const monthlyMap: Record<string, number> = {}
-      const now = new Date()
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const key = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-        monthlyMap[key] = 0
+      const today = new Date()
+      const todayStr = today.toISOString().split('T')[0]
+      const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const thisMonthKey = monthKey(today)
+      const lastMonthKey = monthKey(new Date(today.getFullYear(), today.getMonth() - 1, 1))
+
+      const priceOf = (a: typeof appts[number]) => a.services?.price || 0
+      const inMonth = (a: typeof appts[number], key: string) => a.appointment_date.slice(0, 7) === key
+      const notCancelled = (a: typeof appts[number]) => a.status !== 'cancelled'
+
+      // ── business health ──
+      const revenueThisMonth = appts.filter(a => notCancelled(a) && inMonth(a, thisMonthKey)).reduce((s, a) => s + priceOf(a), 0)
+      const revenueLastMonth = appts.filter(a => notCancelled(a) && inMonth(a, lastMonthKey)).reduce((s, a) => s + priceOf(a), 0)
+      const revenueGrowthPct = revenueLastMonth > 0
+        ? Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100)
+        : null
+      const apptsThisMonth = appts.filter(a => notCancelled(a) && inMonth(a, thisMonthKey)).length
+      const apptsLastMonth = appts.filter(a => notCancelled(a) && inMonth(a, lastMonthKey)).length
+
+      // ── repeat customer rate (based on completed visits, by phone) ──
+      function repeatRateUpTo(cutoffKey: string): number {
+        const counts: Record<string, number> = {}
+        appts.forEach(a => {
+          if (a.status !== 'completed' || !a.client_phone) return
+          if (a.appointment_date.slice(0, 7) > cutoffKey) return
+          const p = a.client_phone.replace(/\D/g, '')
+          counts[p] = (counts[p] || 0) + 1
+        })
+        const clients = Object.values(counts)
+        if (clients.length === 0) return 0
+        const repeat = clients.filter(c => c > 1).length
+        return Math.round((repeat / clients.length) * 100)
       }
-      allAppts.forEach(a => {
-        const d = new Date(a.appointment_date + 'T00:00:00')
-        const key = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-        if (key in monthlyMap) monthlyMap[key] += a.services?.price || 0
-      })
-      const monthlyRevenue = Object.entries(monthlyMap).map(([month, revenue]) => ({ month, revenue }))
+      const repeatRate = repeatRateUpTo(thisMonthKey)
+      const repeatRateLastMonth = repeatRateUpTo(lastMonthKey)
 
-      const serviceMap: Record<string, { count: number; revenue: number }> = {}
-      allAppts.forEach(a => {
-        const name = a.services?.name || 'Unknown'
-        if (!serviceMap[name]) serviceMap[name] = { count: 0, revenue: 0 }
-        serviceMap[name].count++
-        serviceMap[name].revenue += a.services?.price || 0
-      })
-      const topServices = Object.entries(serviceMap)
-        .map(([name, v]) => ({ name, ...v }))
-        .sort((a, b) => b.revenue - a.revenue).slice(0, 5)
+      // ── monthly revenue, last 6 months ──
+      const monthlyRevenue: { month: string; revenue: number }[] = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1)
+        const key = monthKey(d)
+        const revenue = appts.filter(a => notCancelled(a) && inMonth(a, key)).reduce((s, a) => s + priceOf(a), 0)
+        monthlyRevenue.push({ month: d.toLocaleDateString('en-US', { month: 'short' }), revenue })
+      }
 
-      const phoneSeen = new Set<string>()
-      let newClients = 0, returningClients = 0
-      allAppts.forEach(a => {
+      // ── top service by revenue (all time, completed + upcoming counted) ──
+      const svc: Record<string, number> = {}
+      let totalSvcRevenue = 0
+      appts.forEach(a => {
+        if (!notCancelled(a)) return
+        const name = a.services?.name
+        if (!name) return
+        svc[name] = (svc[name] || 0) + priceOf(a)
+        totalSvcRevenue += priceOf(a)
+      })
+      const topEntry = Object.entries(svc).sort((a, b) => b[1] - a[1])[0]
+      const topService = topEntry
+        ? { name: topEntry[0], revenue: topEntry[1], sharePct: totalSvcRevenue > 0 ? Math.round((topEntry[1] / totalSvcRevenue) * 100) : 0 }
+        : null
+
+      // ── busiest day of week (completed + upcoming) ──
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      const dayCounts = [0, 0, 0, 0, 0, 0, 0]
+      appts.forEach(a => {
+        if (!notCancelled(a)) return
+        const d = new Date(a.appointment_date + 'T00:00:00').getDay()
+        dayCounts[d]++
+      })
+      const maxDayCount = Math.max(...dayCounts)
+      const busiestDay = maxDayCount > 0
+        ? { day: dayNames[dayCounts.indexOf(maxDayCount)], count: maxDayCount }
+        : null
+
+      // ── average days between visits (per client, completed only) ──
+      const byClient: Record<string, string[]> = {}
+      appts.forEach(a => {
+        if (a.status !== 'completed' || !a.client_phone) return
+        const p = a.client_phone.replace(/\D/g, '')
+        ;(byClient[p] = byClient[p] || []).push(a.appointment_date)
+      })
+      const gaps: number[] = []
+      Object.values(byClient).forEach(dates => {
+        const sorted = dates.slice().sort()
+        for (let i = 1; i < sorted.length; i++) {
+          const diff = (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86400000
+          if (diff > 0) gaps.push(diff)
+        }
+      })
+      const avgDaysBetween = gaps.length > 0 ? Math.round(gaps.reduce((s, g) => s + g, 0) / gaps.length) : null
+
+      // ── overdue clients: last completed groom >42 days ago AND no upcoming ──
+      const lastCompletedByClient: Record<string, string> = {}
+      const hasUpcoming: Record<string, boolean> = {}
+      appts.forEach(a => {
         if (!a.client_phone) return
-        if (phoneSeen.has(a.client_phone)) { returningClients++ }
-        else { newClients++; phoneSeen.add(a.client_phone) }
+        const p = a.client_phone.replace(/\D/g, '')
+        if (a.status === 'completed') {
+          if (!lastCompletedByClient[p] || a.appointment_date > lastCompletedByClient[p]) {
+            lastCompletedByClient[p] = a.appointment_date
+          }
+        }
+        if (notCancelled(a) && a.appointment_date >= todayStr) hasUpcoming[p] = true
+      })
+      let overdueCount = 0
+      Object.entries(lastCompletedByClient).forEach(([p, last]) => {
+        if (hasUpcoming[p]) return
+        const days = (today.getTime() - new Date(last + 'T00:00:00').getTime()) / 86400000
+        if (days > 42) overdueCount++
       })
 
-      const totalRevenue = allAppts.reduce((sum, a) => sum + (a.services?.price || 0), 0)
-      const totalAppointments = allAppts.length
-      const avgRevenuePerAppt = totalAppointments > 0 ? Math.round(totalRevenue / totalAppointments) : 0
+      // ── smart suggestions ──
+      const suggestions: InsightsData['suggestions'] = []
+      if (busiestDay && busiestDay.count >= 3) {
+        suggestions.push({ icon: '📅', text: `${busiestDay.day}s are consistently your busiest day.`, tone: 'info' })
+      }
+      if (overdueCount > 0) {
+        suggestions.push({ icon: '⏰', text: `${overdueCount} client${overdueCount === 1 ? ' is' : 's are'} overdue for grooming.`, tone: 'watch' })
+      }
+      if (topService && topService.sharePct >= 40) {
+        suggestions.push({ icon: '💰', text: `${topService.name} generates ${topService.sharePct}% of your revenue.`, tone: 'info' })
+      }
+      if (repeatRateLastMonth > 0 && repeatRate > repeatRateLastMonth) {
+        suggestions.push({ icon: '📈', text: `Repeat customers increased by ${repeatRate - repeatRateLastMonth}%.`, tone: 'good' })
+      } else if (repeatRateLastMonth > 0 && repeatRate < repeatRateLastMonth) {
+        suggestions.push({ icon: '👀', text: `Repeat customer rate dipped ${repeatRateLastMonth - repeatRate}% — worth a check-in with past clients.`, tone: 'watch' })
+      }
+      if (revenueGrowthPct !== null && revenueGrowthPct >= 10) {
+        suggestions.push({ icon: '🎉', text: `Revenue is up ${revenueGrowthPct}% over last month. Nice work.`, tone: 'good' })
+      } else if (revenueGrowthPct !== null && revenueGrowthPct <= -10) {
+        suggestions.push({ icon: '📉', text: `Revenue is down ${Math.abs(revenueGrowthPct)}% from last month.`, tone: 'watch' })
+      }
+      if (avgDaysBetween) {
+        suggestions.push({ icon: '🔁', text: `Your clients return about every ${avgDaysBetween} days on average.`, tone: 'info' })
+      }
 
-      setReportData({ monthlyRevenue, topServices, newVsReturning: { new: newClients, returning: returningClients }, avgRevenuePerAppt, totalRevenue, totalAppointments, noShowRate: 0, reviewsGenerated: 0 })
+      setData({
+        revenueThisMonth, revenueLastMonth, revenueGrowthPct,
+        apptsThisMonth, apptsLastMonth,
+        repeatRate, repeatRateLastMonth,
+        monthlyRevenue, topService, busiestDay, avgDaysBetween, overdueCount,
+        suggestions,
+      })
       setLoading(false)
     }
-    loadReports()
-  }, [canAccessReports])
+    load()
+  }, [canAccess])
 
-  const maxRevenue = reportData ? Math.max(...reportData.monthlyRevenue.map(m => m.revenue), 1) : 1
+  const maxRevenue = data ? Math.max(...data.monthlyRevenue.map(m => m.revenue), 1) : 1
 
-  const BlurredContent = () => (
+  // trend conclusion sentence for the revenue chart
+  const revenueTrendLine = (() => {
+    if (!data) return ''
+    if (data.revenueGrowthPct === null) return 'Building your first month of history.'
+    if (data.revenueGrowthPct > 0) return `Up ${data.revenueGrowthPct}% from last month — trending in the right direction.`
+    if (data.revenueGrowthPct < 0) return `Down ${Math.abs(data.revenueGrowthPct)}% from last month.`
+    return 'Holding steady with last month.'
+  })()
+
+  const GrowthPill = ({ pct }: { pct: number | null }) => {
+    if (pct === null) return <span style={{ fontSize: '12px', color: '#9CA3AF' }}>New</span>
+    const up = pct >= 0
+    return (
+      <span style={{
+        display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '50px',
+        fontSize: '12px', fontWeight: 700,
+        background: up ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#FEE2E2',
+        color: up ? '#1A5C36' : '#DC2626',
+      }}>
+        {up ? '▲' : '▼'} {Math.abs(pct)}%
+      </span>
+    )
+  }
+
+  const Locked = () => (
     <div className="relative">
       <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginBottom: '24px' }}>
-          {[['Total Revenue', '$2,840'], ['Appointments', '38'], ['Avg per Appt', '$74']].map(([label, val]) => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '12px', marginBottom: '16px' }}>
+          {[['Revenue This Month', '$2,840'], ['Repeat Customers', '64%'], ['Appointments', '38'], ['Overdue Clients', '12']].map(([label, val]) => (
             <div key={label} className="dash-card rounded-2xl p-5">
               <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>{label}</div>
               <div className="playfair" style={{ fontSize: '32px', fontWeight: 700, color: '#1A3329' }}>{val}</div>
@@ -1341,10 +1566,10 @@ function ReportsPage({ profile, supabase, router }: {
         </div>
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl" style={{ background: 'rgba(245,242,235,0.8)', backdropFilter: 'blur(2px)' }}>
-        <div style={{ fontSize: '36px', marginBottom: '16px' }}>📊</div>
-        <div className="playfair" style={{ fontSize: '20px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textAlign: 'center' }}>Advanced Analytics</div>
-        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px', textAlign: 'center', maxWidth: '280px' }}>
-          Revenue trends, no-show rates, top services &amp; client retention — available on Essential and Professional plans.
+        <div style={{ fontSize: '36px', marginBottom: '16px' }}>💡</div>
+        <div className="playfair" style={{ fontSize: '20px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textAlign: 'center' }}>Insights</div>
+        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px', textAlign: 'center', maxWidth: '300px' }}>
+          See how your business is growing, who&apos;s overdue, and what to focus on — available on Essential and Professional plans.
         </div>
         <button onClick={() => router.push('/pricing')} style={{ padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', boxShadow: '0 4px 15px rgba(26,51,41,0.25)' }}>
           Upgrade to Essential — $44/mo →
@@ -1353,45 +1578,116 @@ function ReportsPage({ profile, supabase, router }: {
     </div>
   )
 
+  const statCard = (label: string, value: string, pill?: React.ReactNode, dark?: boolean) => (
+    <div className="dash-card rounded-2xl" style={dark
+      ? { padding: '20px', background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25)' }
+      : { padding: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: dark ? 'rgba(216,243,220,0.5)' : '#9CA3AF' }}>{label}</div>
+        {pill}
+      </div>
+      <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: dark ? 'white' : '#1A3329', letterSpacing: '-0.02em' }}>{value}</div>
+    </div>
+  )
+
   return (
     <>
       <header className="page-header">
-        <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Reports</h1>
-        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Your business performance at a glance</p>
+        <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Insights</h1>
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>What&apos;s working, what to watch, and where you&apos;re growing</p>
       </header>
-      <div className="page-content">
-        {!canAccessReports ? <BlurredContent /> : loading ? (
+      <div className="page-content" style={{ maxWidth: '900px' }}>
+        {!canAccess ? <Locked /> : loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
             <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#2D6A4F', borderTopColor: 'transparent' }} />
           </div>
-        ) : reportData ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-              <div className="dash-card rounded-2xl" style={{ padding: '20px', background: 'linear-gradient(145deg, #1A3329, #0f2218)', boxShadow: '0 8px 24px rgba(15,34,24,0.25)' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(216,243,220,0.5)', marginBottom: '8px' }}>Total Revenue</div>
-                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: 'white', letterSpacing: '-0.02em' }}>${reportData.totalRevenue}</div>
+        ) : data ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* ── SMART SUGGESTIONS (the second brain) ── */}
+            {data.suggestions.length > 0 && (
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '10px' }}>What to know today</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {data.suggestions.map((s, i) => (
+                    <div key={i} className="dash-card rounded-2xl" style={{
+                      padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px',
+                      borderLeft: `3px solid ${s.tone === 'good' ? '#2D6A4F' : s.tone === 'watch' ? '#F59E0B' : '#D1C9B8'}`,
+                    }}>
+                      <span style={{ fontSize: '18px', flexShrink: 0 }}>{s.icon}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 500, color: '#1A3329', lineHeight: 1.5 }}>{s.text}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Appointments</div>
-                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>{reportData.totalAppointments}</div>
-              </div>
-              <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Avg per Appt</div>
-                <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>${reportData.avgRevenuePerAppt}</div>
+            )}
+
+            {/* ── BUSINESS HEALTH ── */}
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '10px' }}>Business health</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {statCard('Revenue This Month', `$${data.revenueThisMonth}`, <GrowthPill pct={data.revenueGrowthPct} />, true)}
+                {statCard('Appointments', String(data.apptsThisMonth),
+                  data.apptsLastMonth > 0
+                    ? <GrowthPill pct={Math.round(((data.apptsThisMonth - data.apptsLastMonth) / data.apptsLastMonth) * 100)} />
+                    : undefined)}
+                {statCard('Repeat Customer Rate', `${data.repeatRate}%`,
+                  data.repeatRateLastMonth > 0
+                    ? <GrowthPill pct={data.repeatRate - data.repeatRateLastMonth} />
+                    : undefined)}
+                <div className="dash-card rounded-2xl" style={{ padding: '20px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Overdue Clients</div>
+                  <div className="playfair" style={{ fontSize: '32px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>{data.overdueCount}</div>
+                  {data.overdueCount > 0 && (
+                    <button onClick={onViewOverdue}
+                      style={{ marginTop: '8px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#2D6A4F' }}>
+                      View clients →
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="dash-card rounded-2xl p-5">
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '20px' }}>Monthly Revenue — Last 6 Months</div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '140px' }}>
-                {reportData.monthlyRevenue.map((m, i) => (
-                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#2D6A4F' }}>{m.revenue > 0 ? `$${m.revenue}` : ''}</div>
-                    <div style={{ width: '100%', borderRadius: '4px 4px 0 0', height: `${Math.max((m.revenue / maxRevenue) * 110, m.revenue > 0 ? 8 : 2)}px`, background: i === reportData.monthlyRevenue.length - 1 ? 'linear-gradient(180deg, #2D6A4F, #1A3329)' : 'linear-gradient(180deg, #D8F3DC, #c8eacd)' }} />
-                    <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{m.month}</div>
-                  </div>
-                ))}
+
+            {/* ── REVENUE TREND ── */}
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '10px' }}>Revenue trend</div>
+              <div className="dash-card rounded-2xl p-5">
+                <div style={{ fontSize: '15px', fontWeight: 600, color: '#1A3329', marginBottom: '2px' }}>{revenueTrendLine}</div>
+                <div style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '20px' }}>Last 6 months</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '140px' }}>
+                  {data.monthlyRevenue.map((m, i) => (
+                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 600, color: '#2D6A4F' }}>{m.revenue > 0 ? `$${m.revenue}` : ''}</div>
+                      <div style={{ width: '100%', borderRadius: '4px 4px 0 0', height: `${Math.max((m.revenue / maxRevenue) * 110, m.revenue > 0 ? 8 : 2)}px`, background: i === data.monthlyRevenue.length - 1 ? 'linear-gradient(180deg, #2D6A4F, #1A3329)' : 'linear-gradient(180deg, #D8F3DC, #c8eacd)' }} />
+                      <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{m.month}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+
+            {/* ── BUSINESS INTELLIGENCE ── */}
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '10px' }}>Know your business</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                <div className="dash-card rounded-2xl" style={{ padding: '18px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Top Service</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1A3329' }}>{data.topService?.name || '—'}</div>
+                  {data.topService && <div style={{ fontSize: '12px', color: '#2D6A4F', marginTop: '2px' }}>{data.topService.sharePct}% of revenue</div>}
+                </div>
+                <div className="dash-card rounded-2xl" style={{ padding: '18px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Busiest Day</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1A3329' }}>{data.busiestDay?.day || '—'}</div>
+                  {data.busiestDay && <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{data.busiestDay.count} appointments</div>}
+                </div>
+                <div className="dash-card rounded-2xl" style={{ padding: '18px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Return Rhythm</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1A3329' }}>{data.avgDaysBetween ? `~${data.avgDaysBetween} days` : '—'}</div>
+                  {data.avgDaysBetween && <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>between visits</div>}
+                </div>
+              </div>
+            </div>
+
           </div>
         ) : null}
       </div>
@@ -1541,6 +1837,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming'>('today')
   const [activePage, setActivePage] = useState<ActivePage>('dashboard')
+  const [customerFilter, setCustomerFilter] = useState<'all' | 'upcoming' | 'overdue'>('all')
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
   const [completingAppt, setCompletingAppt] = useState<string | null>(null)
   const router = useRouter()
@@ -1561,6 +1858,11 @@ export default function DashboardPage() {
     }
     load()
   }, [])
+
+  function goToCustomers(filter: 'all' | 'upcoming' | 'overdue') {
+    setCustomerFilter(filter)
+    setActivePage('customers')
+  }
 
   async function handleSignOut() { await supabase.auth.signOut(); router.push('/login') }
   async function handleDelete(id: string) {
@@ -1603,7 +1905,7 @@ export default function DashboardPage() {
     { label: 'Dog Profile', emoji: '🐾', page: 'dogs' },
     { label: 'Services', emoji: '✂️', page: 'services' },
     { label: 'Calendar', emoji: '📆', page: 'calendar' },
-    { label: 'Reports', emoji: '📊', page: 'reports' },
+    { label: 'Insights', emoji: '💡', page: 'reports' },
     { label: 'Settings', emoji: '⚙', page: 'settings' },
   ]
 
@@ -1765,11 +2067,11 @@ export default function DashboardPage() {
 
           {activePage === 'dogs' && <DogProfilePage supabase={supabase} />}
 
-          {activePage === 'customers' && <CustomerProfilePage supabase={supabase} />}
+          {activePage === 'customers' && <CustomerProfilePage supabase={supabase} initialFilter={customerFilter} onFilterConsumed={() => setCustomerFilter('all')} />}
 
           {activePage === 'calendar' && <CalendarPage profile={profile} supabase={supabase} />}
           {activePage === 'services' && <ServicesPage supabase={supabase} />}
-          {activePage === 'reports' && <ReportsPage profile={profile} supabase={supabase} router={router} />}
+          {activePage === 'reports' && <InsightsPage profile={profile} supabase={supabase} router={router} onViewOverdue={() => goToCustomers('overdue')} />}
           {activePage === 'settings' && (
             <SettingsPage
               profile={profile}
