@@ -39,6 +39,7 @@ interface Profile {
   google_review_link: string
   slug: string
   availability: { days: Record<string, boolean>; startTime: string; endTime: string }
+  automation?: { grooming_weeks: number; review_hours: number }
 }
 
 interface Service {
@@ -1696,10 +1697,11 @@ function InsightsPage({ profile, supabase, router, onViewOverdue }: {
 }
 
 // ─── SETTINGS PAGE ────────────────────────────────────────────────────────────
-function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supabase }: {
+function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, onAutomationUpdate, supabase }: {
   profile: Profile | null
   onBusinessNameUpdate: (name: string) => void
   onReviewLinkUpdate: (link: string) => void
+  onAutomationUpdate: (automation: { grooming_weeks: number; review_hours: number }) => void
   supabase: ReturnType<typeof createClient>
 }) {
   const [editingName, setEditingName] = useState(false)
@@ -1711,6 +1713,8 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
   const [newReviewLink, setNewReviewLink] = useState(profile?.google_review_link || '')
   const [savingReviewLink, setSavingReviewLink] = useState(false)
   const [reviewLinkError, setReviewLinkError] = useState('')
+
+  const automation = profile?.automation || { grooming_weeks: 6, review_hours: 1 }
 
   async function handleSaveName() {
     if (!newName.trim()) { setNameError('Business name is required'); return }
@@ -1731,6 +1735,14 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
     onReviewLinkUpdate(newReviewLink.trim()); setEditingReviewLink(false); setSavingReviewLink(false)
   }
 
+  async function updateAutomation(patch: Partial<{ grooming_weeks: number; review_hours: number }>) {
+    const next = { ...automation, ...patch }
+    onAutomationUpdate(next) // optimistic
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('profiles').update({ automation: next }).eq('id', user.id)
+  }
+
   async function handleManagePlan() {
     setPortalLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
@@ -1742,86 +1754,194 @@ function SettingsPage({ profile, onBusinessNameUpdate, onReviewLinkUpdate, supab
 
   const isEssential = profile?.plan === 'essential'
   const isProfessional = profile?.plan === 'professional'
+  const canAutomate = isEssential || isProfessional
+
+  // ── shared building blocks ──
+  const sectionLabel = (text: string) => (
+    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', margin: '0 4px 10px' }}>{text}</div>
+  )
+
+  // A calm segmented control for automation choices
+  const Segmented = ({ value, options, onChange }: { value: number; options: { v: number; label: string }[]; onChange: (v: number) => void }) => (
+    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      {options.map(o => {
+        const active = value === o.v
+        return (
+          <button key={o.v} onClick={() => onChange(o.v)}
+            style={{
+              padding: '9px 18px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+              border: active ? '2px solid #1A3329' : '1px solid #EDE9DF',
+              background: active ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : '#F5F2EB',
+              color: active ? '#1A3329' : '#9CA3AF',
+            }}>
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+
+  // second retention nudge lands 2 weeks after the first
+  const overdueWeeks = automation.grooming_weeks
+  const secondWeeks = automation.grooming_weeks + 2
 
   return (
     <>
       <header className="page-header">
         <h1 className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>Settings</h1>
-        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Manage your account and preferences</p>
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Make PawBooking work the way your salon does</p>
       </header>
-      <div className="page-content">
-        <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Business Name</div>
-            {!editingName && (
-              <button onClick={() => { setEditingName(true); setNewName(profile?.business_name || '') }} style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>✏️</button>
-            )}
-          </div>
-          {editingName ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <input type="text" value={newName} onChange={e => setNewName(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} onKeyDown={e => e.key === 'Enter' && handleSaveName()} />
-              {nameError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{nameError}</p>}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleSaveName} disabled={savingName} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingName ? 0.5 : 1 }}>
-                  {savingName ? 'Saving...' : 'Save'}
-                </button>
-                <button onClick={() => { setEditingName(false); setNameError('') }} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
-              </div>
-            </div>
-          ) : (
-            <div style={{ fontSize: '14px', color: '#6B7280' }}>{profile?.business_name}</div>
-          )}
-        </div>
 
-        {(isEssential || isProfessional) && (
-          <div className="dash-card rounded-2xl p-5" style={{ marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Google Review Link</div>
-                <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>Sent to clients after every completed appointment</div>
+      <div className="page-content" style={{ maxWidth: '720px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+          {/* ── BUSINESS ── */}
+          <div>
+            {sectionLabel('Business')}
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editingName ? '12px' : '4px' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Business Name</div>
+                  <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>Shown on your booking page, emails, and texts</div>
+                </div>
+                {!editingName && (
+                  <button onClick={() => { setEditingName(true); setNewName(profile?.business_name || '') }} style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer', flexShrink: 0 }}>✏️</button>
+                )}
               </div>
-              {!editingReviewLink && (
-                <button onClick={() => { setEditingReviewLink(true); setNewReviewLink(profile?.google_review_link || '') }} style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer', flexShrink: 0, marginLeft: '12px' }}>✏️</button>
+              {editingName ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <input type="text" value={newName} onChange={e => setNewName(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} onKeyDown={e => e.key === 'Enter' && handleSaveName()} />
+                  {nameError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{nameError}</p>}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={handleSaveName} disabled={savingName} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingName ? 0.5 : 1 }}>
+                      {savingName ? 'Saving...' : 'Save'}
+                    </button>
+                    <button onClick={() => { setEditingName(false); setNameError('') }} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ fontSize: '15px', fontWeight: 500, color: '#1A3329', marginTop: '8px' }}>{profile?.business_name}</div>
               )}
             </div>
-            {editingReviewLink ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
-                <input type="url" value={newReviewLink} onChange={e => setNewReviewLink(e.target.value)} placeholder="https://g.page/r/your-review-link" style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} onKeyDown={e => e.key === 'Enter' && handleSaveReviewLink()} />
-                <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Google Maps → your business → Share → Copy link</p>
-                {reviewLinkError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{reviewLinkError}</p>}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={handleSaveReviewLink} disabled={savingReviewLink} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingReviewLink ? 0.5 : 1 }}>
-                    {savingReviewLink ? 'Saving...' : 'Save'}
-                  </button>
-                  <button onClick={() => { setEditingReviewLink(false); setReviewLinkError('') }} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
+          </div>
+
+          {/* ── REVIEWS ── */}
+          <div>
+            {sectionLabel('Reviews')}
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Google Review Link</div>
+                  <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>How you collect more 5-star reviews, automatically</div>
+                </div>
+                {!editingReviewLink && (
+                  <button onClick={() => { setEditingReviewLink(true); setNewReviewLink(profile?.google_review_link || '') }} style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer', flexShrink: 0, marginLeft: '12px' }}>✏️</button>
+                )}
+              </div>
+
+              {editingReviewLink ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px' }}>
+                  <input type="url" value={newReviewLink} onChange={e => setNewReviewLink(e.target.value)} placeholder="https://g.page/r/your-review-link" style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', background: '#F5F2EB', border: '1px solid #EDE9DF', color: '#1A3329' }} onKeyDown={e => e.key === 'Enter' && handleSaveReviewLink()} />
+                  <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Google Maps → your business → Share → Copy link</p>
+                  {reviewLinkError && <p style={{ fontSize: '12px', color: '#DC2626' }}>{reviewLinkError}</p>}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={handleSaveReviewLink} disabled={savingReviewLink} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1A3329, #2D6A4F)', opacity: savingReviewLink ? 0.5 : 1 }}>
+                      {savingReviewLink ? 'Saving...' : 'Save'}
+                    </button>
+                    <button onClick={() => { setEditingReviewLink(false); setReviewLinkError('') }} style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#6B7280', border: 'none', cursor: 'pointer', background: '#F5F2EB' }}>Cancel</button>
+                  </div>
+                </div>
+              ) : profile?.google_review_link ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                  <span>⭐</span>
+                  <a href={profile.google_review_link} target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: '#2D6A4F', wordBreak: 'break-all' }}>{profile.google_review_link}</a>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '14px', padding: '14px 16px', borderRadius: '12px', background: 'linear-gradient(135deg, #D8F3DC, #c8eacd)', border: '1px solid rgba(45,106,79,0.12)' }}>
+                  <span style={{ fontSize: '18px', flexShrink: 0 }}>⭐</span>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#1A5C36', marginBottom: '2px' }}>Turn happy clients into 5-star reviews</div>
+                    <div style={{ fontSize: '13px', color: '#1A5C36', lineHeight: 1.5, opacity: 0.85 }}>
+                      Add your link and PawBooking will automatically ask customers for a Google review after every completed appointment.
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── AUTOMATION ── */}
+          <div>
+            {sectionLabel('Automation')}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+              {/* Appointment reminder — fixed 24h for now */}
+              <div className="dash-card rounded-2xl p-5">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Appointment Reminders</div>
+                    <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>Clients get a text so they don&apos;t forget</div>
+                  </div>
+                  <span style={{ padding: '6px 14px', borderRadius: '50px', fontSize: '13px', fontWeight: 600, background: '#F5F2EB', color: '#6B7280', border: '1px solid #EDE9DF', whiteSpace: 'nowrap' }}>
+                    24 hours before
+                  </span>
                 </div>
               </div>
-            ) : (
-              <div style={{ marginTop: '8px' }}>
-                {profile?.google_review_link ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>⭐</span>
-                    <a href={profile.google_review_link} target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: '#2D6A4F', wordBreak: 'break-all' }}>{profile.google_review_link}</a>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px', background: '#FEF3C7', border: '1px solid #FDE68A' }}>
-                    <span>⚠️</span>
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: '#92400E' }}>Add your Google review link to enable auto review requests</span>
+
+              {/* Grooming schedule — the one retention decision */}
+              <div className="dash-card rounded-2xl p-5">
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Typical Grooming Schedule</div>
+                <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px', marginBottom: '14px' }}>How often your clients usually come in</div>
+                <Segmented
+                  value={automation.grooming_weeks}
+                  options={[{ v: 4, label: 'Every 4 weeks' }, { v: 6, label: 'Every 6 weeks' }, { v: 8, label: 'Every 8 weeks' }]}
+                  onChange={v => updateAutomation({ grooming_weeks: v })}
+                />
+                <div style={{ marginTop: '14px', padding: '12px 14px', borderRadius: '10px', background: '#F5F2EB', border: '1px solid #EDE9DF', fontSize: '12px', color: '#6B7280', lineHeight: 1.6 }}>
+                  💡 PawBooking will remind overdue clients to rebook at <strong style={{ color: '#1A3329' }}>{overdueWeeks} weeks</strong>, follow up again at <strong style={{ color: '#1A3329' }}>{secondWeeks} weeks</strong>, and send a final nudge at <strong style={{ color: '#1A3329' }}>12 weeks</strong>.
+                </div>
+              </div>
+
+              {/* Review request timing */}
+              <div className="dash-card rounded-2xl p-5">
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329' }}>Review Request Timing</div>
+                <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px', marginBottom: '14px' }}>When to ask for a review after a groom</div>
+                <Segmented
+                  value={automation.review_hours}
+                  options={[{ v: 1, label: '1 hour after' }, { v: 4, label: '4 hours after' }, { v: 24, label: 'Next day' }]}
+                  onChange={v => updateAutomation({ review_hours: v })}
+                />
+                {!profile?.google_review_link && (
+                  <div style={{ marginTop: '12px', fontSize: '12px', color: '#9CA3AF' }}>
+                    Add a Google review link above to start sending these.
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        )}
 
-        <div className="dash-card rounded-2xl p-5">
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '24px' }}>Your Plan</div>
-          <div style={{ textAlign: 'center', padding: '24px' }}>
-            <div className="playfair" style={{ fontSize: '24px', fontWeight: 700, color: '#1A3329', marginBottom: '8px', textTransform: 'capitalize' }}>{profile?.plan || 'Starter'} Plan</div>
-            <button onClick={handleManagePlan} disabled={portalLoading} style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#6B7280', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB', opacity: portalLoading ? 0.5 : 1 }}>
-              {portalLoading ? 'Opening...' : 'Manage Plan'}
-            </button>
+              {!canAutomate && (
+                <div style={{ fontSize: '12px', color: '#9CA3AF', padding: '0 4px' }}>
+                  Automated reminders are part of the Essential and Professional plans.
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* ── BILLING ── */}
+          <div>
+            {sectionLabel('Billing')}
+            <div className="dash-card rounded-2xl p-5">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '2px' }}>Current plan</div>
+                  <div className="playfair" style={{ fontSize: '22px', fontWeight: 600, color: '#1A3329', textTransform: 'capitalize', letterSpacing: '-0.01em' }}>{profile?.plan || 'Starter'}</div>
+                </div>
+                <button onClick={handleManagePlan} disabled={portalLoading} style={{ padding: '11px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#1A3329', border: '1px solid #EDE9DF', cursor: 'pointer', background: '#F5F2EB', opacity: portalLoading ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  {portalLoading ? 'Opening...' : 'Manage Subscription'}
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </>
@@ -2077,6 +2197,7 @@ export default function DashboardPage() {
               profile={profile}
               onBusinessNameUpdate={(name) => setProfile(prev => prev ? { ...prev, business_name: name } : prev)}
               onReviewLinkUpdate={(link) => setProfile(prev => prev ? { ...prev, google_review_link: link } : prev)}
+              onAutomationUpdate={(automation) => setProfile(prev => prev ? { ...prev, automation } : prev)}
               supabase={supabase}
             />
           )}
