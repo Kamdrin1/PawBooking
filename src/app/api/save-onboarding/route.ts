@@ -14,37 +14,55 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
 
-    // Update profile
-    await supabase.from('profiles').update({
+    // Update profile — check for failure
+    const { error: profileError } = await supabase.from('profiles').update({
       phone,
       service_area: serviceArea,
       availability: JSON.stringify(availability),
       payment_methods: paymentMethods,
     }).eq('id', userId)
 
+    if (profileError) {
+      console.error('Profile save failed:', profileError.message)
+      return NextResponse.json({ error: 'Could not save your business details. Please try again.' }, { status: 500 })
+    }
+
     // Get existing services
-    const { data: existingServices } = await supabase
+    const { data: existingServices, error: fetchError } = await supabase
       .from('services')
       .select('id, name')
       .eq('profile_id', userId)
 
-    // Save services
+    if (fetchError) {
+      console.error('Service fetch failed:', fetchError.message)
+      return NextResponse.json({ error: 'Could not save your services. Please try again.' }, { status: 500 })
+    }
+
+    // Save services — stop and report if any one fails
     for (const s of services) {
       const match = (existingServices || []).find(
         e => e.name.toLowerCase().trim() === s.name.toLowerCase().trim()
       )
       if (match) {
-        await supabase.from('services').update({
+        const { error: updateError } = await supabase.from('services').update({
           price: parseFloat(s.price),
           duration_minutes: parseInt(s.duration),
         }).eq('id', match.id)
+        if (updateError) {
+          console.error('Service update failed:', updateError.message)
+          return NextResponse.json({ error: `Could not save the "${s.name}" service. Please try again.` }, { status: 500 })
+        }
       } else {
-        await supabase.from('services').insert({
+        const { error: insertError } = await supabase.from('services').insert({
           profile_id: userId,
           name: s.name.trim(),
           price: parseFloat(s.price),
           duration_minutes: parseInt(s.duration),
         })
+        if (insertError) {
+          console.error('Service insert failed:', insertError.message)
+          return NextResponse.json({ error: `Could not save the "${s.name}" service. Please try again.` }, { status: 500 })
+        }
       }
     }
 

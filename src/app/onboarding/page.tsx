@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [endTime, setEndTime] = useState('17:00')
   const [paymentMethods, setPaymentMethods] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
@@ -67,6 +68,7 @@ export default function OnboardingPage() {
 
   async function handleFinish() {
     setLoading(true)
+    setSaveError('')
     let userId: string | null = null
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
@@ -88,13 +90,25 @@ export default function OnboardingPage() {
       .filter(s => s.name.trim() && s.price)
       .map(s => ({ name: s.name.trim(), price: s.price, duration: s.duration }))
 
-    const res = await fetch('/api/save-onboarding', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, phone: toE164(phone), serviceArea, availability: { days: availability, startTime, endTime }, paymentMethods, services: validServices }),
-    })
-    if (!res.ok) console.error('Failed to save onboarding data')
-    router.push('/dashboard')
+    try {
+      const res = await fetch('/api/save-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, phone: toE164(phone), serviceArea, availability: { days: availability, startTime, endTime }, paymentMethods, services: validServices }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setSaveError(data.error || 'Something went wrong saving your setup. Please try again.')
+        setLoading(false)
+        return
+      }
+
+      router.push('/dashboard')
+    } catch {
+      setSaveError('Couldn\'t reach the server. Check your connection and try again.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -410,6 +424,9 @@ export default function OnboardingPage() {
               </div>
               {paymentMethods.length === 0 && (
                 <p style={{ fontSize: '12px', color: '#EF4444', marginBottom: '12px' }}>Please select at least one payment method.</p>
+              )}
+              {saveError && (
+                <p style={{ fontSize: '13px', color: '#EF4444', marginBottom: '12px', textAlign: 'center' }}>{saveError}</p>
               )}
               <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                 <button onClick={() => setStep(3)} className="btn-back">← Back</button>
