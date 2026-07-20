@@ -275,11 +275,11 @@ export default function Home() {
           <section className="hero-pad" style={{ textAlign: 'center', maxWidth: '860px', margin: '0 auto', padding: '96px 24px 80px', position: 'relative' }}>
             <div className="hero-glow" />
             <h1 className="playfair" style={{ fontSize: 'clamp(40px, 8vw, 88px)', fontWeight: 800, color: '#1A3329', lineHeight: 1.05, marginBottom: '28px', letterSpacing: '-0.02em' }}>
-              Stop losing <span style={{ color: '#2D6A4F', background: 'linear-gradient(135deg, #2D6A4F, #45a070)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>$85</span> every<br />
-              time a client <span style={{ color: '#E8704A', fontStyle: 'italic' }}>forgets.</span>
+              Stop texting clients back<br />
+              all day. Let them <span style={{ color: '#E8704A', fontStyle: 'italic' }}>book themselves.</span>
             </h1>
             <p className="hero-subtext" style={{ fontSize: '19px', color: '#5A6672', maxWidth: '540px', margin: '0 auto 40px', lineHeight: 1.75, fontWeight: 400 }}>
-              PawBooking handles your bookings, sends automatic SMS reminders before every appointment, and requests Google reviews after every job — completely on autopilot.
+              Your clients book themselves online. Reminders and review requests go out on their own. You just show up and groom.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
               <Link href="/signup" className="btn-primary cta-btn-full" style={{ fontSize: '15px', padding: '16px 36px' }}>
@@ -287,7 +287,7 @@ export default function Home() {
               </Link>
             </div>
             <p style={{ fontSize: '13px', color: '#9CA3AF', fontWeight: 500 }}>
-              30 days free · No charged today · Cancel anytime
+              30 days free · Nothing charged today · Cancel anytime
             </p>
           </section>
 
@@ -296,10 +296,10 @@ export default function Home() {
             <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '600px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(216,243,220,0.3), transparent)' }} />
             <div className="stats-grid" style={{ maxWidth: '800px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center' }}>
               {[
-                { stat: '−34%', label: 'Fewer no-shows' },
-                { stat: '$85+', label: 'Saved per no-show' },
-                { stat: '4.9★', label: 'Avg Google rating' },
-                { stat: '5min', label: 'To get set up' },
+                { stat: 'Solo', label: 'Built for solo groomers' },
+                { stat: 'No app', label: 'Nothing for clients to download' },
+                { stat: 'Auto', label: 'Reminders & reviews on autopilot' },
+                { stat: '1 day', label: 'Set up in an afternoon' },
               ].map((s, i) => (
                 <div key={i} className="stat-item">
                   <div className="playfair stat-stat" style={{ fontSize: '32px', fontWeight: 700, color: 'white', marginBottom: '6px', letterSpacing: '-0.02em' }}>{s.stat}</div>
@@ -313,19 +313,19 @@ export default function Home() {
           <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                <div className="section-label" style={{ marginBottom: '16px' }}>The Real Cost</div>
+                <div className="section-label" style={{ marginBottom: '16px' }}>Sound Familiar?</div>
                 <h2 className="playfair problem-h2" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '18px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-                  You're running a grooming business solo.<br />Admin shouldn't eat your day.
+                  You're running the whole thing solo.<br />The admin shouldn't run you.
                 </h2>
                 <p style={{ color: '#6B7280', maxWidth: '500px', margin: '0 auto', fontSize: '16px', lineHeight: 1.75 }}>
-                  Every no-show, every forgotten review request, every booking taken over text — it adds up to real money and real hours out of your week.
+                  The texts that never stop. The no-shows. The reviews you meant to ask for. It piles up into hours you don't have.
                 </p>
               </div>
               <div className="cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                 {[
-                  { icon: '📵', title: 'No-shows kill your day', desc: "You drove there. You set up. They forgot. That's 2 hours and a full appointment slot gone.", cost: '↑ $85–$150 lost per no-show' },
-                  { icon: '⭐', title: "Reviews don't ask themselves", desc: 'Happy clients mean to leave a review. They never do. Meanwhile your competitor has 200 more than you.', cost: '↓ Losing clients to groomers with more reviews' },
-                  { icon: '📱', title: 'Booking over text is chaos', desc: "Back-and-forth messages, double bookings, missed requests. There's a better way.", cost: '↑ Hours of admin every single week' },
+                  { icon: '📱', title: 'The texting never stops', desc: "\"Any openings Saturday?\" — again. You're mid-groom, hands full, and the phone won't quit. Every booking is a conversation you have to have.", cost: 'Hours of back-and-forth every week' },
+                  { icon: '📵', title: 'No-shows wreck your day', desc: "You set aside the time. They forgot. That's a slot you could've filled and can't get back.", cost: 'A full slot, gone' },
+                  { icon: '⭐', title: "Reviews don't ask themselves", desc: 'Happy clients mean to leave a review. They never do — and the groomer down the road keeps pulling ahead.', cost: 'Clients pick whoever has more reviews' },
                 ].map((p, i) => (
                   <div key={i} className="glow-card" style={{ padding: '28px' }}>
                     <div className="problem-icon">{p.icon}</div>
@@ -344,19 +344,19 @@ export default function Home() {
           <section id="features" className="section-pad" style={{ background: '#FDFBF7', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: '940px', margin: '0 auto' }}>
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                <div className="section-label" style={{ marginBottom: '16px' }}>What You Get</div>
+                <div className="section-label" style={{ marginBottom: '16px' }}>What Changes</div>
                 <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '18px', letterSpacing: '-0.02em' }}>
                   Everything you need. Nothing you don't.
                 </h2>
                 <p style={{ color: '#6B7280', maxWidth: '480px', margin: '0 auto', fontSize: '16px', lineHeight: 1.75 }}>
-                  Three tools that work together to save you time, cut no-shows, and grow your reputation — automatically.
+                  Three things working quietly in the background so your day gets simpler, not busier.
                 </p>
               </div>
               <div className="cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                 {[
-                  { icon: '📅', tag: 'All Plans', tagClass: 'pill-basic', title: 'Smart Online Booking', desc: 'Your own booking page clients can use 24/7. They pick a service, pick a time, and confirm — without texting you.', bullets: ['Custom booking link you share anywhere', 'You set your hours & services', 'Instant SMS when someone books', 'Works on mobile & desktop'] },
-                  { icon: '💬', tag: 'All Plans', tagClass: 'pill-basic', title: 'Automatic SMS Reminders', desc: 'PawBooking texts your clients automatically 24 hours before their appointment. Proven to reduce no-shows by 34%.', bullets: ['24hr reminder by default', 'Clients can confirm or cancel by reply', 'Catches cancellations early', 'Smart rebooking reminders on Essential+'] },
-                  { icon: '⭐', tag: 'Essential + Pro', tagClass: 'pill-pro', title: 'Auto Review Requests', desc: 'After every completed appointment, PawBooking sends a friendly text asking for a Google review. Most groomers see 5–15 new reviews per month.', bullets: ['Sent automatically after each job', 'Direct link to your Google review page', 'Smart personalized messages', 'More reviews = more phone calls'] },
+                  { icon: '📅', tag: 'All Plans', tagClass: 'pill-basic', title: 'Clients book themselves', desc: 'Your own booking page, open 24/7. They pick a service and a time and confirm — no texting you, no waiting on a reply.', bullets: ['A booking link you share anywhere', 'You set your hours & services', 'A text lands the second someone books', 'Works on any phone or computer'] },
+                  { icon: '💬', tag: 'All Plans', tagClass: 'pill-basic', title: 'Reminders send themselves', desc: 'PawBooking texts every client the day before, so far fewer people simply forget — and you never make an awkward follow-up call.', bullets: ['24-hour reminder, automatically', 'Clients reply to confirm or cancel', 'You hear about cancellations early', 'Win-back nudges on Essential+'] },
+                  { icon: '⭐', tag: 'Essential + Professional', tagClass: 'pill-pro', title: 'More reviews, without asking', desc: 'After every finished groom, PawBooking texts a friendly review request for you — so happy clients actually leave the review they meant to.', bullets: ['Sent automatically after each job', 'Direct link to your Google page', 'No awkward in-person asking', 'More reviews means more new calls'] },
                 ].map((f, i) => (
                   <div key={i} className="glow-card" style={{ padding: '28px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -387,13 +387,13 @@ export default function Home() {
             <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
               <div className="section-label" style={{ marginBottom: '16px', color: 'rgba(216,243,220,0.7)' }}>Simple Setup</div>
               <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: 'white', marginBottom: '48px', letterSpacing: '-0.02em' }}>
-                Up and running in 5 minutes.
+                You could set this up today.
               </h2>
               <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '40px', textAlign: 'left' }}>
                 {[
-                  { step: '1', title: 'Set up your profile', desc: 'Add your services, prices, and availability. We walk you through every step — takes about 5 minutes.' },
-                  { step: '2', title: 'Share your booking link', desc: "Put it in your Instagram bio, Facebook page, and anywhere clients look for you. That's your whole marketing setup." },
-                  { step: '3', title: 'PawBooking handles the rest', desc: 'Reminders go out automatically. Reviews get requested automatically. You just show up and groom.' },
+                  { step: '1', title: 'Add your services', desc: 'Your services, your prices, your hours. We walk you through it — takes about an afternoon.' },
+                  { step: '2', title: 'Share your link', desc: "Drop it in your Instagram bio and Facebook page. That's your whole booking setup, done." },
+                  { step: '3', title: 'Let it run', desc: 'Reminders and review requests go out on their own. You just show up and groom.' },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="step-circle" style={{ marginBottom: '20px' }}>{s.step}</div>
@@ -411,10 +411,10 @@ export default function Home() {
               <div style={{ textAlign: 'center', marginBottom: '56px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>The Experience</div>
                 <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em', marginBottom: '16px' }}>
-                  Your clients get a beautiful booking experience.
+                  Booking with you feels effortless.
                 </h2>
                 <p style={{ color: '#6B7280', maxWidth: '520px', margin: '0 auto', fontSize: '15px', lineHeight: 1.75 }}>
-                  They don't see "PawBooking." They see your grooming service, your prices, your availability—ready to book 24/7.
+                  Clients don't see "PawBooking." They see your grooming service, your prices, your open times — ready whenever they are.
                 </p>
               </div>
 
@@ -459,38 +459,8 @@ export default function Home() {
                 </div>
 
                 <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginTop: '32px', position: 'relative', zIndex: 1 }}>
-                  Clean, fast, zero friction. Your clients book in 30 seconds.
+                  A few taps and they're booked — no calls, no waiting on you.
                 </p>
-              </div>
-            </div>
-          </section>
-
-          <div className="divider" />
-
-          {/* TESTIMONIALS */}
-          <section className="section-pad" style={{ background: '#F5F2EB', padding: '96px 24px', position: 'relative', zIndex: 1 }}>
-            <div style={{ maxWidth: '940px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                <div className="section-label" style={{ marginBottom: '16px' }}>Early Feedback</div>
-                <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>
-                  Groomers love it.
-                </h2>
-              </div>
-              <div className="cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                {[
-                  { name: 'Sarah M.', role: 'Mobile Dog Groomer · Portland, OR', quote: "I was losing two or three appointments a week to no-shows. Since using PawBooking I've had maybe two in two months. The math is insane." },
-                  { name: 'Jamie R.', role: 'Solo Groomer · Austin, TX', quote: 'The review thing is genius. I gained 26 Google reviews in my first month. My phone is ringing from people who found me because of my rating.' },
-                  { name: 'Maria T.', role: 'Mobile Groomer · Denver, CO', quote: 'I used to take bookings over text like an animal. Now clients book themselves and I wake up to a full schedule. Worth every penny.' },
-                ].map((t, i) => (
-                  <div key={i} className="testimonial-card" style={{ padding: '28px' }}>
-                    <div className="star" style={{ fontSize: '14px', marginBottom: '16px', letterSpacing: '2px' }}>★★★★★</div>
-                    <p className="testimonial-quote" style={{ marginBottom: '20px', fontSize: '15px' }}>"{t.quote}"</p>
-                    <div style={{ borderTop: '1px solid rgba(237,233,223,0.8)', paddingTop: '16px' }}>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#1A3329' }}>{t.name}</div>
-                      <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '3px' }}>{t.role}</div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </section>
@@ -503,20 +473,21 @@ export default function Home() {
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>Questions?</div>
                 <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', letterSpacing: '-0.02em' }}>
-                  Common questions answered.
+                  The stuff groomers actually ask.
                 </h2>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
                 {[
-                  { q: 'How do my clients actually book?', a: 'You get a custom booking link (like pawbooking.net/book/sarah). Share it on Instagram, Facebook, your website, or text it directly. Clients click, pick a service and time, and confirm instantly with their phone number. You get an SMS notification immediately.' },
-                  { q: 'What if a client texts me instead of booking online?', a: 'You can still accept text bookings manually—PawBooking doesn\'t force everyone to book online. But you\'ll be amazed how many prefer the self-service option.' },
-                  { q: 'Can I customize the reminder message?', a: 'Yes. On Essential and Professional plans, you can customize the 24-hour reminder text and the auto-review request message.' },
-                  { q: 'Do you integrate with Instagram, Google, or Facebook?', a: 'Your booking link works everywhere. We\'re building direct Instagram & Google integration in Q2 2026.' },
-                  { q: 'What payment methods do clients use?', a: 'Clients book free through your link. They pay you at the appointment (cash, Venmo, card—however you normally accept payment).' },
-                  { q: 'How long does setup actually take?', a: 'Genuinely 5 minutes. Add your name, services, prices, and availability. We give you a booking link. Share it. Done.' },
-                  { q: 'Can I pause reminders for a week or special occasion?', a: 'Yes. You can block off dates in your availability calendar. Any bookings during blocked time are prevented.' },
-                  { q: 'What if I have multiple assistants?', a: 'Right now, PawBooking is built for solo groomers. Multi-user team management is coming in Q3 2026.' },
+                  { q: 'How do my clients actually book?', a: 'You get your own booking link (like pawbooking.net/book/sarah). Share it on Instagram, Facebook, or text it to a client. They tap it, pick a service and time, and confirm with their phone number. You get a text the moment they book.' },
+                  { q: 'What if someone texts me instead of booking online?', a: 'No problem — you can still take that booking however you normally would. PawBooking never locks you out of your own clients. Most people, though, are happy to just book themselves once they have the link.' },
+                  { q: 'Can clients book at night or on weekends?', a: 'Yes. Your booking page is open 24/7. Clients can book at midnight if they want — you wake up to a full schedule instead of a pile of texts.' },
+                  { q: 'Will the reminders really send on their own?', a: 'Yes. Once you set your grooming schedule and timing in Settings, the 24-hour reminders and review requests go out automatically. You don\'t press a button.' },
+                  { q: 'Can I block off vacation or a day off?', a: 'Yes. Mark any dates as unavailable in your calendar and clients simply can\'t book them. Take the week off without worrying about a surprise appointment.' },
+                  { q: 'Do you connect with Instagram, Google, or Facebook?', a: 'Your booking link works everywhere you already post. Deeper Instagram and Google connections are on our roadmap.' },
+                  { q: 'How do clients pay?', a: 'Booking is free for them. They pay you at the appointment — cash, card, Venmo, however you already take payment.' },
+                  { q: 'How long does setup really take?', a: 'About an afternoon. Add your services, prices, and hours, grab your booking link, and share it. That\'s the whole thing.' },
+                  { q: 'What if I have assistants or a small team?', a: 'Right now PawBooking is built for solo groomers. Multi-person team support is on our roadmap.' },
                 ].map((item, i) => (
                   <details key={i} style={{ background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', border: '1px solid rgba(237,233,223,0.8)', borderRadius: '16px', padding: '20px 24px', cursor: 'pointer', transition: 'all 0.2s' }}>
                     <summary style={{ fontWeight: 600, color: '#1A3329', fontSize: '15px', outline: 'none', userSelect: 'none', cursor: 'pointer' }}>
@@ -530,7 +501,7 @@ export default function Home() {
               </div>
 
               <div style={{ background: 'linear-gradient(135deg, rgba(232,112,74,0.05), rgba(232,112,74,0.02))', border: '1px solid rgba(232,112,74,0.1)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
-                <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>Don't see your question?</p>
+                <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>Still wondering about something?</p>
                 <a href="mailto:team@pawbooking.net" style={{ color: '#E8704A', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
                   Get in touch →
                 </a>
@@ -546,16 +517,16 @@ export default function Home() {
               <div style={{ textAlign: 'center', marginBottom: '48px' }}>
                 <div className="section-label" style={{ marginBottom: '16px' }}>Simple Pricing</div>
                 <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: 700, color: '#1A3329', marginBottom: '14px', letterSpacing: '-0.02em' }}>
-                  One app. Three plans. Pick what fits.
+                  Pick the plan that fits your week.
                 </h2>
-                <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. All plans include 30-day free trial.</p>
+                <p style={{ color: '#6B7280', fontSize: '15px' }}>Cancel anytime. No contracts. Every plan starts with a 30-day free trial.</p>
               </div>
 
               <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'stretch' }}>
                 {/* Starter */}
                 <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)' }}>
                   <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px' }}>Starter</h3>
-                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For solo groomers just starting</p>
+                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For groomers just getting off the texts</p>
                   <div style={{ marginBottom: '24px' }}>
                     <span className="playfair price-large">$24</span>
                     <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
@@ -578,7 +549,7 @@ export default function Home() {
                     ⭐ Most Popular
                   </div>
                   <h3 style={{ fontWeight: 700, color: 'white', fontSize: '22px', marginBottom: '4px' }}>Essential</h3>
-                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '24px' }}>The sweet spot for growing groomers</p>
+                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', marginBottom: '24px' }}>For the busy solo groomer</p>
                   <div style={{ marginBottom: '24px' }}>
                     <span className="playfair" style={{ fontSize: '56px', fontWeight: 700, color: 'white' }}>$44</span>
                     <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '14px' }}>/mo</span>
@@ -596,13 +567,13 @@ export default function Home() {
                 {/* Pro */}
                 <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #FDFBF7, #F8F5EF)', borderRadius: '24px', border: '1px solid rgba(237,233,223,0.8)' }}>
                   <h3 style={{ fontWeight: 700, color: '#1A3329', fontSize: '22px', marginBottom: '4px' }}>Professional</h3>
-                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For high-volume groomers</p>
+                  <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '24px' }}>For a growing grooming business</p>
                   <div style={{ marginBottom: '24px' }}>
                     <span className="playfair price-large">$79</span>
                     <span style={{ color: '#9CA3AF', fontSize: '14px' }}>/mo</span>
                   </div>
                   <div style={{ flex: 1, marginBottom: '28px' }}>
-                    {['Everything in Essential', 'Priority phone support', 'Custom branding', 'Advanced analytics', 'Team support Q3 2026'].map((f, i) => (
+                    {['Everything in Essential', 'Priority phone support', 'Custom branding', 'Advanced analytics', 'Team support on our roadmap'].map((f, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '13px', color: '#1A3329', marginBottom: '10px' }}>
                         <span style={{ marginRight: '8px', color: '#E8704A', fontWeight: 700 }}>✓</span> {f}
                       </div>
@@ -621,10 +592,10 @@ export default function Home() {
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(45,106,79,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: '540px', margin: '0 auto', position: 'relative' }}>
               <h2 className="playfair" style={{ fontSize: 'clamp(26px, 5vw, 46px)', fontWeight: 700, color: 'white', marginBottom: '18px' }}>
-                Your first month is free. See the impact yourself.
+                Less admin. More grooming.
               </h2>
               <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '36px', fontSize: '16px' }}>
-                Join PawBooking today. 30 days free, cancel anytime.
+                Your first month is on us. Set up this afternoon, cancel anytime.
               </p>
               <Link href="/signup" className="btn-cta cta-btn-full">Start Your Free Trial →</Link>
             </div>
