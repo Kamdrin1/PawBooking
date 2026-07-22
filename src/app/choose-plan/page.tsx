@@ -45,7 +45,7 @@ const professionalFeatures = [
   'Everything in Essential',
   'Priority phone support',
   'Custom booking page branding',
-  'Team member support (Q3 2026)',
+  'Team member support (on our roadmap)',
   'Advanced analytics & insights',
   'Custom integrations',
 ]
@@ -280,30 +280,27 @@ function ChoosePlanContent() {
               </div>
             </button>
 
-            <button onClick={() => setSelectedPlan('professional')}
-              className={`plan-card ${selectedPlan === 'professional' ? 'plan-card-selected' : 'plan-card-unselected'}`}>
-              {selectedPlan === 'professional' && (
-                <div style={{ position: 'absolute', top: '14px', right: '14px', width: '24px', height: '24px', borderRadius: '50%', background: '#1A3329', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 10l5 5 7-7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              )}
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', color: selectedPlan === 'professional' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>Professional</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
-                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: selectedPlan === 'professional' ? '#1A3329' : 'white' }}>$79</span>
-                <span style={{ fontSize: '13px', color: selectedPlan === 'professional' ? '#9CA3AF' : 'rgba(255,255,255,0.5)' }}>/mo</span>
+            <div
+              className="plan-card plan-card-unselected"
+              style={{ cursor: 'default', opacity: 0.7 }}>
+              <div style={{ position: 'absolute', top: '14px', right: '14px', padding: '4px 12px', borderRadius: '50px', fontSize: '11px', fontWeight: 700, background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap' }}>
+                On the way
               </div>
-              <p style={{ fontSize: '12px', marginBottom: '16px', color: selectedPlan === 'professional' ? '#6B7280' : 'rgba(255,255,255,0.45)' }}>Maximum growth & support</p>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px', color: 'rgba(255,255,255,0.5)' }}>Professional</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '4px' }}>
+                <span className="playfair" style={{ fontSize: '36px', fontWeight: 700, color: 'white' }}>$79</span>
+                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>/mo</span>
+              </div>
+              <p style={{ fontSize: '12px', marginBottom: '16px', color: 'rgba(255,255,255,0.45)' }}>Maximum growth & support</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {professionalFeatures.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    <CheckIcon light={selectedPlan !== 'professional'} />
-                    <span style={{ fontSize: '13px', color: selectedPlan === 'professional' ? '#374151' : 'rgba(255,255,255,0.75)' }}>{f}</span>
+                    <CheckIcon light={true} />
+                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)' }}>{f}</span>
                   </div>
                 ))}
               </div>
-            </button>
+            </div>
 
           </div>
 
@@ -324,7 +321,7 @@ function ChoosePlanContent() {
               🔒 No charge today. Your 30-day free trial starts now.
             </p>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }}>
-              After 30 days you'll be billed {planPrices[selectedPlan]}/mo. Cancel anytime before then and you pay absolutely nothing.
+              After 30 days you&apos;ll be billed {planPrices[selectedPlan]}/mo. Cancel anytime before then and you pay absolutely nothing.
             </p>
           </div>
 
