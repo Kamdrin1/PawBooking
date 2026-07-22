@@ -699,7 +699,7 @@ function CustomerProfilePage({ supabase, initialFilter, onFilterConsumed }: {
         />
 
         {/* FILTER */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
           {([
             { id: 'all', label: 'All' },
             { id: 'upcoming', label: 'Upcoming' },
@@ -1043,23 +1043,23 @@ function CalendarPage({ profile, supabase }: {
         <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>Mark dates when you&apos;re unavailable</p>
       </header>
       <div className="page-content" style={{ maxWidth: '1400px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '24px' }}>
-          <div className="dash-card rounded-2xl" style={{ padding: '32px', marginBottom: '16px' }}>
+        <div className="cal-grid" style={{ gap: 'clamp(16px, 3vw, 24px)' }}>
+          <div className="dash-card rounded-2xl" style={{ padding: 'clamp(16px, 4vw, 32px)', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
               <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))} style={{ width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>‹</button>
-              <h2 className="playfair" style={{ fontSize: '28px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>
+              <h2 className="playfair" style={{ fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em' }}>
                 {new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </h2>
               <button onClick={() => setCurrentMonth(new Date(year, month + 1, 1))} style={{ width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', background: '#F5F2EB', border: '1px solid #EDE9DF', cursor: 'pointer' }}>›</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 'clamp(6px, 1.5vw, 12px)', marginBottom: '16px' }}>
               {daysOfWeek.map(day => (
                 <div key={day} style={{ textAlign: 'center', fontSize: '14px', fontWeight: 700, color: '#9CA3AF', paddingBottom: '8px' }}>{day}</div>
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 'clamp(6px, 1.5vw, 12px)' }}>
               {calendarDays.map((day, i) => {
                 if (day === null) return <div key={`empty-${i}`} />
                 const dateStr = getDateString(day)
@@ -1078,9 +1078,9 @@ function CalendarPage({ profile, supabase }: {
                     title={dayAppts.length > 0 ? `${dayAppts.length} booking${dayAppts.length === 1 ? '' : 's'}` : 'Click to select, Ctrl+Click to multi-select'}
                     style={{
                       position: 'relative',
-                      padding: '16px 8px',
+                      padding: 'clamp(10px, 2.5vw, 16px) 4px',
                       borderRadius: '12px',
-                      fontSize: '18px',
+                      fontSize: 'clamp(15px, 4vw, 18px)',
                       fontWeight: 700,
                       border: isSelected ? '3px solid #1A3329' : isMarkedUnavailable ? '2px solid #DC2626' : isToday ? '2px solid #2D6A4F' : '1px solid #EDE9DF',
                       background: isMarkedUnavailable ? '#DC2626' : isPast ? '#EDE9DF' : isToday ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : isSelected ? 'linear-gradient(135deg, #D8F3DC, #c8eacd)' : !isAvailable ? '#F5F2EB' : '#FDFBF7',
@@ -1109,7 +1109,7 @@ function CalendarPage({ profile, supabase }: {
             </div>
           </div>
 
-          <div className="dash-card rounded-2xl" style={{ padding: '20px', height: 'fit-content', position: 'sticky', top: '100px' }}>
+          <div className="dash-card rounded-2xl cal-notes" style={{ padding: '20px', height: 'fit-content', position: 'sticky', top: '100px' }}>
             <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1A3329', marginBottom: '16px' }}>Notes</h3>
 
             {selectedDates.length > 0 ? (
@@ -1670,7 +1670,7 @@ function InsightsPage({ profile, supabase, router, onViewOverdue }: {
             {/* ── BUSINESS INTELLIGENCE ── */}
             <div>
               <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '10px' }}>Know your business</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
                 <div className="dash-card rounded-2xl" style={{ padding: '18px' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', marginBottom: '8px' }}>Top Service</div>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: '#1A3329' }}>{data.topService?.name || '—'}</div>
@@ -1960,6 +1960,7 @@ export default function DashboardPage() {
   const [customerFilter, setCustomerFilter] = useState<'all' | 'upcoming' | 'overdue'>('all')
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null)
   const [completingAppt, setCompletingAppt] = useState<string | null>(null)
+  const [moreOpen, setMoreOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -2029,6 +2030,15 @@ export default function DashboardPage() {
     { label: 'Settings', emoji: '⚙', page: 'settings' },
   ]
 
+  const mobileNavItems: { label: string; icon: string; page: ActivePage }[] = [
+    { label: 'Home', icon: '🏠', page: 'dashboard' },
+    { label: 'Calendar', icon: '📆', page: 'calendar' },
+    { label: 'Customers', icon: '👥', page: 'customers' },
+    { label: 'Dogs', icon: '🐾', page: 'dogs' },
+    { label: 'Insights', icon: '💡', page: 'reports' },
+  ]
+  const moreActive = moreOpen || activePage === 'services' || activePage === 'settings'
+
   return (
     <>
       <style>{`
@@ -2059,11 +2069,55 @@ export default function DashboardPage() {
         .page-content { padding: 24px 32px; }
         .p-5 { padding: 20px; }
         .rounded-2xl { border-radius: 16px; }
+        .dash-stats-grid { grid-template-columns: repeat(3, 1fr); }
+        .cal-grid { display: grid; grid-template-columns: 1fr 300px; }
+
+        /* mobile bottom nav — hidden on desktop */
+        .mobile-nav, .mobile-more-sheet, .mobile-more-backdrop { display: none; }
+
         @media (max-width: 768px) {
           .sidebar { display: none !important; }
           .page-header { padding: 16px 16px; }
-          .page-content { padding: 16px 16px; }
+          .page-content { padding: 16px 16px calc(88px + env(safe-area-inset-bottom)); }
+          .dash-stats-grid { grid-template-columns: repeat(2, 1fr); }
+          .dash-stats-grid .revenue-card { grid-column: 1 / -1; }
+          .cal-grid { grid-template-columns: 1fr; }
+          .cal-notes { position: static !important; top: auto !important; }
+
+          .mobile-nav {
+            display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+            background: rgba(253,251,247,0.92); backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(237,233,223,0.9);
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+          }
+          .mobile-nav-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 3px; padding: 6px 2px; border: none; background: none; cursor: pointer;
+            color: #9CA3AF; font-size: 10px; font-weight: 600; transition: color 0.15s ease;
+          }
+          .mobile-nav-item .mn-icon { font-size: 19px; line-height: 1; }
+          .mobile-nav-item.active { color: #1A3329; }
+
+          .mobile-more-backdrop {
+            display: block; position: fixed; inset: 0; z-index: 44;
+            background: rgba(15,34,24,0.35); animation: fadeIn 0.15s ease;
+          }
+          .mobile-more-sheet {
+            display: flex; flex-direction: column; position: fixed; bottom: 0; left: 0; right: 0; z-index: 45;
+            background: linear-gradient(180deg, #FDFBF7, #FAF7F2);
+            border-radius: 20px 20px 0 0; border-top: 1px solid rgba(237,233,223,0.9);
+            box-shadow: 0 -12px 40px rgba(15,34,24,0.18);
+            padding: 8px 12px calc(16px + env(safe-area-inset-bottom));
+            animation: sheetUp 0.22s ease;
+          }
+          .mobile-more-item {
+            display: flex; align-items: center; gap: 12px; padding: 14px 12px;
+            border: none; background: none; cursor: pointer; text-align: left;
+            font-size: 15px; font-weight: 500; color: #1A3329; border-radius: 12px;
+          }
+          .mobile-more-item:active { background: rgba(45,106,79,0.08); }
         }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       `}</style>
 
       <div className="dash-layout">
@@ -2111,7 +2165,7 @@ export default function DashboardPage() {
                 <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '2px' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
               </header>
               <div className="page-content">
-                <div className="dash-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                <div className="dash-stats-grid" style={{ display: 'grid', gap: '12px', marginBottom: '16px' }}>
                   <div className="stat-card dash-card rounded-2xl" style={{ padding: '20px' }}>
                     <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF', marginBottom: '8px' }}>Today</div>
                     <div className="playfair" style={{ fontSize: '40px', fontWeight: 600, color: '#1A3329', letterSpacing: '-0.02em', lineHeight: 1 }}>{todayAppts.length}</div>
@@ -2203,6 +2257,43 @@ export default function DashboardPage() {
           )}
         </main>
       </div>
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <nav className="mobile-nav">
+        {mobileNavItems.map(item => (
+          <button
+            key={item.page}
+            onClick={() => { setActivePage(item.page); setMoreOpen(false) }}
+            className={`mobile-nav-item ${activePage === item.page && !moreOpen ? 'active' : ''}`}
+          >
+            <span className="mn-icon">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+        <button onClick={() => setMoreOpen(true)} className={`mobile-nav-item ${moreActive ? 'active' : ''}`}>
+          <span className="mn-icon">⋯</span>
+          <span>More</span>
+        </button>
+      </nav>
+
+      {/* ── MOBILE "MORE" SHEET ── */}
+      {moreOpen && (
+        <>
+          <div className="mobile-more-backdrop" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-more-sheet">
+            <div style={{ width: '36px', height: '4px', borderRadius: '2px', background: '#E0DACE', margin: '4px auto 10px' }} />
+            <button className="mobile-more-item" onClick={() => { setActivePage('services'); setMoreOpen(false) }}>
+              <span style={{ fontSize: '18px' }}>✂️</span> Services
+            </button>
+            <button className="mobile-more-item" onClick={() => { setActivePage('settings'); setMoreOpen(false) }}>
+              <span style={{ fontSize: '18px' }}>⚙️</span> Settings
+            </button>
+            <button className="mobile-more-item" onClick={() => { setMoreOpen(false); handleSignOut() }} style={{ color: '#9CA3AF' }}>
+              <span style={{ fontSize: '18px' }}>↪</span> Sign out
+            </button>
+          </div>
+        </>
+      )}
 
       {selectedAppt && (
         <div className="modal-bg" style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', background: 'rgba(15,34,24,0.5)', backdropFilter: 'blur(6px)' }}
