@@ -228,17 +228,10 @@ export default function SignupPage() {
             </button>
           </form>
 
-          {/* Social proof */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
-            <div style={{ display: 'flex' }}>
-              {['#52B788', '#E76F51', '#2D6A4F', '#F4A261'].map((c, i) => (
-                <div key={i} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: 'white', background: c, marginLeft: i > 0 ? '-6px' : 0 }}>
-                  {['S', 'M', 'J', 'R'][i]}
-                </div>
-              ))}
-            </div>
-            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Trusted by <span style={{ color: '#2D6A4F', fontWeight: 600 }}>37+ dog groomers</span></p>
-          </div>
+          {/* Reassurance */}
+          <p style={{ textAlign: 'center', fontSize: '13px', color: '#2D6A4F', fontWeight: 600, marginTop: '16px' }}>
+            Five minutes now. Hours saved every week.
+          </p>
 
           <div style={{ borderTop: '1px solid #F3F4F6', marginTop: '20px', paddingTop: '16px' }}>
             <p style={{ textAlign: 'center', fontSize: '12px', color: '#9CA3AF', marginBottom: '8px' }}>30 days free · Cancel anytime</p>
