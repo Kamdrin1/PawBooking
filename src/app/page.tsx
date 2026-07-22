@@ -579,9 +579,9 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <Link href="/signup?plan=pro" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #1A3329', color: '#1A3329', textDecoration: 'none', background: 'transparent' }}>
-                    Start Free Trial
-                  </Link>
+                  <span style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid #D1CFC7', color: '#9CA3AF', background: 'transparent', cursor: 'not-allowed', userSelect: 'none' }}>
+                    On the way
+                  </span>
                 </div>
               </div>
             </div>
